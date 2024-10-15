@@ -1,0 +1,10 @@
+{
+  "projects": {
+    "firebase deploy --only firestore:indexes": "vigilerp",
+    "vigilerp": "vigilerp",
+    "vigil": "vigilerp"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

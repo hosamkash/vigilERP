@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "897138972448",
+    "project_id": "vigilerp",
+    "storage_bucket": "vigilerp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:897138972448:android:826651682b39f593046945",
+        "android_client_info": {
+          "package_name": "com.vigil.vigil_erp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjuSoCErZyIhhyMlwGOdH9uZO-nR8Jbb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:897138972448:android:1fa56852d2d99acc046945",
+        "android_client_info": {
+          "package_name": "vigil.erp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjuSoCErZyIhhyMlwGOdH9uZO-nR8Jbb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

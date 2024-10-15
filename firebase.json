@@ -1,0 +1,29 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "vigilerp",
+          "appId": "1:897138972448:android:826651682b39f593046945",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "vigilerp",
+          "configurations": {
+            "android": "1:897138972448:android:826651682b39f593046945",
+            "ios": "1:897138972448:ios:0698fe51cb046837046945",
+            "macos": "1:897138972448:ios:0698fe51cb046837046945",
+            "web": "1:897138972448:web:4f28a3957a72968f046945",
+            "windows": "1:897138972448:web:c6b6ee3464f41565046945"
+          }
+        }
+      }
+    }
+  },
+
+  "firestore": {
+    "indexes": "firestore.indexes.json"
+  }
+}

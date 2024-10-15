@@ -1,0 +1,58 @@
+{
+  "indexes": [
+
+
+    {
+      "collectionGroup": "Fix_Address_City",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "IDGovernment", "order": "ASCENDING" },
+        { "fieldPath": "ID", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Def_ProductStructure",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "IDCategory", "order": "ASCENDING" },
+        { "fieldPath": "BarCode", "order": "ASCENDING" }
+      ]
+    },
+
+    {
+      "collectionGroup": "Inv_PermissionAdd",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "IDBranch", "order": "ASCENDING" },
+        { "fieldPath": "Date", "order": "ASCENDING" }
+
+      ]
+    },
+
+    {
+      "collectionGroup": "Inv_PermissionDiscount",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "IDBranch", "order": "ASCENDING" },
+        { "fieldPath": "Date", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Inv_Settlement",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "IDBranch", "order": "ASCENDING" },
+        { "fieldPath": "Date", "order": "ASCENDING" }
+      ]
+    }
+
+
+
+
+
+
+
+
+
+  ]
+}
