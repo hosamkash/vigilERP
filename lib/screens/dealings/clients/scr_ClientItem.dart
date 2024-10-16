@@ -455,8 +455,6 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
         ),
         ElevatedButton.icon(
           onPressed: () async {
-
-
             if (contLocationLatitude.text.isNotEmpty && contLocationLongitude.text.isNotEmpty) {
               sharedFunctions_Location.openGoogleMaps(double.parse(contLocationLatitude.text), double.parse(contLocationLongitude.text));
             }
@@ -601,8 +599,8 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
       widget.itemClients!.Mobile = contMobile.text;
       widget.itemClients!.Address = contAddress.text;
       widget.itemClients!.IDPriceType = priceTypeID;
-      widget.itemClients!.CreditLimit = double.parse(contCreditLimit.text);
-      widget.itemClients!.CurrentBalance = double.parse(contCurrentBalance.text);
+      widget.itemClients!.CreditLimit = contCreditLimit.text.isNotEmpty ? double.parse(contCreditLimit.text) : 0;
+      widget.itemClients!.CurrentBalance = contCurrentBalance.text.isNotEmpty ? double.parse(contCurrentBalance.text) : 0;
       widget.itemClients!.BalanceType = balanceTypeID;
       widget.itemClients!.Note = contNote.text;
       widget.itemClients!.LocationLatitude =

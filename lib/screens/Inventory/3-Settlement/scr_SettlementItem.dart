@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllDef_Stocks.dart';
 import 'package:vigil_erp/bll/classModel/Def_ProductStructure.dart';
 import 'package:vigil_erp/bll/classModel/Def_Units.dart';
 
@@ -63,9 +64,8 @@ final TextEditingController contQty = TextEditingController();
 final TextEditingController contPrice = TextEditingController();
 
 bool? isBigUnit;
-// List<DropDowenDataSource> lstStocksAsDataSource = [];
 List<Inv_ProductsQty> lstProductsQty = [];
-TextEditingController controllerfilter = TextEditingController();
+TextEditingController contFilter = TextEditingController();
 
 class _scr_SettlementItemState extends State<scr_SettlementItem> {
   @override
@@ -176,11 +176,9 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
 
           // reset Stock and populate with New branch
           stockID = null;
-          stock_bloc.instance.getLstStockAsDataSource(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]);
-
-          // stockID = stock_bloc.instance.LstStocksAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-          //     ? stock_bloc.instance.LstStocksAsDataSource.first.valueMember
-          //     : stockID;
+          stock_bloc.instance.add(getLstStocksAsDataSource_Event(
+              branchID: branchID, condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
+          stockID = stock_bloc.instance.LstStocksAsDataSource.length > 0 ? stock_bloc.instance.LstStocksAsDataSource.first.valueMember : stockID;
           return null;
         },
         OnValidate: (value) {
@@ -192,34 +190,38 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
       ),
       BlocBuilder<stock_bloc, definition_state>(
         builder: (context, state) {
-          if (state is stock_StateInitial || state is getLstStocksAsDataSource_State) {
-            return ctr_DropDowenList(hintLable: 'المخزن', padding: const EdgeInsets.only(top: 0, right: 5, bottom: 5, left: 0), showClearIcon: true);
-          } else if (state is getLstStocksAsDataSource_State) {
-            return ctr_DropDowenList(
-              hintLable: 'المخزن',
-              padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-              lstDataSource: state.LstStocksAsDataSource,
-              hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-              itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-              menuMaxHeightValue: 300,
-              showClearIcon: true,
-              selectedValue: stockID = state.LstStocksAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-                  ? state.LstStocksAsDataSource.first.valueMember
-                  : stockID,
-              OnChanged: (returnID) {
-                stockID = returnID;
-                return stockID;
-              },
-              OnValidate: (value) {
-                stockID = value;
-                if (value == null || stockID == null) {
-                  return 'لابد من إختيار قيمة';
-                }
-                return null;
-              },
-            );
-          } else
-            return SizedBox();
+          bool isStockState = state is getLstStocksAsDataSource_State;
+          List<DropDowenDataSource> lstStocks =
+              branchID != null && isStockState ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource : [];
+          // عند تغيير المخزن لابد من تغيير الكمية الدفترية
+          stockID = lstStocks.length > 0 ? lstStocks.first.valueMember : stockID;
+          settlement_bloc.instance.add(updateSettlementProductQtyByStock_Event(stockID: stockID));
+          // settlement_bloc.instance.updateSettlementProductQtyByStock(stockID);
+          // settlement_bloc.instance.add(refreshDetails_Event());
+
+          return ctr_DropDowenList(
+            hintLable: 'المخزن',
+            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+            lstDataSource: lstStocks,
+            hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+            itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+            menuMaxHeightValue: 300,
+            showClearIcon: true,
+            selectedValue: stockID = lstStocks.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocks.first.valueMember : stockID,
+            OnChanged: (returnID) {
+              stockID = returnID;
+              // عند تغيير المخزن لابد من تغيير الكمية الدفترية
+              settlement_bloc.instance.add(updateSettlementProductQtyByStock_Event(stockID: stockID));
+              return stockID;
+            },
+            OnValidate: (value) {
+              stockID = value;
+              if (value == null || stockID == null) {
+                return 'لابد من إختيار قيمة';
+              }
+              return null;
+            },
+          );
         },
       ),
       Row(
@@ -427,7 +429,7 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
                     children: [
                       Expanded(
                           child: ctr_TextFormField(
-                        Controller: controllerfilter,
+                        Controller: contFilter,
                         PrefixIcon: const Icon(Icons.search),
                         padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
                         OnChanged: (value) {
@@ -439,7 +441,7 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
                       )),
                       IconButton(
                         onPressed: () {
-                          controllerfilter.clear();
+                          contFilter.clear();
                           settlement_bloc.instance.add(resetFilterSettlementDetails_Event());
                         },
                         icon: const Icon(Icons.clear),
@@ -709,14 +711,10 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
   @override
   void initState() {
     super.initState();
-    // List<BLLCondions>? condions=[
-    //   BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true),
-    // ];
-
     product_bloc.instance.add(getListProduct_Event([BLLCondions(enTable_Def_ProductStructure.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     requestStatus_bloc.instance.getLst_requestStatusAsDataSource();
     priceType_bloc.instance.getLst_PriceTypeAsDataSource();
-    categories_bloc.instance.add(getListCategories_Event([BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
+    // categories_bloc.instance.add(getListCategories_Event([BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     categories_bloc.instance.getList_CategoryAsDataSource();
     unit_bloc.instance.add(getListUnit_Event([BLLCondions(enTable_Def_Units.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     clearCachedData();
@@ -849,6 +847,10 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
       },
     );
   }
+
+  // void updateProductsQtyBalance(int stockID) {
+  //     settlement_bloc.instance.add(updateSettlementProductQtyByStock_Event(stockID:stockID ));
+  // }
 
   void saveData() async {
     if (frmKey.currentState != null && frmKey.currentState!.validate()) {

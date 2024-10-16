@@ -218,7 +218,8 @@ class _ctr_SelectProductState extends State<ctr_SelectProduct> {
           children: [
             ctr_DropDowenList(
               hintLable: 'التصنيف',
-              padding: const EdgeInsets.only(top: 5, right: 5, bottom: 5, left: 0),
+              padding: const EdgeInsets.only(top: 5, right: 0, bottom: 5, left: 0),
+              height: 50,
               lstDataSource: categories_bloc.instance.LstCategoriesAsDataSource,
               hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
               itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -268,7 +269,7 @@ class _ctr_SelectProductState extends State<ctr_SelectProduct> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 0, right: 5, bottom: 20, left: 0),
+              padding: const EdgeInsets.only(top: 0, right: 5, bottom: 0, left: 0),
               child: ctr_TextFormField(
                 Controller: widget.filterController,
                 Lable: widget.labelText ?? 'البحث فى الأصناف',
@@ -295,7 +296,7 @@ class _ctr_SelectProductState extends State<ctr_SelectProduct> {
               ),
             ),
             SizedBox(
-              height: 520,
+              height: 500,
               child: buildListView(context),
             ),
           ],
@@ -306,7 +307,7 @@ class _ctr_SelectProductState extends State<ctr_SelectProduct> {
 
   Widget buildListView(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 0, right: 0, bottom: 70, left: 0),
+      padding: const EdgeInsets.only(top: 0, right: 0, bottom: 50, left: 0),
       child: ListView.separated(
         physics: const BouncingScrollPhysics(),
         // padding: const EdgeInsets.only(right: 2, left: 2),

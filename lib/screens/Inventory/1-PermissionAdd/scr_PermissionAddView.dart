@@ -355,7 +355,8 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
     super.initState();
 
     company_bloc.instance.add(getListCompany_Event([BLLCondions(enTable_Def_CompanyStructure.isActive.name, en_CondionsWhere.isEqualTo, true)]));
-    stock_bloc.instance.add(getLstStocksAsDataSource_Event());
+    // stock_bloc.instance.add(getLstStocksAsDataSource_Event());
+    stock_bloc.instance.getLstStockAsDataSource();
     employee_bloc.instance.add(getListEmployee_Event());
 
     loadDataFromDB();

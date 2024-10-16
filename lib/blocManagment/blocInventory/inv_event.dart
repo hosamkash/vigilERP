@@ -148,4 +148,9 @@ class deleteItemSettlementDetails_Event extends inv_event {
   deleteItemSettlementDetails_Event({ this.itemDetails});
 }
 class resetFilterSettlementDetails_Event extends inv_event {}
-
+class refreshDetails_Event extends inv_event {}
+class updateSettlementProductQtyByStock_Event extends inv_event {
+  final int? stockID;
+  final int? productID;
+  updateSettlementProductQtyByStock_Event({this.productID , this.stockID  });
+}

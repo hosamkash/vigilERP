@@ -123,11 +123,8 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
 
                 // reset Stock and populate with New branch
                 stockID = null;
-                stock_bloc.instance.add(getLstStocksAsDataSource_Event(branchID: branchID, condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
-
-                // stockID = stock_bloc.instance.LstStocksAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-                //     ? stock_bloc.instance.LstStocksAsDataSource.first.valueMember
-                //     : stockID;
+                stock_bloc.instance.add(
+                    getLstStocksAsDataSource_Event(branchID: branchID , condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
                 return null;
               },
               OnValidate: (value) {
@@ -181,34 +178,31 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
       BlocBuilder<stock_bloc, definition_state>(
         builder: (context, state) {
-          if (state is stock_StateInitial ) {
-            return ctr_DropDowenList(hintLable: 'المخزن', padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5), showClearIcon: true);
-          } else if (state is getLstStocksAsDataSource_State) {
-            return ctr_DropDowenList(
-              hintLable: 'المخزن',
-              padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-              lstDataSource: state.LstStocksAsDataSource,
-              hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-              itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-              menuMaxHeightValue: 300,
-              showClearIcon: true,
-              selectedValue: stockID = state.LstStocksAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-                  ? state.LstStocksAsDataSource.first.valueMember
-                  : stockID,
-              OnChanged: (returnID) {
-                stockID = returnID;
-                return stockID;
-              },
-              OnValidate: (value) {
-                stockID = value;
-                if (value == null || stockID == null) {
-                  return 'لابد من إختيار قيمة';
-                }
-                return null;
-              },
-            );
-          } else
-            return SizedBox();
+          bool isStockState = state is getLstStocksAsDataSource_State;
+          List<DropDowenDataSource> lstStocks =
+              branchID != null && isStockState ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource : [];
+
+          return ctr_DropDowenList(
+            hintLable: 'المخزن',
+            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+            lstDataSource: lstStocks,
+            hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+            itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+            menuMaxHeightValue: 300,
+            showClearIcon: true,
+            selectedValue: stockID = lstStocks.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocks.first.valueMember : stockID,
+            OnChanged: (returnID) {
+              stockID = returnID;
+              return stockID;
+            },
+            OnValidate: (value) {
+              stockID = value;
+              if (value == null || stockID == null) {
+                return 'لابد من إختيار قيمة';
+              }
+              return null;
+            },
+          );
         },
       ),
       Row(
@@ -250,7 +244,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
             ),
           ),
           Expanded(
-            child:  ctr_DropDowenList(
+            child: ctr_DropDowenList(
               hintLable: 'حالة الطلب',
               padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
               lstDataSource: requestStatus_bloc.instance.lstRequestStatusAsDataSource,
@@ -258,9 +252,10 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
               itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
               menuMaxHeightValue: 300,
               showClearIcon: true,
-              selectedValue: requestStatusID = requestStatus_bloc.instance.lstRequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-                  ? requestStatus_bloc.instance.lstRequestStatusAsDataSource.first.valueMember
-                  : requestStatusID,
+              selectedValue: requestStatusID =
+                  requestStatus_bloc.instance.lstRequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
+                      ? requestStatus_bloc.instance.lstRequestStatusAsDataSource.first.valueMember
+                      : requestStatusID,
               OnChanged: (returnID) {
                 requestStatusID = returnID;
                 return requestStatusID;
@@ -367,16 +362,16 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                   children: [
                     Expanded(
                         child: ctr_TextFormField(
-                          Controller: controllerfilter,
-                          PrefixIcon: const Icon(Icons.search),
-                          padding: const EdgeInsets.only(right: 5, left: 0 , top: 0 , bottom: 0),
-                          OnChanged: (value) {
-                            if (value != null) {
-                              permissionAdd_bloc.instance.add(filterAnyPermissionAddDetails_Event(filterData: value.trim()));
-                            }
-                            return null;
-                          },
-                        )),
+                      Controller: controllerfilter,
+                      PrefixIcon: const Icon(Icons.search),
+                      padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
+                      OnChanged: (value) {
+                        if (value != null) {
+                          permissionAdd_bloc.instance.add(filterAnyPermissionAddDetails_Event(filterData: value.trim()));
+                        }
+                        return null;
+                      },
+                    )),
                     IconButton(
                       onPressed: () {
                         controllerfilter.clear();
@@ -406,7 +401,6 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
               ),
 
               // Summary
-
             ],
           );
         } else {
@@ -595,11 +589,12 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     //   BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true),
     // ];
 
-    product_bloc.instance.add(getListProduct_Event([BLLCondions(enTable_Def_ProductStructure.IsActive.name, en_CondionsWhere.isEqualTo, true)] ));
+    product_bloc.instance.add(getListProduct_Event([BLLCondions(enTable_Def_ProductStructure.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     requestStatus_bloc.instance.getLst_requestStatusAsDataSource();
     priceType_bloc.instance.getLst_PriceTypeAsDataSource();
     categories_bloc.instance.add(getListCategories_Event([BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
-    categories_bloc.instance.getList_CategoryAsDataSource(condions: [BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]);
+    categories_bloc.instance
+        .getList_CategoryAsDataSource(condions: [BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]);
     unit_bloc.instance.add(getListUnit_Event([BLLCondions(enTable_Def_Units.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     clearCachedData();
 
@@ -676,10 +671,13 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
 
   void clearCachedData() {
     stockID = null;
-    contEmployee.selectEmployee = null;
+
     contEmployee.text = '';
     ctr_SelectEmployee.branchID = branchID = null;
+
+    contEmployee.selectEmployee = null;
     employee_bloc.instance.add(resetFilterEmployee_Event());
+
     lstDetailsDeleted.clear();
     lstProductsQty.clear();
     permissionAdd_bloc.instance.add(clearPermissionAddDetails_Event());

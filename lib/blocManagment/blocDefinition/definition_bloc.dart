@@ -298,7 +298,7 @@ class categories_bloc extends Bloc<definition_event, definition_state> {
   Future getList_CategoryAsDataSource({List<BLLCondions>? condions}) async {
     LstCategoriesAsDataSource.clear();
     if (bllDef_Categories.lstDef_Categories.length == 0) {
-      filterdLst_Category = await getList_Category(condions);
+      await getList_Category(condions);
     }
     for (var item in bllDef_Categories.lstDef_Categories) {
       LstCategoriesAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
@@ -612,8 +612,7 @@ class stock_bloc extends Bloc<definition_event, definition_state> {
       for (var item in bllDef_Stocks.lstDef_Stocks.where((elm) => elm.IDBranch == branchID).toList()) {
         LstStocksAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!, branchID: item.IDBranch));
       }
-    }
-    else {
+    } else {
       for (var item in bllDef_Stocks.lstDef_Stocks) {
         LstStocksAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!, branchID: item.IDBranch));
       }

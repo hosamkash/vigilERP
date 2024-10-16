@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllInv_PermissionAddDetails.dart';
 import '../../bll/bllFirebase/ManageBLL.dart';
 import '../../bll/bllFirebase/bllInv_PermissionAdd.dart';
 import '../../bll/bllFirebase/bllInv_PermissionDiscount.dart';
@@ -58,7 +59,7 @@ class productQty_bloc extends Bloc<inv_event, inv_state> {
         groupd[k] = k;
         orignalLst.add(item);
       } else {
-        Inv_ProductsQty xx = orignalLst.where((val) => val.IDProduct == item.IDProduct).first;
+        Inv_ProductsQty xx = orignalLst.where((val) => val.IDProduct == item.IDProduct && val.IDStock == item.IDStock).first;
         xx.Qty = xx.Qty! + (item.Qty ?? 0);
         xx.TotalQty = xx.Qty;
       }
@@ -161,7 +162,7 @@ class productQty_bloc extends Bloc<inv_event, inv_state> {
               double.parse(filterdLst_productQty.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2)),
         ));
       } else if (event is getListProductsQtyByCondions_Event) {
-        await getList_ProductsQty(conditions: event.condions,priceType: event.priceType,hideQtyZeroID: event.hideQtyZeroID);
+        await getList_ProductsQty(conditions: event.condions, priceType: event.priceType, hideQtyZeroID: event.hideQtyZeroID);
         emit(productQty_StateDataChanged(
           filterdLst_productQty: filterdLst_productQty,
           sumQty: filterdLst_productQty.fold(0, (previousValue, element) => previousValue! + element.Qty!),
@@ -179,6 +180,7 @@ class productQty_bloc extends Bloc<inv_event, inv_state> {
         await filterAny_productQty(filterData: event.filterData);
         emit(productQty_StateDataChanged(filterdLst_productQty: filterdLst_productQty));
       }
+
     });
   }
 }
@@ -248,7 +250,7 @@ class permissionAdd_bloc extends Bloc<inv_event, inv_state> {
     try {
       double price = addCustomProduct.isBigUnit! ? addCustomProduct.UnitBigPrice! : addCustomProduct.UnitSmllPrice!;
 
-      filterdLst_PermissionAddDetails.add(Inv_PermissionAddDetails(
+      Inv_PermissionAddDetails itemInsert = Inv_PermissionAddDetails(
           ID: filterdLst_PermissionAddDetails.length + 1,
           IDProduct: addCustomProduct.ID,
           Barcode: addCustomProduct.BarCode,
@@ -269,7 +271,11 @@ class permissionAdd_bloc extends Bloc<inv_event, inv_state> {
               : int.parse(addCustomProduct.controller!.text),
           TotalPrice: price * int.parse(addCustomProduct.controller!.text),
           PriceType: addCustomProduct.IDPriceType,
-          isBigUnit: addCustomProduct.isBigUnit));
+          isBigUnit: addCustomProduct.isBigUnit);
+
+      // filterdLst_PermissionAddDetails.add(itemInsert);
+      bllInv_PermissionAdd.lstInv_PermissionAddDetails.add(itemInsert);
+      await resetFilter_permissionAddDetails();
     } catch (error) {
       print(error.toString());
       throw error;
@@ -312,7 +318,8 @@ class permissionAdd_bloc extends Bloc<inv_event, inv_state> {
 
   filterAny_permissionAddDetails({String? filterData}) async {
     if (filterData == null || filterData.isEmpty) {
-      resetFilter_permissionAdd();
+      resetFilter_permissionAddDetails();
+      return;
     }
     filterdLst_PermissionAddDetails = await filterdLst_PermissionAddDetails.where((item) {
       String productName = product_bloc.instance.getNameByID(item.IDProduct);
@@ -322,9 +329,11 @@ class permissionAdd_bloc extends Bloc<inv_event, inv_state> {
     }).toList();
   }
 
-  resetFilter_permissionAddDetails() {
-    filterdLst_PermissionAddDetails.clear();
-    filterdLst_PermissionAddDetails = bllInv_PermissionAdd.lstInv_PermissionAddDetails;
+  resetFilter_permissionAddDetails() async {
+    // filterdLst_PermissionAddDetails.clear();
+    filterdLst_PermissionAddDetails = await bllInv_PermissionAdd.lstInv_PermissionAddDetails.where((item) {
+      return item != 0;
+    }).toList();
   }
 
   permissionAdd_bloc() : super(permissionAdd_StateInitial()) {
@@ -364,6 +373,7 @@ class permissionAdd_bloc extends Bloc<inv_event, inv_state> {
         emit(permissionAddDetails_StateDataChanged(filterdLst_PermissionAddDetails: filterdLst_PermissionAddDetails));
       } else if (event is clearPermissionAddDetails_Event) {
         filterdLst_PermissionAddDetails.clear();
+        bllInv_PermissionAdd.lstInv_PermissionAddDetails.clear();
         emit(clearPermissionAddDetails());
       } else if (event is filterAnyPermissionAddDetails_Event) {
         await filterAny_permissionAddDetails(filterData: event.filterData);
@@ -443,7 +453,7 @@ class permissionDiscount_bloc extends Bloc<inv_event, inv_state> {
     try {
       double price = addCustomProduct.isBigUnit! ? addCustomProduct.UnitBigPrice! : addCustomProduct.UnitSmllPrice!;
 
-      filterdLst_permissionDiscountDetails.add(Inv_PermissionDiscountDetails(
+      Inv_PermissionDiscountDetails itemInserted = Inv_PermissionDiscountDetails(
           ID: filterdLst_permissionDiscountDetails.length + 1,
           IDProduct: addCustomProduct.ID,
           Barcode: addCustomProduct.BarCode,
@@ -464,7 +474,11 @@ class permissionDiscount_bloc extends Bloc<inv_event, inv_state> {
               : int.parse(addCustomProduct.controller!.text),
           TotalPrice: price * int.parse(addCustomProduct.controller!.text),
           PriceType: addCustomProduct.IDPriceType,
-          isBigUnit: addCustomProduct.isBigUnit));
+          isBigUnit: addCustomProduct.isBigUnit);
+
+      // filterdLst_permissionDiscountDetails.add(itemInserted);
+      bllInv_PermissionDiscount.lstInv_PermissionDiscountDetails.add(itemInserted);
+      await resetFilter_permissionDiscountDetails();
     } catch (error) {
       print(error.toString());
       throw error;
@@ -508,6 +522,7 @@ class permissionDiscount_bloc extends Bloc<inv_event, inv_state> {
   filterAny_permissionDiscountDetails({String? filterData}) async {
     if (filterData == null || filterData.isEmpty) {
       resetFilter_permissionDiscountDetails();
+      return;
     }
     filterdLst_permissionDiscountDetails = await filterdLst_permissionDiscountDetails.where((item) {
       String productName = product_bloc.instance.getNameByID(item.IDProduct);
@@ -517,9 +532,10 @@ class permissionDiscount_bloc extends Bloc<inv_event, inv_state> {
     }).toList();
   }
 
-  resetFilter_permissionDiscountDetails() {
-    filterdLst_permissionDiscountDetails.clear();
-    filterdLst_permissionDiscountDetails = bllInv_PermissionDiscount.lstInv_PermissionDiscountDetails;
+  resetFilter_permissionDiscountDetails() async {
+    filterdLst_permissionDiscountDetails = await bllInv_PermissionDiscount.lstInv_PermissionDiscountDetails.where((item) {
+      return item != 0;
+    }).toList();
   }
 
   permissionDiscount_bloc() : super(permissionDiscount_StateInitial()) {
@@ -559,6 +575,7 @@ class permissionDiscount_bloc extends Bloc<inv_event, inv_state> {
         emit(permissionDiscountDetails_StateDataChanged(filterdLst_PermissionDiscountDetails: filterdLst_permissionDiscountDetails));
       } else if (event is clearPermissionDiscountDetails_Event) {
         filterdLst_permissionDiscountDetails.clear();
+        bllInv_PermissionDiscount.lstInv_PermissionDiscountDetails.clear();
         emit(clearPermissionDiscountDetails());
       } else if (event is filterAnyPermissionDiscountDetails_Event) {
         await filterAny_permissionDiscountDetails(filterData: event.filterData);
@@ -595,7 +612,7 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
   }
 
   resetFilter_Settlement() {
-    filterdLst_Settlement.clear();
+    // filterdLst_Settlement.clear();
     filterdLst_Settlement = bllInv_Settlement.lstInv_Settlement;
   }
 
@@ -642,7 +659,7 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
       int diffQty = int.parse(customProduct.controller!.text) < bookQty ? int.parse(customProduct.controller!.text) - bookQty : 0;
       int addQty = int.parse(customProduct.controller!.text) > bookQty ? int.parse(customProduct.controller!.text) - bookQty : 0;
 
-      filterdLst_SettlementDetails.add(Inv_SettlementDetails(
+      Inv_SettlementDetails inserDetails = Inv_SettlementDetails(
         ID: filterdLst_SettlementDetails.length + 1,
         IDProduct: customProduct.ID,
         Barcode: customProduct.BarCode,
@@ -659,7 +676,11 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
         DiffTotalPrice: double.parse((diffQty * price).toStringAsFixed(2)),
         AddQty: addQty,
         AddTotalPrice: double.parse((addQty * price).toStringAsFixed(2)),
-      ));
+      );
+
+      // filterdLst_SettlementDetails.add(inserDetails);
+      bllInv_Settlement.lstInv_SettlementDetails.add(inserDetails);
+      resetFilter_SettlementDetails();
     } catch (error) {
       print(error.toString());
       throw error;
@@ -689,7 +710,9 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
 
   Future deleteItemSettlementDetails(Inv_SettlementDetails itemDetails) async {
     try {
-      filterdLst_SettlementDetails.remove(itemDetails);
+      // filterdLst_SettlementDetails.remove(itemDetails);
+      bllInv_Settlement.lstInv_SettlementDetails.remove(itemDetails);
+      resetFilter_SettlementDetails();
     } catch (error) {
       print(error.toString());
       throw error;
@@ -699,8 +722,9 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
   filterAny_SettlementDetails({String? filterData}) async {
     if (filterData == null || filterData.isEmpty) {
       resetFilter_SettlementDetails();
+      return;
     }
-    filterdLst_SettlementDetails = await filterdLst_SettlementDetails.where((item) {
+    filterdLst_SettlementDetails = await bllInv_Settlement.lstInv_SettlementDetails.where((item) {
       String productName = product_bloc.instance.getNameByID(item.IDProduct);
 
       return (item.Barcode == null ? false : item.Barcode!.toString().contains(filterData!)) ||
@@ -709,8 +733,22 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
   }
 
   resetFilter_SettlementDetails() {
-    filterdLst_SettlementDetails.clear();
-    filterdLst_SettlementDetails = bllInv_Settlement.lstInv_SettlementDetails;
+    filterdLst_SettlementDetails = bllInv_Settlement.lstInv_SettlementDetails.where((item) {
+      return item != 0;
+    }).toList();
+  }
+
+  updateSettlementProductQtyByStock(int? stockID) async {
+    filterdLst_SettlementDetails.forEach((elm)async {
+      elm.BookingQty =  await productQty_bloc.instance.getproductQtyByStockID_OrAllStocks(stockID, elm.IDProduct!);
+
+      elm.AddQty = elm.ActualQty! > elm.BookingQty! ? elm.ActualQty! - elm.BookingQty! : 0;
+      elm.AddTotalPrice = double.parse((elm.AddQty! * elm.Price!).toStringAsFixed(2));
+
+      elm.DiffQty = elm.ActualQty! < elm.BookingQty! ? elm.ActualQty! - elm.BookingQty! : 0;
+      elm.DiffTotalPrice = double.parse((elm.DiffQty! * elm.Price!).toStringAsFixed(2));
+
+    });
   }
 
   settlement_bloc() : super(settlement_StateInitial()) {
@@ -723,12 +761,10 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
       } else if (event is resetFilterSettlement_Event) {
         await resetFilter_Settlement();
         emit(settlement_StateDataChanged(filterdLst_Settlement: filterdLst_Settlement));
-      }
-      else if (event is filterAnySettlement_Event) {
+      } else if (event is filterAnySettlement_Event) {
         await filterAny_Settlement(filterData: event.filterData);
         emit(settlement_StateDataChanged(filterdLst_Settlement: filterdLst_Settlement));
-      }
-      else if (event is deleteSettlement_Event) {
+      } else if (event is deleteSettlement_Event) {
         await bllInv_Settlement.fire_DeleteListMaster_And_Details(event.deleteID.toString(), en_TablesName.Inv_SettlementDetails.name);
         await bllInv_Settlement.fire_getList().then((val) {
           filterdLst_Settlement = val;
@@ -751,6 +787,7 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
         emit(settlementDetails_StateDataChanged(filterdLst_SettlementDetails: filterdLst_SettlementDetails));
       } else if (event is clearSettlementDetails_Event) {
         filterdLst_SettlementDetails.clear();
+        bllInv_Settlement.lstInv_SettlementDetails.clear();
         emit(clearSettlementDetails());
       } else if (event is filterAnySettlementDetails_Event) {
         await filterAny_SettlementDetails(filterData: event.filterData);
@@ -759,6 +796,14 @@ class settlement_bloc extends Bloc<inv_event, inv_state> {
         await resetFilter_SettlementDetails();
         emit(settlementDetails_StateDataChanged(filterdLst_SettlementDetails: filterdLst_SettlementDetails));
       }
+      else if (event is  updateSettlementProductQtyByStock_Event) {
+        await updateSettlementProductQtyByStock(event.stockID );
+        emit(settlementDetails_StateDataChanged(filterdLst_SettlementDetails: filterdLst_SettlementDetails));
+      }
+      else if (event is  refreshDetails_Event) {
+        emit(settlementDetails_StateDataChanged(filterdLst_SettlementDetails: filterdLst_SettlementDetails));
+      }
+
     });
   }
 }
