@@ -83,268 +83,282 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
       ),
       drawer: sharedControls.buildMainMenu(context),
       endDrawer: buildDrawerProductsInvoice(context),
-      body: Container(
-        color: Colors.white,
-        child: buildPageContent(),
-      ),
+      body: SingleChildScrollView(child: buildPageContent()),
     );
   }
 
   Widget buildPageContent() {
-    return SingleChildScrollView(
-      child: Form(
-        key: frmKey,
-        child: Column(
-          children: [
-            ctr_TextHeaderPage(
-              text: 'بيانات إذن الإضافة',
-              color: Colors.grey[300],
-              borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
-            ),
-            const SizedBox(height: 5),
-            ctr_DropDowenList(
-              hintLable: 'الفرع',
-              padding: EdgeInsets.only(right: 5, left: 0, top: 5, bottom: 5),
-              height: 50,
-              lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
-              hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-              itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-              menuMaxHeightValue: 300,
-              showClearIcon: true,
-              selectedValue: branchID,
-              OnChanged: (returnID) {
-                branchID = returnID;
-
-                // reset Employee and populate with New branch
-                contEmployee.selectEmployee = null;
-                contEmployee.text = '';
-                employee_bloc.instance.add(getLstEmployeeAsDataSource_Event());
-                ctr_SelectEmployee.branchID = branchID;
-
-                // reset Stock and populate with New branch
-                stockID = null;
-                stock_bloc.instance.add(
-                    getLstStocksAsDataSource_Event(branchID: branchID , condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
-                return null;
-              },
-              OnValidate: (value) {
-                if (value == null) {
-                  return 'لابد من إختيار قيمة';
-                }
-                return null;
-              },
-            ),
-            SizedBox(
-              height: 560,
-              child: Card(
-                color: Colors.grey[100],
-                child: ctr_TabBar(
-                  LstTabBarViewHeaderWidget: [
-                    Text('البيانات الأساسية', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Row(
-                      children: [
-                        Text('الأصناف', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                        SizedBox(width: 20),
-                        IconButton(
-                            onPressed: () {
-                              print('00000000000000000000');
-                              if (widget.scaffoldKey.currentState != null) {
-                                widget.scaffoldKey.currentState!.openEndDrawer();
-                              }
-                            },
-                            icon: Icon(
-                              Icons.production_quantity_limits,
-                              color: Colors.red,
-                              size: 35,
-                            ))
-                      ],
-                    )
-                  ],
-                  LstTabBarViewWidget: [
-                    BuildPersonalData(),
-                    BuildDetailsProduct_SumValues(),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget BuildPersonalData() {
-    return SingleChildScrollView(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-      BlocBuilder<stock_bloc, definition_state>(
-        builder: (context, state) {
-          bool isStockState = state is getLstStocksAsDataSource_State;
-          List<DropDowenDataSource> lstStocks =
-              branchID != null && isStockState ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource : [];
-
-          return ctr_DropDowenList(
-            hintLable: 'المخزن',
-            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-            lstDataSource: lstStocks,
+    return Form(
+      key: frmKey,
+      child: Column(
+        children: [
+          ctr_TextHeaderPage(
+            text:  'بيانات إذن الإضافة',
+            color: checkIsRecivedDocument() ? Colors.red[100] : Colors.grey[300],
+            borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
+          ),
+          const SizedBox(height: 5),
+          ctr_DropDowenList(
+            hintLable: 'الفرع',
+            padding: EdgeInsets.only(right: 5, left: 5),
+            lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
             hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
             itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
             menuMaxHeightValue: 300,
             showClearIcon: true,
-            selectedValue: stockID = lstStocks.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocks.first.valueMember : stockID,
+            selectedValue: branchID,
             OnChanged: (returnID) {
-              stockID = returnID;
-              return stockID;
+              branchID = returnID;
+
+              // reset Employee and populate with New branch
+              contEmployee.selectEmployee = null;
+              contEmployee.text = '';
+              employee_bloc.instance.add(getLstEmployeeAsDataSource_Event());
+              ctr_SelectEmployee.branchID = branchID;
+
+              // reset Stock and populate with New branch
+              stockID = null;
+              stock_bloc.instance.add(getLstStocksAsDataSource_Event(
+                  branchID: branchID, condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
+              return null;
             },
             OnValidate: (value) {
-              stockID = value;
-              if (value == null || stockID == null) {
+              if (value == null) {
                 return 'لابد من إختيار قيمة';
               }
               return null;
             },
-          );
-        },
-      ),
-      Row(
-        children: [
-          ctr_SelectEmployee(
-            Controller: contEmployee,
-            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-            labelText: 'القائم بالطلب',
-            isOpenSelectorOnTap: true,
-            // branchID: branchID,
-            onSelectEmployee: (Dealing) {
-              print(Dealing.Name);
-              contEmployee.selectEmployee = Dealing;
-            },
-            OnValidate: (employee) {
-              if (employee != null && employee.isEmpty) {
-                return 'لابد من إختيار قيمة';
-              }
-              return null;
-            },
+          ),
+          SizedBox(
+            height: 560,
+            child: Card(
+              color: Colors.grey[100],
+              child: ctr_TabBar(
+                LstTabBarViewHeaderWidget: [
+                  Text('البيانات الأساسية', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Row(
+                    children: [
+                      Text('الأصناف', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      SizedBox(width: 20),
+                      IconButton(
+                          onPressed: () {
+                            print('00000000000000000000');
+                            if (widget.scaffoldKey.currentState != null) {
+                              widget.scaffoldKey.currentState!.openEndDrawer();
+                            }
+                          },
+                          icon: Icon(
+                            Icons.production_quantity_limits,
+                            color: Colors.red,
+                            size: 35,
+                          ))
+                    ],
+                  )
+                ],
+                LstTabBarViewWidget: [
+                  BuildMasterData(),
+                  BuildDetailsProduct_SumValues(),
+                ],
+              ),
+            ),
           ),
         ],
       ),
-      Row(
-        children: [
-          SizedBox(
-            width: 80,
-            child: ctr_TextFormField(
-              Controller: contCode,
-              padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-              Lable: 'الكود',
-              TextType: TextInputType.number,
-              OnValidate: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'لابد من إدخال قيمة';
-                }
-                return null;
-              },
-            ),
+    );
+  }
+
+  Widget BuildMasterData() {
+    return SingleChildScrollView(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          BlocBuilder<stock_bloc, definition_state>(
+            builder: (context, state) {
+              bool isStockState = state is getLstStocksAsDataSource_State;
+              List<DropDowenDataSource> lstStocks =
+              branchID != null && isStockState ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource : [];
+
+              return ctr_DropDowenList(
+                hintLable: 'المخزن',
+                padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                lstDataSource: lstStocks,
+                hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+                itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+                menuMaxHeightValue: 300,
+                showClearIcon: true,
+                selectedValue: stockID = lstStocks.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocks.first.valueMember : stockID,
+                OnChanged: (returnID) {
+                  stockID = returnID;
+                  return stockID;
+                },
+                OnValidate: (value) {
+                  stockID = value;
+                  if (value == null || stockID == null) {
+                    return 'لابد من إختيار قيمة';
+                  }
+                  return null;
+                },
+              );
+            },
           ),
-          Expanded(
-            child: ctr_DropDowenList(
-              hintLable: 'حالة الطلب',
-              padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-              lstDataSource: requestStatus_bloc.instance.lstRequestStatusAsDataSource,
-              hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-              itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-              menuMaxHeightValue: 300,
-              showClearIcon: true,
-              selectedValue: requestStatusID =
+          Row(
+            children: [
+              ctr_SelectEmployee(
+                Controller: contEmployee,
+                padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                labelText: 'القائم بالطلب',
+                isOpenSelectorOnTap: true,
+                // branchID: branchID,
+                onSelectEmployee: (Dealing) {
+                  print(Dealing.Name);
+                  contEmployee.selectEmployee = Dealing;
+                },
+                OnValidate: (employee) {
+                  if (employee != null && employee.isEmpty) {
+                    return 'لابد من إختيار قيمة';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 80,
+                child: ctr_TextFormField(
+                  Controller: contCode,
+                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                  Lable: 'الكود',
+                  TextType: TextInputType.number,
+                  OnValidate: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'لابد من إدخال قيمة';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Expanded(
+                child: ctr_DropDowenList(
+                  hintLable: 'حالة الطلب',
+                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                  lstDataSource: requestStatus_bloc.instance.lstRequestStatusAsDataSource,
+                  hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+                  itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+                  menuMaxHeightValue: 300,
+                  showClearIcon: true,
+                  selectedValue: requestStatusID =
                   requestStatus_bloc.instance.lstRequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
                       ? requestStatus_bloc.instance.lstRequestStatusAsDataSource.first.valueMember
                       : requestStatusID,
-              OnChanged: (returnID) {
-                requestStatusID = returnID;
-                return requestStatusID;
-              },
-              OnValidate: (value) {
-                if (value == null) {
-                  return 'لابد من إختيار قيمة';
-                }
-                return null;
-              },
-            ),
+                  OnChanged: (returnID) {
+                    requestStatusID = returnID;
+                    return requestStatusID;
+                  },
+                  OnValidate: (value) {
+                    if (value == null) {
+                      return 'لابد من إختيار قيمة';
+                    }
+                    return null;
+                  },
+                ),
 
-            // BlocBuilder<requestStatus_bloc, fixTable_state >(
-            //   builder: (context, state) {
-            //     if (state is getListRequestStatus_State) {
-            //       return ctr_DropDowenList(
-            //         hintLable: 'حالة الطلب',
-            //         padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-            //         lstDataSource: state.lst_RequestStatus,
-            //         hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-            //         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-            //         menuMaxHeightValue: 300,
-            //         showClearIcon: true,
-            //         selectedValue: requestStatusID = state.lstrequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-            //             ? state.lstrequestStatusAsDataSource.first.valueMember
-            //             : requestStatusID,
-            //         OnChanged: (returnID) {
-            //           requestStatusID = returnID;
-            //           return requestStatusID;
-            //         },
-            //         OnValidate: (value) {
-            //           if (value == null) {
-            //             return 'لابد من إختيار قيمة';
-            //           }
-            //           return null;
-            //         },
-            //       );
-            //     } else
-            //       return SizedBox();
-            //   },
-            // ),
+                // BlocBuilder<requestStatus_bloc, fixTable_state >(
+                //   builder: (context, state) {
+                //     if (state is getListRequestStatus_State) {
+                //       return ctr_DropDowenList(
+                //         hintLable: 'حالة الطلب',
+                //         padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                //         lstDataSource: state.lst_RequestStatus,
+                //         hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+                //         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+                //         menuMaxHeightValue: 300,
+                //         showClearIcon: true,
+                //         selectedValue: requestStatusID = state.lstrequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
+                //             ? state.lstrequestStatusAsDataSource.first.valueMember
+                //             : requestStatusID,
+                //         OnChanged: (returnID) {
+                //           requestStatusID = returnID;
+                //           return requestStatusID;
+                //         },
+                //         OnValidate: (value) {
+                //           if (value == null) {
+                //             return 'لابد من إختيار قيمة';
+                //           }
+                //           return null;
+                //         },
+                //       );
+                //     } else
+                //       return SizedBox();
+                //   },
+                // ),
+              ),
+            ],
           ),
-        ],
-      ),
-      Row(
-        children: [
-          Expanded(
-            child: ctr_Date(
-              text: 'التاريخ',
-              dtController: contDate,
-              padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-              isReadOnly: true,
-              isOpenSelectorOnTap: true,
-              OnChanged: (val) {
-                return val;
-              },
-              OnValidate: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'لابد من إختيار قيمة';
-                }
-                return null;
-              },
+          Row(
+            children: [
+              Expanded(
+                child: ctr_Date(
+                  text: 'التاريخ',
+                  dtController: contDate,
+                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                  isReadOnly: true,
+                  isOpenSelectorOnTap: true,
+                  OnChanged: (val) {
+                    return val;
+                  },
+                  OnValidate: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'لابد من إختيار قيمة';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              SizedBox(
+                width: 160,
+                child: ctr_Time(
+                  text: 'الساعة',
+                  dtController: contTime,
+                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                  isReadOnly: true,
+                  isVisibleSearchIcon: false,
+                  isOpenSelectorOnTap: true,
+                  selectedTime: timeWorkFrom,
+                  OnChanged: (val) {
+                    timeWorkFrom = val;
+                    return null;
+                  },
+                  OnValidate: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'لابد من إختيار قيمة';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          if(!checkIsRecivedDocument())
+          ElevatedButton.icon(
+            label: Text(
+              'تم الإستلام',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.blue[800]),
             ),
+            icon: Icon(Icons.done_outline),
+            style: ElevatedButton.styleFrom(elevation: 3, backgroundColor: Colors.white),
+            onPressed: () {
+              sharedControls.confirmDialog(
+                  context, 'تأكيد الإستلام',
+                  'فى حالة تأكيد الإستلام سيتم التأثير على رصيد المخزن وإغلاق المستند ولا يمكن التعديل فيه نهائياً',
+                      () {
+                    requestStatusID = en_RequestStatus.Received.value;
+                    saveData();
+                    saveProductsQty();
+                  });
+            },
           ),
-          SizedBox(
-            width: 160,
-            child: ctr_Time(
-              text: 'الساعة',
-              dtController: contTime,
-              padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-              isReadOnly: true,
-              isVisibleSearchIcon: false,
-              isOpenSelectorOnTap: true,
-              selectedTime: timeWorkFrom,
-              OnChanged: (val) {
-                timeWorkFrom = val;
-                return null;
-              },
-              OnValidate: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'لابد من إختيار قيمة';
-                }
-                return null;
-              },
-            ),
-          ),
-        ],
-      ),
-    ]));
+        ]));
   }
 
   BuildListView(BuildContext context) {
@@ -353,55 +367,87 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
         if (state is permissionAddDetails_StateInitial) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is permissionAddDetails_StateDataChanged) {
-          return Column(
-            children: [
-              // Filter
-              SizedBox(
-                height: 60,
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: ctr_TextFormField(
-                      Controller: controllerfilter,
-                      PrefixIcon: const Icon(Icons.search),
-                      padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
-                      OnChanged: (value) {
-                        if (value != null) {
-                          permissionAdd_bloc.instance.add(filterAnyPermissionAddDetails_Event(filterData: value.trim()));
-                        }
-                        return null;
-                      },
-                    )),
-                    IconButton(
-                      onPressed: () {
-                        controllerfilter.clear();
-                        permissionAdd_bloc.instance.add(resetFilterPermissionAddDetails_Event());
-                      },
-                      icon: const Icon(Icons.clear),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Column Header
-
-              // ListView - Rows
-              Expanded(
-                child: SizedBox(
-                  width: 700,
-                  height: 500,
-                  child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return BuildItem(state.filterdLst_PermissionAddDetails[index], context, index);
-                    },
-                    itemCount: state.filterdLst_PermissionAddDetails.length,
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
+              children: [
+                // Filter
+                SizedBox(
+                  height: 60,
+                  width: 670,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                          width: 300,
+                          child: ctr_TextFormField(
+                            Controller: controllerfilter,
+                            PrefixIcon: const Icon(Icons.search),
+                            padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
+                            OnChanged: (value) {
+                              if (value != null) {
+                                permissionAdd_bloc.instance.add(filterAnyPermissionAddDetails_Event(filterData: value.trim()));
+                              }
+                              return null;
+                            },
+                          )),
+                      IconButton(
+                        onPressed: () {
+                          controllerfilter.clear();
+                          permissionAdd_bloc.instance.add(resetFilterPermissionAddDetails_Event());
+                        },
+                        icon: const Icon(Icons.clear),
+                      ),
+                    ],
                   ),
                 ),
-              ),
 
-              // Summary
-            ],
+                // Column Header
+                Container(
+                  color: Colors.grey[300],
+                  padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0),
+                  width: 670,
+                  height: 30,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                          width: 60,
+                          child: Text('باركود', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                      SizedBox(
+                          width: 120,
+                          child: Text('الصنف', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                      SizedBox(
+                          width: 90,
+                          child: Text('تصنيف', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                      SizedBox(
+                          width: 90,
+                          child: Text('فئة السعر', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+                      SizedBox(
+                          width: 220,
+                          child:
+                          Text('الكمية والسعر', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                      SizedBox(
+                          width: 90,
+                          child: Text('  ', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                    ],
+                  ),
+                ),
+
+                // ListView - Rows
+                Expanded(
+                  child: SizedBox(
+                    width: 670,
+                    height: 500,
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return buildListViewItem(state.filterdLst_PermissionAddDetails[index], context, index);
+                      },
+                      itemCount: state.filterdLst_PermissionAddDetails.length,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         } else {
           return Container();
@@ -410,107 +456,107 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     );
   }
 
-  BuildItem(Inv_PermissionAddDetails itemDetails, context, int index) {
-    return Container(
-      padding: const EdgeInsets.only(top: 0, right: 5, bottom: 0, left: 5),
-      color: Colors.white,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                sharedFunctions_String.RemoveStringWords(product_bloc.instance.getNameByID(itemDetails.IDProduct)),
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Spacer(),
-              const SizedBox(width: 5),
-              Text('باركود:', style: const TextStyle(fontSize: 14)),
-              Text('${itemDetails.Barcode}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-            ],
-          ),
-
-          // يظهر السطر فى حالة اضافة وحدة كبري
-          if (itemDetails.isBigUnit!)
+  buildListViewItem(Inv_PermissionAddDetails itemDetails, context, int index) {
+    return InkWell(
+      onDoubleTap: () => editItemDetails(itemDetails, index),
+      child: Container(
+        padding: const EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 0),
+        color: Colors.white,
+        height: itemDetails.isBigUnit! ? 62 : 42, // لو الصنف بوحدة كبيرة يكبر إرتفاع السطر
+        child: Column(
+          children: [
+            Divider(
+              color: Colors.grey,
+              thickness: 1,
+            ),
             Row(
               children: [
-                Text('الكمية:', style: const TextStyle(fontSize: 14)),
-                Text('${itemDetails.UnitBig_Qty} ${unit_bloc.instance.getNameByID(itemDetails.UnitBig_ID)}',
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                Text(' السعر:', style: const TextStyle(fontSize: 14)),
-                Text('${itemDetails.UnitBig_Price}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                Text(' الإجمالى:', style: const TextStyle(fontSize: 14)),
-                Text('${itemDetails.TotalPrice!.toStringAsFixed(2)}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                SizedBox(
+                  width: 60,
+                  child: Text('${itemDetails.Barcode}', textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(
+                  width: 120,
+                  child: Text(
+                    sharedFunctions_String.RemoveStringWords(product_bloc.instance.getNameByID(itemDetails.IDProduct)),
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 90,
+                  child: Text('${categories_bloc.instance.getNameByID(itemDetails.IDClassefication)}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(
+                  width: 90,
+                  child: Text('${priceType_bloc.instance.getNameByID(itemDetails.PriceType)}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(
+                  width: 220,
+                  child: Column(
+                    children: [
+                      // يظهر السطر فى حالة اضافة وحدة كبري
+                      if (itemDetails.isBigUnit!)
+                        Row(
+                          children: [
+                            Text('${itemDetails.UnitBig_Qty} ${unit_bloc.instance.getNameByID(itemDetails.UnitBig_ID)}',
+                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                            Text(' x ', style: const TextStyle(fontSize: 14)),
+                            Text('${itemDetails.UnitBig_Price}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                            Text(' = ', style: const TextStyle(fontSize: 14)),
+                            Text('${itemDetails.TotalPrice!.toStringAsFixed(2)}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      // خاص ببيانات الوحدة الصغري
+                      Row(
+                        children: [
+                          Text('${itemDetails.UnitSmall_Qty} ${unit_bloc.instance.getNameByID(itemDetails.UnitSmall_ID)}',
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                          Text(' x ', style: const TextStyle(fontSize: 14)),
+                          Text('${itemDetails.UnitSmall_Price}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                          Text(' = ', style: const TextStyle(fontSize: 14)),
+                          Text('${itemDetails.TotalPrice!.toStringAsFixed(2)}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 90,
+                  child: Row(
+                    children: [
+                      InkWell(
+                        child: const Row(
+                          children: [
+                            Icon(Icons.edit, color: Colors.blue),
+                          ],
+                        ),
+                        onTap: () async {
+                          editItemDetails(itemDetails, index);
+                        },
+                      ),
+                      const SizedBox(width: 10),
+                      InkWell(
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete, color: Colors.red[700]),
+                          ],
+                        ),
+                        onTap: () {
+                          deletItemDetails(itemDetails);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-          // خاص ببيانات الوحدة الصغري
-          Row(
-            children: [
-              Text(itemDetails.isBigUnit! ? '     = :' : 'الكمية:', style: const TextStyle(fontSize: 14)),
-              Text('${itemDetails.UnitSmall_Qty} ${unit_bloc.instance.getNameByID(itemDetails.UnitSmall_ID)}',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              Text('السعر:', style: const TextStyle(fontSize: 14)),
-              Text('${itemDetails.UnitSmall_Price}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              Text(' الإجمالى:', style: const TextStyle(fontSize: 14)),
-              Text('${itemDetails.TotalPrice!.toStringAsFixed(2)}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          Row(
-            children: [
-              Text('الفئة:', style: const TextStyle(fontSize: 14)),
-              Text('${priceType_bloc.instance.getNameByID(itemDetails.PriceType)}',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-
-              const Spacer(),
-              InkWell(
-                child: const Row(
-                  children: [
-                    Icon(Icons.edit, color: Colors.blue),
-                    Text(
-                      'تعديل',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.blue),
-                    ),
-                  ],
-                ),
-                onTap: () async {
-                  await ctr_SelectProduct(onAddProduct: (c) {})
-                    ..editProduct(
-                      context,
-                      itemDetails.IDProduct!,
-                      itemDetails.PriceType!,
-                      itemDetails.isBigUnit!,
-                      itemDetails.isBigUnit! ? itemDetails.UnitBig_Price! : itemDetails.UnitSmall_Price!,
-                      itemDetails.isBigUnit! ? itemDetails.UnitBig_Qty! : itemDetails.UnitSmall_Qty!,
-                      // index,
-                    ).then((cProduct) {
-                      if (cProduct != null) {
-                        permissionAdd_bloc.instance.add(editRowPermissionAddDetails_Event(itemCustomProduct: cProduct, index: index));
-                      }
-                    });
-                },
-              ),
-              const SizedBox(width: 7),
-              InkWell(
-                child: Row(
-                  children: [
-                    Icon(Icons.delete, color: Colors.red[700]),
-                    Text(
-                      'حذف',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.red[700]),
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  deletItemDetails(itemDetails);
-                },
-              ),
-              // const SizedBox(width: 5),
-            ],
-          ),
-          const Divider(height: 5, color: Colors.grey, thickness: 2, indent: 15, endIndent: 15),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -545,7 +591,8 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     Text('    الإجمالى:', style: const TextStyle(fontSize: 14)),
                     Text(
-                        '${state.filterdLst_PermissionAddDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2)}',
+                        '${state.filterdLst_PermissionAddDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!)
+                            .toStringAsFixed(2)}',
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   ],
                 );
@@ -608,7 +655,8 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
   Widget buildCustomBar() {
     return Row(
       children: [
-        IconButton(
+        if(!checkIsRecivedDocument())
+          IconButton(
           onPressed: () {
             saveData();
           },
@@ -696,10 +744,12 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     selectedID = widget.itemPermissionAdd!.ID!;
     branchID = widget.itemPermissionAdd!.IDBranch;
     // stock_bloc.instance.getLstStockAsDataSource();
-    stock_bloc.instance.getLstStockAsDataSource(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]);
-
-    stockID = widget.itemPermissionAdd!.IDStock!;
+    stock_bloc.instance
+        .add(getLstStocksAsDataSource_Event(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
+    // stock_bloc.instance.getLstStockAsDataSource(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]);
+ stockID = widget.itemPermissionAdd!.IDStock!;
     requestStatusID = widget.itemPermissionAdd!.IDRequestStatus!;
+
     contCode.text = widget.itemPermissionAdd!.Code.toString();
     contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemPermissionAdd!.IDEmployee!.toString());
     contEmployee.text = contEmployee.selectEmployee!.Name!;
@@ -718,11 +768,36 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     lstProductsQty = await bllInv_ProductsQty.fire_getListWithConditions(conditions: cond);
   }
 
+  bool checkIsRecivedDocument() {
+    if (widget.frmMode == en_FormMode.EditMode &&
+        widget.itemPermissionAdd!.IDRequestStatus == en_RequestStatus.Received.value)
+      return true;
+    else
+      return false;
+  }
+
+  void editItemDetails(Inv_PermissionAddDetails itemDetails, index) async {
+    await ctr_SelectProduct(onAddProduct: (c) {})
+      ..editProduct(
+        context,
+        itemDetails.IDProduct!,
+        itemDetails.PriceType!,
+        itemDetails.isBigUnit!,
+        itemDetails.isBigUnit! ? itemDetails.UnitBig_Price! : itemDetails.UnitSmall_Price!,
+        itemDetails.isBigUnit! ? itemDetails.UnitBig_Qty! : itemDetails.UnitSmall_Qty!,
+        // index,
+      ).then((cProduct) {
+        if (cProduct != null) {
+          permissionAdd_bloc.instance.add(editRowPermissionAddDetails_Event(itemCustomProduct: cProduct, index: index));
+        }
+      });
+  }
+
   void deletItemDetails(Inv_PermissionAddDetails itemDetails) {
     sharedControls.confirmDelete(
       context,
       product_bloc.instance.getNameByID(itemDetails.IDProduct),
-      () {
+          () {
         permissionAdd_bloc.instance.add(deleteItemPermissionAddDetails_Event(itemDetails: itemDetails));
         lstDetailsDeleted.add(itemDetails);
       },
@@ -760,7 +835,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
         detais: permissionAdd_bloc.instance.filterdLst_PermissionAddDetails.map((elm) => elm.toMap()).toList(),
         deletedItemsDetais: lstDetailsDeleted.map((elm) => elm.toMap()).toList(),
       );
-      saveProductsQty();
+
       Navigator.pop(context, true);
     }
   }

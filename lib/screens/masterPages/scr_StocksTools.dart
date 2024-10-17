@@ -3,6 +3,8 @@ import 'package:vigil_erp/screens/Inventory/1-PermissionAdd/scr_PermissionAddVie
 import 'package:vigil_erp/screens/Inventory/10-ProductsQty/scr_ProductsQtyView.dart';
 import 'package:vigil_erp/screens/Inventory/2-PermissionDiscount/scr_PermissionDiscountView.dart';
 import 'package:vigil_erp/screens/Inventory/3-Settlement/scr_SettlementView.dart';
+import 'package:vigil_erp/screens/Inventory/4-Transfer/scr_TransferView.dart';
+import 'package:vigil_erp/screens/Inventory/5-RecivedQty/scr_RecivedQtyView.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
 
 class scr_StocksTools extends StatelessWidget {
@@ -213,62 +215,62 @@ class scr_StocksTools extends StatelessWidget {
                   ),
                 ),
               ),
-              // InkWell(
-              //   onTap: () async {
-              //     // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-              //   },
-              //   child: Container(
-              //     decoration: const BoxDecoration(
-              //       color: Colors.pink,
-              //       borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-              //     ),
-              //     child: const Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         Icon(
-              //           Icons.home,
-              //           color: Colors.white,
-              //           size: 40,
-              //         ),
-              //         Text(
-              //           'التحويل بين المخازن',
-              //           textAlign: TextAlign.center,
-              //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              //           maxLines: 2,
-              //           overflow: TextOverflow.ellipsis,
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-              // InkWell(
-              //   onTap: () async {
-              //     // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-              //   },
-              //   child: Container(
-              //     decoration: const BoxDecoration(
-              //       color: Colors.pink,
-              //       borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-              //     ),
-              //     child: const Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         Icon(
-              //           Icons.home,
-              //           color: Colors.white,
-              //           size: 40,
-              //         ),
-              //         Text(
-              //           'حركة الأصناف',
-              //           textAlign: TextAlign.center,
-              //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              //           maxLines: 2,
-              //           overflow: TextOverflow.ellipsis,
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
+              InkWell(
+                onTap: () async {
+                   sharedControls.navigatTo(context, scr_TransferView());
+                },
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.pink,
+                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+                  ),
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.home,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                      Text(
+                        'التحويل بين المخازن',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () async {
+                   sharedControls.navigatTo(context, scr_RecivedQtyView());
+                },
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.pink,
+                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+                  ),
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.home,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                      Text(
+                        'إستلام تحويل أصناف',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               // InkWell(
               //   onTap: () async {
               //     // sharedControls.navigatTo(context, scr_InvoicesRepresentView());

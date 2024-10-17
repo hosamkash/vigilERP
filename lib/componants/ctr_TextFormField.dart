@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
-class ctr_TextFormField extends StatelessWidget {
+class ctr_TextFormField extends StatefulWidget {
   late TextAlign? TextAlignValue;
   late Widget? SufixIcon;
   late Widget? sufix;
@@ -15,7 +15,7 @@ class ctr_TextFormField extends StatelessWidget {
   late TextStyle? labelStyle;
   late Widget? PrefixIcon;
   late EdgeInsets? padding;
-  double? height;
+  // double? height;
   late bool? autoSelectData;
   late bool? readOnly;
   late bool? useAsBarcodeControle;
@@ -42,7 +42,7 @@ class ctr_TextFormField extends StatelessWidget {
     this.labelStyle,
     this.PrefixIcon,
     this.padding = const EdgeInsets.all(0),
-    this.height,
+    // this.height = 50,
     this.autoSelectData,
     this.readOnly,
     this.useAsBarcodeControle,
@@ -55,53 +55,68 @@ class ctr_TextFormField extends StatelessWidget {
   }) : super(key: Key);
 
   @override
+  State<ctr_TextFormField> createState() => _ctr_TextFormFieldState();
+}
+
+class _ctr_TextFormFieldState extends State<ctr_TextFormField> {
+  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: padding ?? EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-      height: height ?? 45,
+      padding: widget.padding ?? EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
+      // height: widget.height ,
       child: Row(
         children: [
           Expanded(
             child: TextFormField(
-              controller: Controller,
-              enabled: Isenabled,
-              keyboardType: TextType,
+              controller: widget.Controller,
+              enabled: widget.Isenabled,
+              keyboardType: widget.TextType,
               textDirection: TextDirection.ltr,
-              textAlign: TextAlignValue ?? TextAlign.center,
-              style: textStyle ?? const TextStyle(fontSize: 17, color: Colors.black),
-              obscureText: IsobscureText,
-              readOnly: readOnly ?? false,
-              maxLines: maxLines,
-          minLines: minLines,
+              textAlign: widget.TextAlignValue ?? TextAlign.center,
+              style: widget.textStyle ?? const TextStyle(fontSize: 17, color: Colors.black),
+              obscureText: widget.IsobscureText,
+              readOnly: widget.readOnly ?? false,
+              maxLines: widget.maxLines,
+              minLines: widget.minLines,
               decoration: InputDecoration(
-                label: Text(Lable),
-                labelStyle: labelStyle ?? const TextStyle(fontSize: 17, color: Colors.grey),
-                prefixIcon: PrefixIcon,
-                suffixIcon: SufixIcon,
+                label: Text(widget.Lable),
+                labelStyle: widget.labelStyle ?? const TextStyle(fontSize: 17, color: Colors.grey),
+                prefixIcon: widget.PrefixIcon,
+                suffixIcon: widget.SufixIcon,
                 fillColor: Colors.white,
                 filled: true,
-                suffix: sufix,
-                border: border,
-                contentPadding: EdgeInsets.symmetric(vertical: 0.3  ,horizontal: 2), // حشوة داخلية ثابتة
+                suffix: widget.sufix,
+                border: widget.border,
+                contentPadding: EdgeInsets.symmetric(vertical: 0.3, horizontal: 2), // حشوة داخلية ثابتة
               ),
-              validator: OnValidate,
-              onChanged: OnChanged,
+
+               validator: widget.OnValidate,
+              // validator: (val) {
+              //   setState(() {
+              //     if (val == null || val.isEmpty) {
+              //       widget.height = widget.height! + 10;
+              //     } else
+              //       widget.height = 50;
+              //   });
+              //    return widget.OnValidate != null ? widget.OnValidate!(val) : null;
+              // },
+              onChanged: widget.OnChanged,
               onTap: () {
                 // if(autoSelectData == true )  {
                 //   Controller!.selection = TextSelection(baseOffset: 0, extentOffset: Controller!.text.length);
                 // }
-                OnTap != null ? OnTap!() : null;
+                widget.OnTap != null ? widget.OnTap!() : null;
               },
-              onFieldSubmitted: OnSubmitted,
+              onFieldSubmitted: widget.OnSubmitted,
             ),
           ),
-          if (useAsBarcodeControle ?? false)
+          if (widget.useAsBarcodeControle ?? false)
             IconButton(
                 onPressed: () async {
                   await FlutterBarcodeScanner.scanBarcode("#ff6666", 'Cancel', false, ScanMode.BARCODE).then((val) {
                     // print('***************************   ${val}   ****************');
-                    Controller!.text = val;
-                    OnChanged != null ? OnChanged!(val) : null;
+                    widget.Controller!.text = val;
+                    widget.OnChanged != null ? widget.OnChanged!(val) : null;
                     return val;
                   });
                 },

@@ -90,8 +90,7 @@ class _scr_ProductItemState extends State<scr_ProductItem> {
             ),
             ctr_DropDowenList(
               hintLable: 'التصنيف',
-              padding: EdgeInsets.only(right: 5, left: 0, top: 5, bottom: 5),
-              height: 50,
+              padding: EdgeInsets.only(right: 5, left: 5),
               lstDataSource: categories_bloc.instance.LstCategoriesAsDataSource,
               hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
               itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -219,8 +218,7 @@ class _scr_ProductItemState extends State<scr_ProductItem> {
                   width: 200,
                   child: ctr_TextFormField(
                     Controller: controllerUnitCountOf,
-                    padding: EdgeInsets.only(right: 0, left: 0, top: 10, bottom: 5),
-                    height: 50,
+                    padding: EdgeInsets.only(right: 5, left: 5),
                     TextType: TextInputType.number,
                     TextAlignValue: TextAlign.center,
                     Lable: 'الكبري تحتوي علي ؟؟؟ من الصغري',

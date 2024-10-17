@@ -67,6 +67,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => settlement_bloc()),
         BlocProvider(create: (context) => requestStatus_bloc()),
         BlocProvider(create: (context) => address_bloc()),
+        BlocProvider(create: (context) => transfer_bloc()),
       ],
       child: BlocConsumer<cubitGeneral, cubitStates>(
         listener: (context, state) => state_InitialApp(),
@@ -100,6 +101,7 @@ class MyApp extends StatelessWidget {
           settlement_bloc.cretaeInctance(context);
           requestStatus_bloc.cretaeInctance(context);
           address_bloc.cretaeInctance(context);
+          transfer_bloc.cretaeInctance(context);
 
           //*************************************
           cubitGeneral.get(context);

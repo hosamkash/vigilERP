@@ -1,39 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vigil_erp/bll/classModel/Def_CompanyStructure.dart';
 import 'package:vigil_erp/bll/classModel/Def_Stocks.dart';
-
 import 'package:vigil_erp/blocManagment/blocDealing/dealing_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
-import 'package:vigil_erp/blocManagment/blocFixTables/fix_table_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocInventory/inv_bloc.dart';
-import 'package:vigil_erp/blocManagment/tablesCondions.dart';
 import 'package:vigil_erp/componants/ctr_AlertDialog.dart';
 import 'package:vigil_erp/componants/ctr_TextFormField.dart';
 import 'package:vigil_erp/componants/ctr_TextHeaderPage.dart';
-import 'package:vigil_erp/screens/Inventory/1-PermissionAdd/scr_PermissionAddItem.dart';
+import 'package:vigil_erp/screens/Inventory/4-Transfer/scr_TransferItem.dart';
 import 'package:vigil_erp/shared/enumerators.dart';
-import 'package:vigil_erp/shared/sharedFunctions.dart';
 import 'package:vigil_erp/shared/sharedHive.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
-
 import '../../../bll/bllFirebase/ManageBLL.dart';
-import '../../../bll/classModel/Inv_PermissionAdd.dart';
 import '../../../bll/classModel/Inv_ProductsQty.dart';
+import '../../../bll/classModel/Inv_Transfer.dart';
+import '../../../blocManagment/blocFixTables/fix_table_bloc.dart';
+import '../../../blocManagment/tablesCondions.dart';
 
-class scr_PermissionAddView extends StatefulWidget {
-  scr_PermissionAddView({super.key});
+class scr_RecivedQtyView extends StatefulWidget {
+  scr_RecivedQtyView({super.key});
 
   @override
-  State<scr_PermissionAddView> createState() => _scr_PermissionAddViewState();
+  State<scr_RecivedQtyView> createState() => _scr_RecivedQtyViewState();
 }
 
-class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
+class _scr_RecivedQtyViewState extends State<scr_RecivedQtyView> {
   GlobalKey<ScaffoldState> scaffold = GlobalKey<ScaffoldState>();
   TextEditingController controllerfilter = TextEditingController();
   TextEditingController contDateTo = TextEditingController();
   TextEditingController contDateFrom = TextEditingController();
-  TextEditingController contTotalValue = TextEditingController();
+  TextEditingController contTransferAddValue = TextEditingController();
+  TextEditingController contTransferDiscountValue = TextEditingController();
   bool isGetAllDates = false;
 
   @override
@@ -80,16 +77,16 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ctr_TextHeaderPage(
-                text: 'عرض أذون الإضافة',
+                text: 'عرض إستلامات المخازن',
                 style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25),
                 color: Colors.grey[300],
                 borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
               ),
-              BlocBuilder<permissionAdd_bloc, inv_state>(
+              BlocBuilder<transfer_bloc, inv_state>(
                 builder: (context, state) {
-                  if (state is permissionAdd_StateDataChanged) {
+                  if (state is transfer_StateDataChanged) {
                     return ctr_TextHeaderPage(
-                      text: state.filterdLst_PermissionAdd.length.toString(),
+                      text: state.filterdLst_Transfer.length.toString(),
                       color: Colors.grey[300],
                       borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
                       style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
@@ -103,17 +100,17 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
           )),
 
           SizedBox(
-            height: 60,
+            height: 50,
             child: Row(
               children: [
                 Expanded(
                     child: ctr_TextFormField(
                   Controller: controllerfilter,
                   PrefixIcon: const Icon(Icons.search),
-                  padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
+                  // padding: const EdgeInsets.only(right: 5, left: 5),
                   OnChanged: (value) {
                     if (value != null) {
-                      permissionAdd_bloc.instance.add(filterAnyPermissionAdd_Event(filterData: value.trim()));
+                      transfer_bloc.instance.add(filterAnyTransfer_Event(filterData: value.trim()));
                     }
                     return null;
                   },
@@ -121,14 +118,14 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
                 IconButton(
                   onPressed: () {
                     controllerfilter.clear();
-                    permissionAdd_bloc.instance.add(resetFilterPermissionAdd_Event());
+                    transfer_bloc.instance.add(resetFilterTransfer_Event());
                   },
                   icon: const Icon(Icons.clear),
                 ),
               ],
             ),
           ),
-          // const SizedBox(height: 10),
+          // const SizedBox(height: 5),
           Expanded(
             child: buildListView(context),
           ),
@@ -138,11 +135,11 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
   }
 
   Widget buildListView(BuildContext context) {
-    return BlocBuilder<permissionAdd_bloc, inv_state>(
+    return BlocBuilder<transfer_bloc, inv_state>(
       builder: (context, state) {
-        if (state is permissionAdd_StateInitial) {
+        if (state is transfer_StateInitial) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state is permissionAdd_StateDataChanged) {
+        } else if (state is transfer_StateDataChanged) {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Column(
@@ -151,7 +148,7 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
                 Container(
                   color: Colors.grey[300],
                   padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0),
-                  width: 935,
+                  width: 1090,
                   height: 30,
                   child: Row(
                     children: [
@@ -162,23 +159,29 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
                           width: 90,
                           child: Text('التاريخ', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
                       SizedBox(
-                          width: 70,
+                          width: 60,
                           child: Text('الساعة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
                       SizedBox(
-                          width: 120,
-                          child: Text('الفرع', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+                          width: 100,
+                          child: Text('من فرع', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
                       SizedBox(
-                          width: 120,
-                          child: Text('المخزن', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                          width: 100,
+                          child: Text('من مخزن', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
                       SizedBox(
                           width: 120,
                           child:
                               Text('القائم بالطلب', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
                       SizedBox(
-                          width: 80,
-                          child: Text('القيمة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                          width: 100,
+                          child: Text('إلى فرع', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
                       SizedBox(
-                          width: 150,
+                          width: 100,
+                          child: Text('إلى مخزن', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                      SizedBox(
+                          width: 80,
+                          child: Text('الإجمالى', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                      SizedBox(
+                          width: 120,
                           child: Text('الحالة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
                       SizedBox(
                           width: 110,
@@ -190,41 +193,57 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
                 // ListView - Rows
                 Expanded(
                   child: SizedBox(
-                    width: 935,
+                    width: 1090,
                     height: 480,
                     child: ListView.separated(
                       // physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0),
                       itemBuilder: (context, index) {
-                        return buildListViewItem(state.filterdLst_PermissionAdd[index], context);
+                        return buildListViewItem(state.filterdLst_Transfer[index], context);
                       },
                       separatorBuilder: (context, index) => const SizedBox(height: 1),
-                      itemCount: state.filterdLst_PermissionAdd.length,
+                      itemCount: state.filterdLst_Transfer.length,
                     ),
                   ),
                 ),
 
                 // Summary
                 SizedBox(
-                  width: 930,
+                  width: 1090,
                   height: 35,
                   child: Row(
                     children: [
                       SizedBox(width: 100),
-                      BlocBuilder<permissionAdd_bloc, inv_state>(
+                      BlocBuilder<transfer_bloc, inv_state>(
                         builder: (context, state) {
-                          if (state is permissionAdd_StateDataChanged) {
-                            contTotalValue.text = state.filterdLst_PermissionAdd
-                                .fold(0.0, (previousValue, element) => previousValue + element.Value!)
+                          if (state is transfer_StateDataChanged) {
+                            contTransferAddValue.text = state.filterdLst_Transfer
+                                .fold(0.0, (previousValue, element) => previousValue + element.TotalValueFrom!)
                                 .toStringAsFixed(2);
-                            return SizedBox(
-                              width: 200,
-                              child: ctr_TextFormField(
-                                Controller: contTotalValue,
-                                Lable: 'الإجمالى',
-                                readOnly: true,
-                                textStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
-                              ),
+                            // contTransferDiscountValue.text = state.filterdLst_Transfer
+                            //     .fold(0.0, (previousValue, element) => previousValue + element.TotalValueTo!)
+                            //     .toStringAsFixed(2);
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width: 200,
+                                  child: ctr_TextFormField(
+                                    Controller: contTransferAddValue,
+                                    Lable: 'الإجمالى',
+                                    readOnly: true,
+                                    textStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
+                                  ),
+                                ),
+                                // SizedBox(
+                                //   width: 150,
+                                //   child: ctr_TextFormField(
+                                //     Controller: contTransferDiscountValue,
+                                //     Lable: 'إجمالى النقصان',
+                                //     readOnly: true,
+                                //     textStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
+                                //   ),
+                                // ),
+                              ],
                             );
                           } else
                             return SizedBox();
@@ -243,7 +262,7 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
     );
   }
 
-  buildListViewItem(Inv_PermissionAdd item, context) {
+  buildListViewItem(Inv_Transfer item, context) {
     return Column(
       children: [
         Divider(
@@ -253,7 +272,7 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
         InkWell(
           onDoubleTap: () => editItem(item),
           child: Container(
-            color: item.IDRequestStatus == en_RequestStatus.Received.value ? Colors.red[100] : Colors.white,
+            color: item.IDRequestStatus == en_RequestStatus.Sent.value ? Colors.red[100] : Colors.white,
             height: 25,
             child: Row(
               children: [
@@ -274,7 +293,7 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
                   ),
                 ),
                 SizedBox(
-                  width: 70,
+                  width: 60,
                   child: Text(
                     item.Time ?? '',
                     textAlign: TextAlign.center,
@@ -282,17 +301,17 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
                   ),
                 ),
                 SizedBox(
-                  width: 120,
+                  width: 100,
                   child: Text(
-                    company_bloc.instance.getNameByID(item.IDBranch),
+                    company_bloc.instance.getNameByID(item.IDBranchFrom),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),
                 SizedBox(
-                  width: 120,
+                  width: 100,
                   child: Text(
-                    stock_bloc.instance.getNameByID(item.IDStock),
+                    stock_bloc.instance.getNameByID(item.IDStockFrom),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
@@ -306,15 +325,31 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
                   ),
                 ),
                 SizedBox(
-                  width: 80,
+                  width: 100,
                   child: Text(
-                    item.Value.toString(),
+                    company_bloc.instance.getNameByID(item.IDBranchTo),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),
                 SizedBox(
-                  width: 150,
+                  width: 100,
+                  child: Text(
+                    stock_bloc.instance.getNameByIDOther(item.IDStockTo),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(
+                  width: 80,
+                  child: Text(
+                    item.TotalValueFrom.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(
+                  width: 120,
                   child: Text(
                     requestStatus_bloc.instance.getNameByID(item.IDRequestStatus),
                     textAlign: TextAlign.center,
@@ -354,11 +389,10 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
   @override
   void initState() {
     super.initState();
-
-    company_bloc.instance.add(getListCompany_Event([BLLCondions(enTable_Def_CompanyStructure.isActive.name, en_CondionsWhere.isEqualTo, true)]));
+    // company_bloc.instance.add(getListCompany_Event());
     // stock_bloc.instance.add(getLstStocksAsDataSource_Event());
-    stock_bloc.instance.getLstStockAsDataSource();
-    employee_bloc.instance.add(getListEmployee_Event());
+    // stock_bloc.instance.getLstStockAsDataSource();
+    // stock_bloc.instance.add(getStocksByBranchID_Event());
 
     loadDataFromDB();
   }
@@ -369,13 +403,13 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
         IconButton(
           onPressed: () {
             sharedControls
-                .showFormFilterByDates(context, en_TablesName.Inv_PermissionAdd, branchID, contDateFrom, contDateTo, isGetAllDates)
+                .showFormFilterByDates(context, en_TablesName.Inv_Transfer, sharedHive.currentBranch!.ID, contDateFrom, contDateTo, isGetAllDates)
                 .then((retValues) {
               if (retValues != null) {
                 isGetAllDates = retValues[0] as bool;
                 contDateFrom.text = retValues[1] as String;
                 contDateTo.text = retValues[2] as String;
-                branchID = retValues[3] as int?;
+                branchIDFrom = retValues[3] as int?;
               }
             });
           },
@@ -389,8 +423,8 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
         IconButton(
           onPressed: () {
             tablesCondions
-                .createCondionsByDates(en_TablesName.Inv_PermissionAdd, branchID, contDateFrom, contDateTo, isGetAllDates)
-                .then((cond) => permissionAdd_bloc.instance.add(getListPermissionAdd_Event(condions: cond)));
+                .createCondionsByDates(en_TablesName.Inv_Transfer, branchIDFrom, contDateFrom, contDateTo, isGetAllDates)
+                .then((cond) => transfer_bloc.instance.add(getListTransfer_Event(condions: cond)));
           },
           icon: Icon(
             Icons.cloud_download_rounded,
@@ -422,46 +456,44 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
   }
 
   Future loadDataFromDB() async {
-    await stock_bloc.instance.getLstStockAsDataSource(condions: [BLLCondions(enTable_Def_Stocks.IsActive.name, en_CondionsWhere.isEqualTo, true)]);
+    await company_bloc.instance.getLstBranchesAsDataSource();
+    await stock_bloc.instance.getLstStockAsDataSource();
     await employee_bloc.instance.getLstEmployeeAsDataSource();
     await requestStatus_bloc.instance.getLst_requestStatusAsDataSource();
 
-    contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
-    contDateTo.text = contDateFrom.text;
-
     List<BLLCondions>? cond =
-        await tablesCondions.createCondionsByDates(en_TablesName.Inv_PermissionAdd, sharedHive.currentBranch!.ID, contDateFrom, contDateTo, false);
-    permissionAdd_bloc.instance.add(getListPermissionAdd_Event(condions: cond));
-
+        await tablesCondions.createCondionsByDates(en_TablesName.Inv_Transfer, sharedHive.currentBranch!.ID, contDateFrom, contDateTo, false);
+    transfer_bloc.instance.add(getListTransfer_Event(condions: cond));
     if (controllerfilter.text.trim().isNotEmpty) {
-      permissionAdd_bloc.instance.add(filterAnyPermissionAdd_Event(filterData: controllerfilter.text.trim()));
+      transfer_bloc.instance.add(filterAnyTransfer_Event(filterData: controllerfilter.text.trim()));
     }
   }
 
   void newItem() async {
-     await Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => scr_PermissionAddItem(null, en_FormMode.NewMode),
+        builder: (context) => scr_TransferItem(null, en_FormMode.NewMode),
       ),
     );
     loadDataFromDB();
   }
 
-  void editItem(Inv_PermissionAdd item) async {
+  void editItem(Inv_Transfer item) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => scr_PermissionAddItem(item, en_FormMode.EditMode),
+        builder: (context) => scr_TransferItem(item, en_FormMode.EditMode),
       ),
     );
 
     if (result == null) {
-      permissionAdd_bloc.instance.add(refreshPermissionAdd_Event());
+      transfer_bloc.instance.add(refreshTransfer_Event());
+      stock_bloc.instance.getLstStockAsDataSourceAllData( );
     } else if (result == true) {
       loadDataFromDB();
     }
   }
 
-  void deleteItem(Inv_PermissionAdd item) {
+  void deleteItem(Inv_Transfer item) {
     print('حذف ${item.Code}  -  ID ${item.ID}');
 
     ctr_AlertDialog.showListFilter(
@@ -507,23 +539,22 @@ class _scr_PermissionAddViewState extends State<scr_PermissionAddView> {
     );
   }
 
-  void delete(Inv_PermissionAdd item) async {
+  void delete(Inv_Transfer item) async {
     // الحذف من جدول الفواتير
-    permissionAdd_bloc.instance.add(deletePermissionAdd_Event(deleteID: item.ID!));
+    transfer_bloc.instance.add(deleteTransfer_Event(deleteID: item.ID!));
 
     // الحذف للمستند كامل من الجرد
     List<BLLCondions> cond = [
-      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.permissionAdd.value),
+      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.transfer.value),
       BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, item.ID!),
     ];
-
     productQty_bloc.instance.deleteByCondition(cond);
 
     // الرجوع للشاشة الرئيسية
     Navigator.of(context).pop();
   }
 
-  void shareItem(Inv_PermissionAdd item) async {
+  void shareItem(Inv_Transfer item) async {
     print('مشاركة  ${item.Code}  -  ID ${item.ID}');
   }
 }

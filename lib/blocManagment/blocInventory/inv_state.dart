@@ -41,7 +41,6 @@ final class permissionAddDetails_StateDataChanged extends inv_state {
 
 final class clearPermissionAddDetails extends inv_state {}
 
-
 //******************************** Permission discount **************************************
 final class permissionDiscount_StateInitial extends inv_state {}
 
@@ -61,7 +60,7 @@ final class permissionDiscountDetails_StateDataChanged extends inv_state {
 
 final class clearPermissionDiscountDetails extends inv_state {}
 
-//******************************** Settlement discount **************************************
+//******************************** Settlement **************************************
 final class settlement_StateInitial extends inv_state {}
 
 final class settlement_StateDataChanged extends inv_state {
@@ -79,3 +78,24 @@ final class settlementDetails_StateDataChanged extends inv_state {
 }
 
 final class clearSettlementDetails extends inv_state {}
+
+//********************************  **************************************
+final class transfer_StateInitial extends inv_state {}
+
+final class transfer_StateDataChanged extends inv_state {
+  final List<Inv_Transfer> filterdLst_Transfer;
+
+  transfer_StateDataChanged({required this.filterdLst_Transfer});
+}
+
+final class transferDetails_StateInitial extends inv_state {}
+
+final class transferDetails_StateDataChanged extends inv_state {
+  final List<Inv_TransferDetails> filterdLst_TransferDetails;
+
+  transferDetails_StateDataChanged({required this.filterdLst_TransferDetails});
+}
+
+final class clearTransferDetails extends inv_state {}
+
+

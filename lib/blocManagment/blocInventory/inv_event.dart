@@ -148,9 +148,57 @@ class deleteItemSettlementDetails_Event extends inv_event {
   deleteItemSettlementDetails_Event({ this.itemDetails});
 }
 class resetFilterSettlementDetails_Event extends inv_event {}
-class refreshDetails_Event extends inv_event {}
+class refreshSettlementDetails_Event extends inv_event {}
 class updateSettlementProductQtyByStock_Event extends inv_event {
   final int? stockID;
   final int? productID;
   updateSettlementProductQtyByStock_Event({this.productID , this.stockID  });
+}
+
+//******************************** Transfer **************************************
+
+class getListTransfer_Event extends inv_event {
+  final List<BLLCondions>? condions;
+  getListTransfer_Event({ this.condions });
+}
+class refreshTransfer_Event extends inv_event {}
+class resetFilterTransfer_Event extends inv_event {}
+class filterAnyTransfer_Event extends inv_event {
+  final String? filterData;
+  filterAnyTransfer_Event({ this.filterData});
+}
+class deleteTransfer_Event extends inv_event {
+  final int? deleteID;
+  deleteTransfer_Event({ this.deleteID});
+}
+
+class getListTransferDetails_Event extends inv_event {
+  final int IDTransfer;
+  getListTransferDetails_Event(this.IDTransfer);
+}
+class clearTransferDetails_Event extends inv_event {}
+class filterAnyTransferDetails_Event extends inv_event {
+  final String? filterData;
+  filterAnyTransferDetails_Event({ this.filterData});
+}
+class addNewTransferDetails_Event extends inv_event {
+  final customProductItem? itemCustomProduct;
+  final int? stockID;
+  addNewTransferDetails_Event({ this.itemCustomProduct , this.stockID});
+}
+class editRowTransferDetails_Event extends inv_event {
+  final customProductItem? itemCustomProduct;
+  final int? index;
+  editRowTransferDetails_Event({ this.itemCustomProduct , this.index});
+}
+class deleteItemTransferDetails_Event extends inv_event {
+  final Inv_TransferDetails? itemDetails;
+  deleteItemTransferDetails_Event({ this.itemDetails});
+}
+class resetFilterTransferDetails_Event extends inv_event {}
+class refreshTransferDetails_Event extends inv_event {}
+class updateTransferProductQtyByStock_Event extends inv_event {
+  final int? stockID;
+  final int? productID;
+  updateTransferProductQtyByStock_Event({this.productID , this.stockID  });
 }

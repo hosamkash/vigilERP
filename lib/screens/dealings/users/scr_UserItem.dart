@@ -70,8 +70,7 @@ class _scr_UserItemState extends State<scr_UserItem> {
                 Expanded(
                   child: ctr_DropDowenList(
                     hintLable: 'الفرع',
-                    padding: EdgeInsets.only(right: 5, left: 0, top: 5, bottom: 5),
-                    height: 50,
+                    padding: EdgeInsets.only(right: 5, left: 5),
                     lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
                     hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                     itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),

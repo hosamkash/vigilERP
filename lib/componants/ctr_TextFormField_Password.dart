@@ -37,7 +37,7 @@ class _ctr_TextFormField_PasswordState
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-      height: 45,
+      // height: 45,
       child: TextFormField(
         controller: widget.Controller,
         keyboardType: widget.TextType,

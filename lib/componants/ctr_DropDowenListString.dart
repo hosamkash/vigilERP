@@ -13,7 +13,9 @@ class ctr_DropDowenListString extends StatefulWidget {
   double? menuMaxHeightValue;
   BorderRadius? borderRadius;
   bool showClearIcon;
+  // double? height;
   late int? Function(String? returenValue)? OnChanged;
+  late String? Function(String?)? OnValidate;
 
   ctr_DropDowenListString({
     this.hintLable = '',
@@ -24,7 +26,9 @@ class ctr_DropDowenListString extends StatefulWidget {
     this.padding,
     this.menuMaxHeightValue,
     this.borderRadius,
+    // this.height,
     this.OnChanged,
+    this.OnValidate,
   });
 }
 
@@ -36,7 +40,7 @@ class _ctr_DropDowenListStringState extends State<ctr_DropDowenListString> {
         Expanded(
           child: Container(
             padding:  EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-            height: 45,
+            // height: widget.height ?? 50,
             child: DropdownButtonFormField<String>(
               value: widget.selectedValue,
               hint: Text(
@@ -61,6 +65,19 @@ class _ctr_DropDowenListStringState extends State<ctr_DropDowenListString> {
                   }
                 });
               },
+              validator: widget.OnValidate,
+              // validator: (val) {
+              //   setState(() {
+              //     if (val == null ) {
+              //       widget.height = 55;
+              //     } else
+              //       widget.height = 50;
+              //
+              //     widget.OnValidate!(val);
+              //   });
+              //   return null;
+              // },
+
               icon: const Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: Colors.black,

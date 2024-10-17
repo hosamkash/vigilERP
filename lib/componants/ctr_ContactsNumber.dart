@@ -50,7 +50,7 @@ class ctr_ContactsNumber extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: padding ?? EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-      height: 50,
+      // height: 50,
       child: Row(
         children: [
           Expanded(

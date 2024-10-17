@@ -565,6 +565,7 @@ class stock_bloc extends Bloc<definition_event, definition_state> {
 
   List<Def_Stocks> filterdLst_Stock = [];
   List<DropDowenDataSource> LstStocksAsDataSource = [];
+  List<DropDowenDataSource> LstStocksAsDataSource2 = [];
 
   Future getList_Stock({List<BLLCondions>? condions}) async {
     try {
@@ -590,6 +591,7 @@ class stock_bloc extends Bloc<definition_event, definition_state> {
   Future resetFilter_Stock() async {
     filterdLst_Stock.clear();
     LstStocksAsDataSource.clear();
+    LstStocksAsDataSource2.clear();
     filterdLst_Stock = await bllDef_Stocks.lstDef_Stocks;
   }
 
@@ -603,19 +605,56 @@ class stock_bloc extends Bloc<definition_event, definition_state> {
     return ret;
   }
 
-  Future getLstStockAsDataSource({int? branchID, List<BLLCondions>? condions}) async {
+  String getNameByIDOther(int? ID) {
+    String ret = '';
+    if (LstStocksAsDataSource2.length > 0 && LstStocksAsDataSource2.isNotEmpty && ID != null) {
+      var lst2 = LstStocksAsDataSource2.where((elm) {
+        return elm.valueMember == ID;
+      });
+
+      ret = lst2.length > 0 ? lst2.first.displayMember : '';
+    }
+    return ret;
+  }
+
+  Future getLstStockAsDataSource({int? branchID, int? branchID2, List<BLLCondions>? condions}) async {
     if (bllDef_Stocks.lstDef_Stocks.length == 0) {
       await getList_Stock(condions: condions);
     }
     LstStocksAsDataSource.clear();
+    LstStocksAsDataSource2.clear();
     if (branchID != null) {
       for (var item in bllDef_Stocks.lstDef_Stocks.where((elm) => elm.IDBranch == branchID).toList()) {
         LstStocksAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!, branchID: item.IDBranch));
+      }
+      //*************
+      for (var item2 in bllDef_Stocks.lstDef_Stocks.where((elm) => elm.IDBranch == branchID2).toList()) {
+        LstStocksAsDataSource2.add(DropDowenDataSource(valueMember: item2.ID!, displayMember: item2.Name!, branchID: item2.IDBranch));
       }
     } else {
       for (var item in bllDef_Stocks.lstDef_Stocks) {
         LstStocksAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!, branchID: item.IDBranch));
       }
+      //*************
+      for (var item2 in bllDef_Stocks.lstDef_Stocks) {
+        LstStocksAsDataSource2.add(DropDowenDataSource(valueMember: item2.ID!, displayMember: item2.Name!, branchID: item2.IDBranch));
+      }
+    }
+  }
+
+  Future getLstStockAsDataSourceAllData() async {
+    if (bllDef_Stocks.lstDef_Stocks.length == 0) {
+      await getList_Stock();
+    }
+    LstStocksAsDataSource.clear();
+
+    for (var item in bllDef_Stocks.lstDef_Stocks) {
+      LstStocksAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!, branchID: item.IDBranch));
+    }
+    //*************
+    LstStocksAsDataSource2.clear();
+    for (var item2 in bllDef_Stocks.lstDef_Stocks) {
+      LstStocksAsDataSource2.add(DropDowenDataSource(valueMember: item2.ID!, displayMember: item2.Name!, branchID: item2.IDBranch));
     }
   }
 
@@ -631,12 +670,12 @@ class stock_bloc extends Bloc<definition_event, definition_state> {
         await resetFilter_Stock();
         emit(getListStock_StateDataChanged(filterdLst_Stock: filterdLst_Stock));
       } else if (event is getLstStocksAsDataSource_Event) {
-        await getLstStockAsDataSource(branchID: event.branchID, condions: event.condions);
-        emit(getLstStocksAsDataSource_State(LstStocksAsDataSource: LstStocksAsDataSource));
+        await getLstStockAsDataSource(branchID: event.branchID, branchID2: event.branchID2, condions: event.condions);
+        emit(getLstStocksAsDataSource_State(LstStocksAsDataSource: LstStocksAsDataSource, LstStocksAsDataSource2: LstStocksAsDataSource2));
       }
-      // else if (event is getStocksByBranchID_Event) {
-      //   await getStocksByBranchID(event.branchID);
-      //   emit(getStocksByBranchID_State(LstStocksFilteredByBranchID: LstStocksFilteredByBranchID));
+      // else if (event is getLstStocksOtherAsDataSource_Event) {
+      //   await getLstStockOtherAsDataSource(branchID: event.branchID, condions: event.condions);
+      //   emit(getLstStocksOtherAsDataSource_State(LstStocksOtherAsDataSource: LstStocksOtherAsDataSource));
       // }
     });
   }

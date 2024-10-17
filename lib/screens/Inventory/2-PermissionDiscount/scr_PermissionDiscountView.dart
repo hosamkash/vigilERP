@@ -249,8 +249,11 @@ class _scr_PermissionDiscountViewState extends State<scr_PermissionDiscountView>
         ),
         InkWell(
           onDoubleTap: () => editItem(item),
-          child: SizedBox(
-            height: 30,
+          child: Container(
+           decoration: BoxDecoration(
+             color: item.IDRequestStatus == en_RequestStatus.Received.value ? Colors.red[100] : Colors.white,
+           ),
+            height:25,
             child: Row(
               children: [
                 SizedBox(

@@ -15,6 +15,7 @@ class ctr_Date extends StatelessWidget {
   late bool isOpenSelectorOnTap;
   late bool isVisibleSearchIcon;
   late Icon? prefixIcon;
+  // double? height;
   // late DateTime? defaultValue;
   late EdgeInsets? padding;
   late String? Function(String?)? OnValidate;
@@ -37,6 +38,7 @@ class ctr_Date extends StatelessWidget {
     this.prefixIcon,
     // this.defaultValue,
     this.padding = const EdgeInsets.all(0),
+    // this.height,
     this.OnValidate,
     this.OnChanged,
     this.OnSubmitted,
@@ -55,7 +57,7 @@ class ctr_Date extends StatelessWidget {
     return Container(
       padding: padding ?? EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
       // padding: EdgeInsets.symmetric(vertical: 0.3),
-      height: 45,
+      // height: height ?? 45,
       child: Row(
         children: [
           Expanded(

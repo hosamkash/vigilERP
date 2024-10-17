@@ -104,7 +104,7 @@ class ctr_SelectProduct extends StatefulWidget {
                   ctr_DropDowenList(
                     hintLable: 'فئة السعر',
                     padding: const EdgeInsets.only(top: 10, right: 5, bottom: 5, left: 0),
-                    height: 55,
+
                     lstDataSource: priceType_bloc.instance.lstPriceTypeAsDataSource,
                     hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                     itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -218,8 +218,7 @@ class _ctr_SelectProductState extends State<ctr_SelectProduct> {
           children: [
             ctr_DropDowenList(
               hintLable: 'التصنيف',
-              padding: const EdgeInsets.only(top: 5, right: 0, bottom: 5, left: 0),
-              height: 50,
+              padding: EdgeInsets.only(right: 5, left: 5),
               lstDataSource: categories_bloc.instance.LstCategoriesAsDataSource,
               hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
               itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),

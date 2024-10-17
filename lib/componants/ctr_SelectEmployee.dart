@@ -26,6 +26,7 @@ class ctr_SelectEmployee extends StatefulWidget {
   String? labelText;
   TextStyle? labelStyle;
   late bool isOpenSelectorOnTap;
+  // double? height;
   final void Function(Dealing_Employees) onSelectEmployee;
   late String? Function(String?)? OnValidate;
 
@@ -38,6 +39,7 @@ class ctr_SelectEmployee extends StatefulWidget {
     this.labelText,
     this.labelStyle,
     this.isOpenSelectorOnTap = false,
+    // this.height = 50,
     required this.onSelectEmployee,
     this.OnValidate,
   });
@@ -49,7 +51,7 @@ class _ctr_SelectEmployeeState extends State<ctr_SelectEmployee> {
     return Expanded(
       child: Container(
         padding: widget.padding ?? EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-        height: 45,
+        // height: widget.height ,
         child: SizedBox(
           width: widget.widthControl ?? double.infinity,
           child: Row(
@@ -66,7 +68,8 @@ class _ctr_SelectEmployeeState extends State<ctr_SelectEmployee> {
                     labelText: widget.labelText,
                     labelStyle: widget.labelStyle ?? const TextStyle(fontSize: 17, color: Colors.grey),
                     prefixIcon: widget.suffixIcon,
-                    contentPadding: EdgeInsets.symmetric(vertical: 0.3  ,horizontal: 2), // حشوة داخلية ثابتة
+                    contentPadding: EdgeInsets.symmetric(vertical: 0.3, horizontal: 2),
+                    // حشوة داخلية ثابتة
                     disabledBorder: const OutlineInputBorder(),
                     focusColor: Colors.black,
                     suffixIcon: IconButton(
@@ -80,6 +83,16 @@ class _ctr_SelectEmployeeState extends State<ctr_SelectEmployee> {
                     ),
                   ),
                   validator: widget.OnValidate,
+                  // validator: (val) {
+                  //   setState(() {
+                  //     if (val == null) {
+                  //       widget.height = widget.height! + 15;
+                  //     } else
+                  //       widget.height = 50;
+                  //   });
+                  //   return widget.OnValidate != null ? widget.OnValidate!(val) : null;
+                  // },
+
                   onTap: widget.isOpenSelectorOnTap ? showDialogEmployeesFilter : null,
                 ),
               ),
@@ -140,89 +153,87 @@ class _ctr_SelectEmployeeState extends State<ctr_SelectEmployee> {
       employee_bloc.instance.add(getListEmployee_Event());
     }
 
-      AlertDialog alert = AlertDialog(
-        title: Row(
+    AlertDialog alert = AlertDialog(
+      title: Row(
+        children: [
+          Text('البحث فى الموظفين'),
+          IconButton(
+            onPressed: () {
+              // employee_bloc.instance.add(getListEmployee_Event());
+            },
+            icon: const Icon(Icons.cloud_download_rounded),
+          ),
+        ],
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      backgroundColor: Colors.white,
+      elevation: 3,
+      content: SingleChildScrollView(
+        child: Column(
           children: [
-            Text('البحث فى الموظفين'),
-            IconButton(
-              onPressed: () {
-                // employee_bloc.instance.add(getListEmployee_Event());
+            TextFormField(
+              controller: widget.filterController,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: widget.labelText,
+                labelStyle: widget.labelStyle ?? const TextStyle(fontSize: 17, color: Colors.grey),
+                prefixIcon: widget.suffixIcon,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    widget.filterController.clear();
+                    employee_bloc.instance.add(resetFilterEmployee_Event());
+                  },
+                  icon: widget.prefixIcon ?? const Icon(Icons.clear),
+                  color: Colors.black,
+                ),
+              ),
+              onChanged: (value) {
+                employee_bloc.instance.add(filterAnyEmployee_Event(filterData: value.trim()));
               },
-              icon: const Icon(Icons.cloud_download_rounded),
+            ),
+            SizedBox(
+              height: 400,
+              child: BlocBuilder<employee_bloc, dealing_state>(
+                builder: (context, state) {
+                  if (state is getListEmployee_StateDataChanged) {
+                    // فلتر الموظفين بالفرع الحالى وابقاء أصل اللسته كما هي واستخدام نتيجة الفلتر فقط
+                    widget.lstEmployee = state.filterdLst_Employee.where((item) {
+                      return item.IDBranch == ctr_SelectEmployee.branchID;
+                    }).toList();
+
+                    return ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return buildListViewItem(widget.lstEmployee[index]);
+                      },
+                      separatorBuilder: (context, index) => const SizedBox(height: 1),
+                      itemCount: widget.lstEmployee.length,
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+              ),
             ),
           ],
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        backgroundColor: Colors.white,
-        elevation: 3,
-        content: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextFormField(
-                controller: widget.filterController,
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
-                  labelText: widget.labelText,
-                  labelStyle: widget.labelStyle ?? const TextStyle(fontSize: 17, color: Colors.grey),
-                  prefixIcon: widget.suffixIcon,
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      widget.filterController.clear();
-                      employee_bloc.instance.add(resetFilterEmployee_Event());
-                    },
-                    icon: widget.prefixIcon ?? const Icon(Icons.clear),
-                    color: Colors.black,
-                  ),
-                ),
-                onChanged: (value) {
-                  employee_bloc.instance.add(filterAnyEmployee_Event(filterData: value.trim()));
-                },
-              ),
-              SizedBox(
-                height: 400,
-                child: BlocBuilder<employee_bloc, dealing_state>(
-                  builder: (context, state) {
-                    if (state is getListEmployee_StateDataChanged) {
-                      // فلتر الموظفين بالفرع الحالى وابقاء أصل اللسته كما هي واستخدام نتيجة الفلتر فقط
-                      widget.lstEmployee = state.filterdLst_Employee.where((item) {
-                        return item.IDBranch == ctr_SelectEmployee.branchID;
-                      }).toList();
-
-                      return ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return buildListViewItem(widget.lstEmployee[index]);
-                        },
-                        separatorBuilder: (context, index) => const SizedBox(height: 1),
-                        itemCount: widget.lstEmployee.length,
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-      // عرض الـ AlertDialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        },
-      );
-    }
-
-
-
-    @override
-    void initState() {
-      super.initState();
-
-      // if (employee_bloc.instance.filterdLst_Employee.length == 0) {
-      //   employee_bloc.instance.add(getListEmployee_Event());
-      // }
-    }
+      ),
+    );
+    // عرض الـ AlertDialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // if (employee_bloc.instance.filterdLst_Employee.length == 0) {
+    //   employee_bloc.instance.add(getListEmployee_Event());
+    // }
+  }
+}

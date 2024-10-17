@@ -11,8 +11,8 @@ class ctr_DropDowenList extends StatefulWidget {
   List<DropDowenDataSource> lstDataSource;
   TextStyle? itemsTextStyle;
   TextStyle? hintTextStyle;
-   EdgeInsets? padding;
-   double? height;
+  EdgeInsets? padding;
+  // double? height;
   double? menuMaxHeightValue;
   BorderRadius? borderRadius;
   late int? Function(int? selectedID)? OnChanged;
@@ -27,7 +27,7 @@ class ctr_DropDowenList extends StatefulWidget {
     this.itemsTextStyle,
     this.hintTextStyle,
     this.padding,
-    this.height,
+    // this.height = 50,
     this.menuMaxHeightValue,
     this.borderRadius,
     this.OnChanged,
@@ -60,15 +60,14 @@ class _ctr_DropDowenListState extends State<ctr_DropDowenList> {
         Expanded(
           child: Container(
             padding: widget.padding ?? EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-            height: widget.height ?? 45,
+            // height: widget.height ,
             child: DropdownButtonFormField<int>(
               value: widget.selectedValue,
               hint: Text(widget.hintLable),
-              style:  const TextStyle(fontSize: 17, color: Colors.black, height: 0.2),
+              style: const TextStyle(fontSize: 17, color: Colors.black, height: 0.2),
               iconSize: 22,
 
               items: widget.lstDataSource.map((selectedItem) {
-
                 return DropdownMenuItem<int>(
                   value: selectedItem.valueMember,
                   child: Text('${selectedItem.displayMember}${selectedItem.displayMemberMore.isEmpty ? '' : ' ${selectedItem.displayMemberMore}'}'),
@@ -79,11 +78,22 @@ class _ctr_DropDowenListState extends State<ctr_DropDowenList> {
                   widget.selectedValue = newId;
                   if (widget.OnChanged != null) {
                     widget.OnChanged!(widget.selectedValue!);
-                    print('Selected Id ${widget.selectedValue}');
+                    // print('Selected Id ${widget.selectedValue}');
                   }
                 });
               },
-              validator: widget.OnValidate,
+
+               validator: widget.OnValidate,
+              // validator: (val) {
+              //   setState(() {
+              //     if (val == null) {
+              //       widget.height = widget.height! + 15;
+              //     } else
+              //       widget.height = 50;
+              //   });
+              //   return widget.OnValidate != null ? widget.OnValidate!(val) : null;
+              // },
+
               icon: const Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: Colors.black,

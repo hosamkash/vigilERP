@@ -177,8 +177,7 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
                 child: ctr_TextFormField(
                   Controller: contCode,
                   Lable: 'الكود',
-                  padding: EdgeInsets.only(right: 5, left: 0, top: 10, bottom: 5),
-                  height: 50,
+                  padding: EdgeInsets.only(right: 5, left: 5),
                   TextType: TextInputType.number,
                   OnValidate: (value) {
                     if (value == null || value.isEmpty) {

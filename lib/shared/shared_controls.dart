@@ -114,6 +114,61 @@ class sharedControls {
     );
   }
 
+  static Future<void> confirmDialog(context,String textAddress,  String textHeader, VoidCallback OnDeleted,
+  {TextStyle? style,String? textButtonOk,String? textButtonCancle,  }) {
+
+    return showDialog(
+      context: context,
+      useSafeArea: true,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          actions: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: ctr_TextHeaderPage(
+                    padding: EdgeInsets.only(top: 10, bottom: 0),
+                    text: textAddress,
+                    style: style ?? const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Text(textHeader, style: TextStyle(fontSize: 20, color: Colors.red)),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      label: Text(textButtonOk ?? 'تأكيد', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      icon: const Icon(Icons.delete_forever),
+                      iconAlignment: IconAlignment.end,
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 3),
+                      onPressed: () {
+                        OnDeleted();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      label:  Text(textButtonCancle ?? 'الغاء', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      icon: const Icon(Icons.cancel),
+                      iconAlignment: IconAlignment.end,
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 3),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   static Widget buildMainMenu(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50),

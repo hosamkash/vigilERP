@@ -8,7 +8,10 @@ enum en_AppKey {
 enum en_DocumentType {
   permissionAdd(1),
   permissionDiscount(2),
-  settlement(3);
+  settlement(3),
+  transfer(4),
+  // transfer(5),
+  ;
 
   final int value;
 
@@ -96,19 +99,23 @@ enum en_Monthes {
 }
 
 enum en_RequestStatus {
-  OnDemand,
-  RequestCompleted,
-  UnderReview,
-  ReviewError,
-  Preparing,
-  SuccessfullyPrepared,
-  PreparedWithNotes,
-  PreparedIncomplete,
-  Sending,
-  Sent,
-  ReceivedReview,
-  Received,
-  ReceivedWithCorrection,
+  OnDemand(1), // تحت الطلب
+  RequestCompleted(2), // تم إنهاء الطلب
+  UnderReview(3), // قيد المراجعة
+  ReviewError(4), // خطأ فى المراجعة
+  Preparing(5), // قيد التجهيز
+  SuccessfullyPrepared(6), // تم التجهيز بنجاح
+  PreparedWithNotes(7), // تم التجهيز مع ملاحظات
+  PreparedIncomplete(8), // تم التجهيز - ناقص
+  Sending(9), // قيد الإرسال
+  Sent(10), // تم الإرسال
+  ReceivedReview(11), // قيد مراجعة الإستلام
+  Received(12), // تم الإستلام
+  ReceivedWithCorrection(13); // تم الإستلام مع التصحيح
+
+  final int? value;
+  const en_RequestStatus(this.value);
+
 }
 
 enum en_CondionsWhere {

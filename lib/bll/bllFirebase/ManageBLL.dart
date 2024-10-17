@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../../shared/enumerators.dart';
+import 'package:vigil_erp/shared/enumerators.dart';
 
 enum en_TablesName {
   Def_CompanyStructure,
@@ -35,9 +34,10 @@ enum en_TablesName {
   Def_ProductStructure,
   Dealing_Clients,
   Fix_Address_Government,
-  Fix_Address_Building,
   Fix_Address_City,
-  Fix_Address_DistrictArea
+  Fix_Address_DistrictArea,
+  Inv_TransferDetails,
+  Inv_Transfer
 }
 
 class ManageBLL {

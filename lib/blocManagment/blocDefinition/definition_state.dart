@@ -60,8 +60,14 @@ final class getListStock_StateDataChanged extends definition_state {
 }
 final class getLstStocksAsDataSource_State  extends definition_state {
   List<DropDowenDataSource> LstStocksAsDataSource = [];
-  getLstStocksAsDataSource_State({required this.LstStocksAsDataSource});
+  List<DropDowenDataSource> LstStocksAsDataSource2 = [];
+  getLstStocksAsDataSource_State({required this.LstStocksAsDataSource , required this.LstStocksAsDataSource2});
 }
+// final class getLstStocksOtherAsDataSource_State  extends definition_state {
+//   List<DropDowenDataSource> LstStocksOtherAsDataSource = [];
+//   getLstStocksOtherAsDataSource_State({required this.LstStocksOtherAsDataSource});
+// }
+
 // final class getStocksByBranchID_State extends definition_state {
 //   final List<DropDowenDataSource> LstStocksFilteredByBranchID;
 //   getStocksByBranchID_State({required this.LstStocksFilteredByBranchID});

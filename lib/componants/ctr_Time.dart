@@ -13,6 +13,7 @@ class ctr_Time extends StatelessWidget {
   late TextAlign? TextAlignValue;
   late bool isVisibleSearchIcon;
   late bool isOpenSelectorOnTap;
+  // double? height;
   late EdgeInsets? padding;
   late String? Function(String?)? OnValidate;
   late String? Function(TimeOfDay?)? OnChanged;
@@ -31,6 +32,7 @@ class ctr_Time extends StatelessWidget {
     this.isOpenSelectorOnTap = false,
     this.isVisibleSearchIcon = false,
     this.padding = const EdgeInsets.all(0),
+    // this.height,
     this.OnValidate,
     this.OnChanged,
     this.OnSubmitted,
@@ -42,7 +44,7 @@ class ctr_Time extends StatelessWidget {
     currenrContext = context;
     return Container(
       padding: padding ?? EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-      height: 45,
+      // height: height ?? 45,
       child: Row(
         children: [
           Expanded(

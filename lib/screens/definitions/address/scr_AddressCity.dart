@@ -77,8 +77,7 @@ class _scr_AddressCityState extends State<scr_AddressCity> {
               height: 55,
               child: ctr_DropDowenList(
                 hintLable: 'المحافظة',
-                padding: EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-                height: 55,
+                padding: EdgeInsets.only(right: 5, left: 5),
                 lstDataSource: lst_GovernmentAsDataSource,
                 hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                 itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),

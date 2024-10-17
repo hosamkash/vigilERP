@@ -108,7 +108,38 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
               color: Colors.grey[300],
               borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
             ),
-            const SizedBox(height: 5),
+            ctr_DropDowenList(
+              hintLable: 'الفرع',
+              padding: EdgeInsets.only(right: 5, left: 5),
+              lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
+              hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+              itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+              menuMaxHeightValue: 300,
+              showClearIcon: true,
+              selectedValue: branchID,
+              OnChanged: (returnID) {
+                branchID = returnID;
+
+                // reset Employee and populate with New branch
+                contEmployee.selectEmployee = null;
+                contEmployee.text = '';
+                employee_bloc.instance.add(getLstEmployeeAsDataSource_Event());
+                ctr_SelectEmployee.branchID = branchID;
+
+                // reset Stock and populate with New branch
+                stockID = null;
+                stock_bloc.instance.add(getLstStocksAsDataSource_Event(
+                    branchID: branchID, condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
+                stockID = stock_bloc.instance.LstStocksAsDataSource.length > 0 ? stock_bloc.instance.LstStocksAsDataSource.first.valueMember : stockID;
+                return null;
+              },
+              OnValidate: (value) {
+                if (value == null) {
+                  return 'لابد من إختيار قيمة';
+                }
+                return null;
+              },
+            ),
             SizedBox(
               height: 600,
               child: Card(
@@ -140,7 +171,7 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
                     )
                   ],
                   LstTabBarViewWidget: [
-                    BuildPersonalData(),
+                    BuildMasterData(),
                     BuildDetailsProduct_SumValues(),
                   ],
                 ),
@@ -152,42 +183,10 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
     );
   }
 
-  Widget BuildPersonalData() {
+  Widget BuildMasterData() {
     return SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-      ctr_DropDowenList(
-        hintLable: 'الفرع',
-        padding: EdgeInsets.only(right: 5, left: 0, top: 5, bottom: 5),
-        height: 50,
-        lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
-        hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-        itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-        menuMaxHeightValue: 300,
-        showClearIcon: true,
-        selectedValue: branchID,
-        OnChanged: (returnID) {
-          branchID = returnID;
 
-          // reset Employee and populate with New branch
-          contEmployee.selectEmployee = null;
-          contEmployee.text = '';
-          employee_bloc.instance.add(getLstEmployeeAsDataSource_Event());
-          ctr_SelectEmployee.branchID = branchID;
-
-          // reset Stock and populate with New branch
-          stockID = null;
-          stock_bloc.instance.add(getLstStocksAsDataSource_Event(
-              branchID: branchID, condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
-          stockID = stock_bloc.instance.LstStocksAsDataSource.length > 0 ? stock_bloc.instance.LstStocksAsDataSource.first.valueMember : stockID;
-          return null;
-        },
-        OnValidate: (value) {
-          if (value == null) {
-            return 'لابد من إختيار قيمة';
-          }
-          return null;
-        },
-      ),
       BlocBuilder<stock_bloc, definition_state>(
         builder: (context, state) {
           bool isStockState = state is getLstStocksAsDataSource_State;
@@ -201,7 +200,7 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
 
           return ctr_DropDowenList(
             hintLable: 'المخزن',
-            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+            padding: EdgeInsets.only(right: 5, left: 5),
             lstDataSource: lstStocks,
             hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
             itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -263,33 +262,27 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
             ),
           ),
           Expanded(
-            child: BlocBuilder<cubitGeneral, cubitStates>(
-              builder: (context, state) {
-                if (state is requestStatus_StateChanged) {
-                  return ctr_DropDowenList(
-                    hintLable: 'حالة الطلب',
-                    padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-                    lstDataSource: state.lstrequestStatusAsDataSource,
-                    hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-                    itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-                    menuMaxHeightValue: 300,
-                    showClearIcon: true,
-                    selectedValue: requestStatusID = state.lstrequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-                        ? state.lstrequestStatusAsDataSource.first.valueMember
-                        : requestStatusID,
-                    OnChanged: (returnID) {
-                      requestStatusID = returnID;
-                      return requestStatusID;
-                    },
-                    OnValidate: (value) {
-                      if (value == null) {
-                        return 'لابد من إختيار قيمة';
-                      }
-                      return null;
-                    },
-                  );
-                } else
-                  return SizedBox();
+            child: ctr_DropDowenList(
+              hintLable: 'حالة الطلب',
+              padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+              lstDataSource: requestStatus_bloc.instance.lstRequestStatusAsDataSource,
+              hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+              itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+              menuMaxHeightValue: 300,
+              showClearIcon: true,
+              selectedValue: requestStatusID =
+                  requestStatus_bloc.instance.lstRequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
+                      ? requestStatus_bloc.instance.lstRequestStatusAsDataSource.first.valueMember
+                      : requestStatusID,
+              OnChanged: (returnID) {
+                requestStatusID = returnID;
+                return requestStatusID;
+              },
+              OnValidate: (value) {
+                if (value == null) {
+                  return 'لابد من إختيار قيمة';
+                }
+                return null;
               },
             ),
           ),
@@ -813,16 +806,17 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
     selectedID = widget.itemSettlement!.ID!;
     branchID = widget.itemSettlement!.IDBranch;
     // stock_bloc.instance.getLstStockAsDataSource();
-    stock_bloc.instance.getLstStockAsDataSource(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]);
+    // stock_bloc.instance.getLstStockAsDataSource(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]);
+    stock_bloc.instance
+        .add(getLstStocksAsDataSource_Event(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)])); stockID = widget.itemSettlement!.IDStock!;
+    requestStatusID = widget.itemSettlement!.IDRequestStatus;
 
-    stockID = widget.itemSettlement!.IDStock!;
     contCode.text = widget.itemSettlement!.Code.toString();
     contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemSettlement!.IDEmployee!.toString());
     contEmployee.text = contEmployee.selectEmployee!.Name!;
     ctr_SelectEmployee.branchID = branchID;
     contDate.text = widget.itemSettlement!.Date!;
     contTime.text = widget.itemSettlement!.Time!;
-    requestStatusID = widget.itemSettlement!.IDRequestStatus ?? null;
     contNote.text = widget.itemSettlement!.Note!;
     contSettlementAddValue.text = widget.itemSettlement!.SettlementAddValue.toString();
     contSettlementDiscountValue.text = widget.itemSettlement!.SettlementDiscountValue.toString();
@@ -847,10 +841,6 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
       },
     );
   }
-
-  // void updateProductsQtyBalance(int stockID) {
-  //     settlement_bloc.instance.add(updateSettlementProductQtyByStock_Event(stockID:stockID ));
-  // }
 
   void saveData() async {
     if (frmKey.currentState != null && frmKey.currentState!.validate()) {
@@ -885,7 +875,7 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
         detais: settlement_bloc.instance.filterdLst_SettlementDetails.map((elm) => elm.toMap()).toList(),
         deletedItemsDetais: lstDetailsDeleted.map((elm) => elm.toMap()).toList(),
       );
-      saveProductsQty();
+
       Navigator.pop(context, true);
     }
   }

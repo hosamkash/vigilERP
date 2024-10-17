@@ -83,8 +83,7 @@ class _scr_AddressAreaState extends State<scr_AddressArea> {
                   height: 55,
                   child: ctr_DropDowenList(
                     hintLable: 'المحافظة',
-                    padding: EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-                    height: 55,
+                    padding: EdgeInsets.only(right: 5, left: 5),
                     lstDataSource: lst_GovernmentAsDataSource,
                     hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                     itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -102,8 +101,7 @@ class _scr_AddressAreaState extends State<scr_AddressArea> {
                   height: 55,
                   child: ctr_DropDowenList(
                     hintLable: 'المدينة',
-                    padding: EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-                    height: 55,
+                    padding: EdgeInsets.only(right: 5, left: 5),
                     lstDataSource: lst_CityAsDataSource,
                     hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                     itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),

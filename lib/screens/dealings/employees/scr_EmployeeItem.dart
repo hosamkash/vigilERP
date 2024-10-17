@@ -146,8 +146,7 @@ class _scr_EmployeeItemState extends State<scr_EmployeeItem> {
               Expanded(
                 child: ctr_DropDowenList(
                   hintLable: 'الفرع',
-                  padding: EdgeInsets.only(right: 5, left: 0, top: 5, bottom: 5),
-                   height: 50,
+                  padding: EdgeInsets.only(right: 5, left: 5),
                   lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
                   hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                   itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -401,8 +400,7 @@ class _scr_EmployeeItemState extends State<scr_EmployeeItem> {
         children: [
           ctr_DropDowenList(
             hintLable: 'الوظيفة',
-            padding: EdgeInsets.only(right: 5, left: 0, top: 5, bottom: 5),
-            height: 50,
+            padding: EdgeInsets.only(right: 5, left: 5),
             lstDataSource: job_bloc.instance.LstJobsAsDataSource,
             hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
             itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),

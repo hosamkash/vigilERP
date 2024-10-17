@@ -91,8 +91,14 @@ class filterAnyStock_Event extends definition_event {
 class getLstStocksAsDataSource_Event extends definition_event {
   List<BLLCondions>? condions  ;
   int? branchID ;
-  getLstStocksAsDataSource_Event({this.branchID  ,this.condions});
+  int? branchID2 ;
+  getLstStocksAsDataSource_Event({this.branchID  ,this.branchID2  ,this.condions});
 }
+// class getLstStocksOtherAsDataSource_Event extends definition_event {
+//   List<BLLCondions>? condions  ;
+//   int? branchID ;
+//   getLstStocksOtherAsDataSource_Event({this.branchID  ,this.condions});
+// }
 
 // class getStocksByBranchID_Event extends definition_event {
 //   final int? branchID;

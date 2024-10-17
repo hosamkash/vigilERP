@@ -49,8 +49,8 @@ class _ctr_AddressState extends State<ctr_Address> {
                 //************************ المحافظة **************************
                 ctr_DropDowenList(
                   hintLable: 'المحافظة',
-                  padding: EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-                  height: 50,
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                
                   lstDataSource: lst_GovernmentAsDataSource,
                   hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                   itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -67,8 +67,8 @@ class _ctr_AddressState extends State<ctr_Address> {
                 //************************ المدن **************************
                 ctr_DropDowenList(
                   hintLable: 'المركز - المدينة',
-                  padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-                  height: 50,
+                  padding: EdgeInsets.only(right: 5, left: 5),
+
                   lstDataSource: lst_CityAsDataSource,
                   hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                   itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -84,8 +84,8 @@ class _ctr_AddressState extends State<ctr_Address> {
 
                 ctr_DropDowenList(
                   hintLable: 'البلد - القرية',
-                  padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-                  height: 50,
+                  padding: EdgeInsets.only(right: 5, left: 5),
+
                   lstDataSource: lst_AreaAsDataSource,
                   hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                   itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -107,8 +107,8 @@ class _ctr_AddressState extends State<ctr_Address> {
 
         ctr_DropDowenList(
           hintLable: 'الحي - المنطقة',
-          padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-          height: 50,
+          padding: EdgeInsets.only(right: 5, left: 5),
+
           lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
           hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
           itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -121,8 +121,8 @@ class _ctr_AddressState extends State<ctr_Address> {
         ),
         ctr_DropDowenList(
           hintLable: 'المنشأة - جهة العمل',
-          padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-          height: 50,
+          padding: EdgeInsets.only(right: 5, left: 5),
+
           lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
           hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
           itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
