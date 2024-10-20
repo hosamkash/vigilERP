@@ -312,12 +312,7 @@ class _scr_salesItemState extends State<scr_salesItem> {
             padding: EdgeInsets.only(right: 5, left: 0),
             Lable: 'الرصيد الحالى',
             TextType: TextInputType.number,
-            OnValidate: (value) {
-              if (value == null || value.isEmpty) {
-                return 'لابد من إدخال قيمة';
-              }
-              return null;
-            },
+
           ),
           SizedBox(height: 5),
           Row(
@@ -925,7 +920,7 @@ class _scr_salesItemState extends State<scr_salesItem> {
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
       itemProductsQty.IDDocumentType = en_DocumentType.sales.value;
-      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.sales.value);
+      itemProductsQty.DocumentTypeName = en_DocumentType.sales.name;
       itemProductsQty.IDStock = stockID;
       itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockID);
       itemProductsQty.LineNumber = index;

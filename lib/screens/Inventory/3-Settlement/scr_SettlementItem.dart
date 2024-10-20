@@ -907,7 +907,7 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
       itemProductsQty.IDDocumentType = en_DocumentType.settlement.value;
-      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.settlement.value);
+      itemProductsQty.DocumentTypeName = en_DocumentType.settlement .name;;
       itemProductsQty.IDStock = stockID;
       itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockID);
       itemProductsQty.LineNumber = index;

@@ -840,7 +840,7 @@ class _scr_PermissionDiscountItemState extends State<scr_PermissionDiscountItem>
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
       itemProductsQty.IDDocumentType = en_DocumentType.permissionDiscount.value;
-      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.permissionDiscount.value);
+      itemProductsQty.DocumentTypeName = en_DocumentType. permissionDiscount.name;;
       itemProductsQty.IDStock = stockID;
       itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockID);
       itemProductsQty.LineNumber = index;

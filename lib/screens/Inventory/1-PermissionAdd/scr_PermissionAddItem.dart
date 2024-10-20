@@ -873,7 +873,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
       itemProductsQty.IDDocumentType = en_DocumentType.permissionAdd.value;
-      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.permissionAdd.value);
+      itemProductsQty.DocumentTypeName = en_DocumentType. permissionAdd.name;
       itemProductsQty.IDStock = stockID;
       itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockID);
       itemProductsQty.LineNumber = index;

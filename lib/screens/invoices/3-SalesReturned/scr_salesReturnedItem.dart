@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vigil_erp/bll/bllFirebase/bllInvoices_Purchase.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllInvoices_SalesReturned.dart';
 import 'package:vigil_erp/bll/classModel/Def_Categories.dart';
 import 'package:vigil_erp/bll/classModel/Def_ProductStructure.dart';
 import 'package:vigil_erp/bll/classModel/Def_Stocks.dart';
 import 'package:vigil_erp/bll/classModel/Def_Units.dart';
-import 'package:vigil_erp/bll/classModel/Invoices_Purchase.dart';
-import 'package:vigil_erp/bll/classModel/Invoices_PurchaseDetails.dart';
+import 'package:vigil_erp/bll/classModel/Invoices_SalesReturned.dart';
+import 'package:vigil_erp/bll/classModel/Invoices_SalesReturnedDetails.dart';
 import 'package:vigil_erp/blocManagment/blocDealing/dealing_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocFixTables/fix_table_bloc.dart';
@@ -28,19 +28,19 @@ import '../../../bll/bllFirebase/bllDealing_Employees.dart';
 import '../../../bll/bllFirebase/bllInv_ProductsQty.dart';
 import '../../../bll/classModel/Inv_ProductsQty.dart';
 
-class scr_purchaseItem extends StatefulWidget {
-  scr_purchaseItem(this.itemPurchase, this.frmMode, {super.key});
+class scr_salesReturnedItem extends StatefulWidget {
+  scr_salesReturnedItem(this.itemSalesReturned, this.frmMode, {super.key});
 
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  Invoices_Purchase? itemPurchase;
+  Invoices_SalesReturned? itemSalesReturned;
   en_FormMode frmMode;
 
   @override
-  State<scr_purchaseItem> createState() => _scr_purchaseItemState();
+  State<scr_salesReturnedItem> createState() => _scr_salesReturnedItemState();
 }
 
 var frmKey = GlobalKey<FormState>();
-List<Invoices_PurchaseDetails> lstDetailsDeleted = [];
+List<Invoices_SalesReturnedDetails> lstDetailsDeleted = [];
 List<Inv_ProductsQty> lstProductsQty = [];
 TextEditingController controllerfilter = TextEditingController();
 
@@ -52,8 +52,8 @@ TimeOfDay? timeWorkFrom;
 int? branchID;
 int? stockID;
 TextEditingController_Employee contEmployee = TextEditingController_Employee();
-int? vendorID;
-TextEditingController contVendorSerial = TextEditingController();
+int? clientID;
+TextEditingController contClientSerial = TextEditingController();
 
 TextEditingController contTotalValue = TextEditingController(text: '0.0');
 TextEditingController contDiscountValue = TextEditingController(text: '0.0');
@@ -65,7 +65,7 @@ TextEditingController contNote = TextEditingController(text: '');
 TextEditingController contCurrentBalance = TextEditingController(text: '0.0');
 bool? isBigUnit;
 
-class _scr_purchaseItemState extends State<scr_purchaseItem> {
+class _scr_salesReturnedItemState extends State<scr_salesReturnedItem> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +98,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
       child: Column(
         children: [
           ctr_TextHeaderPage(
-            text: 'بيانات فاتورة المشتريات',
+            text: 'بيانات مرتجعات المبيعات',
             color: checkIsSavedClosed() ? Colors.red[100] : Colors.grey[300],
             borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
           ),
@@ -159,17 +159,18 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
                     children: [
                       Text('الأصناف', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       SizedBox(width: 20),
-                      IconButton(
-                          onPressed: () {
-                            if (widget.scaffoldKey.currentState != null) {
-                              widget.scaffoldKey.currentState!.openEndDrawer();
-                            }
-                          },
-                          icon: Icon(
-                            Icons.production_quantity_limits,
-                            color: Colors.red,
-                            size: 35,
-                          ))
+                      if (!checkIsSavedClosed())
+                        IconButton(
+                            onPressed: () {
+                              if (widget.scaffoldKey.currentState != null) {
+                                widget.scaffoldKey.currentState!.openEndDrawer();
+                              }
+                            },
+                            icon: Icon(
+                              Icons.production_quantity_limits,
+                              color: Colors.red,
+                              size: 35,
+                            ))
                     ],
                   )
                 ],
@@ -192,33 +193,17 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(height: 5),
-          Row(
-            children: [
-              SizedBox(
-                width: 175,
-                child: ctr_TextFormField(
-                  Controller: contCode,
-                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-                  Lable: 'الكود',
-                  TextType: TextInputType.number,
-                  OnValidate: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'لابد من إدخال قيمة';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 175,
-                child: ctr_TextFormField(
-                  Controller: contVendorSerial,
-                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-                  Lable: 'سريال المورد',
-                  TextType: TextInputType.text,
-                ),
-              ),
-            ],
+          ctr_TextFormField(
+            Controller: contCode,
+            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+            Lable: 'الكود',
+            TextType: TextInputType.number,
+            OnValidate: (value) {
+              if (value == null || value.isEmpty) {
+                return 'لابد من إدخال قيمة';
+              }
+              return null;
+            },
           ),
           Row(
             children: [
@@ -294,23 +279,23 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
             },
           ),
           const SizedBox(height: 5),
-          BlocBuilder<vendor_bloc, dealing_state>(
+          BlocBuilder<client_bloc, dealing_state>(
             builder: (context, state) {
-              bool isState = state is getListVendorAsDataSource_StateDataChanged;
-              List<DropDowenDataSource> lstVendors = isState ? state.filterdLst_VendorAsDataSource : [];
+              bool isState = state is getListClientAsDataSource_StateDataChanged;
+              List<DropDowenDataSource> lstClients = isState ? state.filterdLst_ClientAsDataSource : [];
 
               return ctr_DropDowenList(
-                hintLable: 'المورد',
+                hintLable: 'العميل',
                 padding: EdgeInsets.only(right: 5, left: 5),
-                lstDataSource: lstVendors,
+                lstDataSource: lstClients,
                 hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                 itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
                 menuMaxHeightValue: 300,
                 showClearIcon: true,
-                selectedValue: vendorID,
+                selectedValue: clientID,
                 OnChanged: (returnID) {
-                  vendorID = returnID;
-                  return vendorID;
+                  clientID = returnID;
+                  return clientID;
                 },
                 OnValidate: (value) {
                   if (value == null) {
@@ -380,11 +365,11 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
   }
 
   BuildListView(BuildContext context) {
-    return BlocBuilder<purchase_bloc, invoic_state>(
+    return BlocBuilder<salesReturned_bloc, invoic_state>(
       builder: (context, state) {
-        if (state is purchaseDetails_StateInitial) {
+        if (state is salesReturnedDetails_StateInitial) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state is purchaseDetails_StateDataChanged) {
+        } else if (state is salesReturnedDetails_StateDataChanged) {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Column(
@@ -403,7 +388,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
                             padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
                             OnChanged: (value) {
                               if (value != null) {
-                                purchase_bloc.instance.add(filterAnyPurchaseDetails_Event(filterData: value.trim()));
+                                salesReturned_bloc.instance.add(filterAnySalesReturnedDetails_Event(filterData: value.trim()));
                               }
                               return null;
                             },
@@ -411,7 +396,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
                       IconButton(
                         onPressed: () {
                           controllerfilter.clear();
-                          purchase_bloc.instance.add(resetFilterPurchaseDetails_Event());
+                          salesReturned_bloc.instance.add(resetFilterSalesReturnedDetails_Event());
                         },
                         icon: const Icon(Icons.clear),
                       ),
@@ -458,9 +443,9 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
                     child: ListView.builder(
                       physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
-                        return buildListViewItem(state.filterdLst_PurchaseDetails[index], context, index);
+                        return buildListViewItem(state.filterdLst_SalesReturnedDetails[index], context, index);
                       },
-                      itemCount: state.filterdLst_PurchaseDetails.length,
+                      itemCount: state.filterdLst_SalesReturnedDetails.length,
                     ),
                   ),
                 ),
@@ -474,7 +459,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
     );
   }
 
-  buildListViewItem(Invoices_PurchaseDetails itemDetails, context, int index) {
+  buildListViewItem(Invoices_SalesReturnedDetails itemDetails, context, int index) {
     return InkWell(
       onDoubleTap: () => editItemDetails(itemDetails, index),
       child: Container(
@@ -600,20 +585,20 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
       },
       child: Container(
         color: Colors.yellow[200],
-        child: BlocBuilder<purchase_bloc, invoic_state>(
+        child: BlocBuilder<salesReturned_bloc, invoic_state>(
           builder: (context, state) {
-            if (state is purchaseDetails_StateDataChanged) {
+            if (state is salesReturnedDetails_StateDataChanged) {
               contTotalValue.text =
-                  state.filterdLst_PurchaseDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2);
+                  state.filterdLst_SalesReturnedDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2);
               calcSumValues(context);
               return Column(
                 children: [
                   Row(
                     children: [
                       Text('العدد:', style: const TextStyle(fontSize: 14)),
-                      Text('${state.filterdLst_PurchaseDetails.length}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('${state.filterdLst_SalesReturnedDetails.length}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       Text('   الكمية :', style: const TextStyle(fontSize: 14)),
-                      Text('${state.filterdLst_PurchaseDetails.fold(0, (previousValue, element) => previousValue + element.UnitSmall_Qty!)}',
+                      Text('${state.filterdLst_SalesReturnedDetails.fold(0, (previousValue, element) => previousValue + element.UnitSmall_Qty!)}',
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       // الإجمالى
                       Text('    الإجمالى:', style: const TextStyle(fontSize: 14)),
@@ -653,7 +638,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
                 padding: const EdgeInsets.only(top: 0, right: 5, bottom: 10, left: 0),
                 child: ctr_SelectProduct(
                   onAddProduct: (customProductItem prod) {
-                    purchase_bloc.instance.add(addNewPurchaseDetails_Event(itemCustomProduct: prod));
+                    salesReturned_bloc.instance.add(addNewSalesReturnedDetails_Event(itemCustomProduct: prod));
                   },
                   priceTypeID: en_PriceType.salesPrice1.value,
                 ),
@@ -675,7 +660,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
     product_bloc.instance.add(getListProduct_Event([BLLCondions(enTable_Def_ProductStructure.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     priceType_bloc.instance.getLst_PriceTypeAsDataSource();
     categories_bloc.instance.add(getListCategories_Event([BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
-    vendor_bloc.instance.add(getListVendorAsDataSource_Event());
+    client_bloc.instance.add(getListClientAsDataSource_Event());
     categories_bloc.instance
         .getList_CategoryAsDataSource(condions: [BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]);
     unit_bloc.instance.add(getListUnit_Event([BLLCondions(enTable_Def_Units.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
@@ -748,26 +733,26 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
     // stock_bloc.instance.add(resetFilterStock_Event());
     // employee_bloc.instance.add(resetFilterEmployee_Event());
     //
-    // // purchase_bloc.instance.filterdLst_PurchaseDetails.clear();
+    // // salesReturned_bloc.instance.filterdLst_SalesReturnedDetails.clear();
     // // مسح البيانات من التفاصيل عشان التعريف الجديد القادم
-    // purchase_bloc.instance.add(clearPurchaseDetails_Event());
+    // salesReturned_bloc.instance.add(clearSalesReturnedDetails_Event());
   }
 
   void clearCachedData() {
     stockID = null;
 
-    ctr_SelectEmployee.branchID = branchID = contEmployee.selectEmployee = vendorID =null;
+    ctr_SelectEmployee.branchID = branchID = contEmployee.selectEmployee = clientID = null;
     contNote.text = contCurrentBalance.text =
         contTotalValue.text = contDiscountPercent.text = contDiscountValue.text = contNetValue.text = contEmployee.text = '';
     employee_bloc.instance.add(resetFilterEmployee_Event());
 
     lstDetailsDeleted.clear();
     lstProductsQty.clear();
-    purchase_bloc.instance.add(clearPurchaseDetails_Event());
+    salesReturned_bloc.instance.add(clearSalesReturnedDetails_Event());
   }
 
   void newMode() async {
-    bllInvoices_Purchase.getMax_firestore(enTable_Invoices_Purchase.Code).then((val) {
+    bllInvoices_SalesReturned.getMax_firestore(enTable_Invoices_SalesReturned.Code).then((val) {
       contCode.text = val.toString();
     }).toString();
     contDate.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
@@ -775,35 +760,34 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
   }
 
   void editMode() async {
-    selectedID = widget.itemPurchase!.ID!;
-    branchID = widget.itemPurchase!.IDBranch;
+    selectedID = widget.itemSalesReturned!.ID!;
+    branchID = widget.itemSalesReturned!.IDBranch;
     // stock_bloc.instance.getLstStockAsDataSource();
     stock_bloc.instance
         .add(getLstStocksAsDataSource_Event(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
     // stock_bloc.instance.getLstStockAsDataSource(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]);
-    stockID = widget.itemPurchase!.IDStock!;
-
-    contCode.text = widget.itemPurchase!.Code.toString();
-    contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemPurchase!.IDEmployee!.toString());
+    stockID = widget.itemSalesReturned!.IDStock!;
+    clientID = widget.itemSalesReturned!.IDClient;
+    chkIsClosed = widget.itemSalesReturned!.IsClosed!;
+    contCode.text = widget.itemSalesReturned!.Code.toString();
+    contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemSalesReturned!.IDEmployee!.toString());
     contEmployee.text = contEmployee.selectEmployee!.Name!;
     ctr_SelectEmployee.branchID = branchID;
-    contDate.text = widget.itemPurchase!.Date!;
-    contTime.text = widget.itemPurchase!.Time!;
-    chkIsClosed = widget.itemPurchase!.IsClosed!;
-    vendorID = widget.itemPurchase!.IDVendor;
+    contDate.text = widget.itemSalesReturned!.Date!;
+    contTime.text = widget.itemSalesReturned!.Time!;
 
-    contNote.text = widget.itemPurchase!.Note!;
-    contCurrentBalance.text = widget.itemPurchase!.CurrentBalance.toString();
-    purchase_bloc.instance.add(getListPurchaseDetails_Event(widget.itemPurchase!.ID!));
+    contNote.text = widget.itemSalesReturned!.Note!;
+    contCurrentBalance.text = widget.itemSalesReturned!.CurrentBalance.toString();
+    salesReturned_bloc.instance.add(getListSalesReturnedDetails_Event(widget.itemSalesReturned!.ID!));
 
     List<BLLCondions> cond = [
-      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.purchase.value),
+      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.salesReturned.value),
       BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, selectedID),
     ];
     lstProductsQty = await bllInv_ProductsQty.fire_getListWithConditions(conditions: cond);
   }
 
-  void editItemDetails(Invoices_PurchaseDetails itemDetails, index) async {
+  void editItemDetails(Invoices_SalesReturnedDetails itemDetails, index) async {
     await ctr_SelectProduct(onAddProduct: (c) {})
       ..editProduct(
         context,
@@ -815,7 +799,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
         // index,
       ).then((cProduct) {
         if (cProduct != null) {
-          purchase_bloc.instance.add(editRowPurchaseDetails_Event(itemCustomProduct: cProduct, index: index));
+          salesReturned_bloc.instance.add(editRowSalesReturnedDetails_Event(itemCustomProduct: cProduct, index: index));
         }
       });
   }
@@ -823,7 +807,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
   void editCalcSumValues(context) {
     sharedControls
         .showEditSummtionInvoice(
-            context, en_TablesName.Invoices_Purchase, contTotalValue.text, contDiscountValue.text, contDiscountPercent.text, contNetValue.text)
+            context, en_TablesName.Invoices_SalesReturned, contTotalValue.text, contDiscountValue.text, contDiscountPercent.text, contNetValue.text)
         .then((retValues) {
       if (retValues != null) {
         contTotalValue.text = retValues[0] as String;
@@ -843,19 +827,19 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
     contNetValue.text = (double.parse(contTotalValue.text) - double.parse(contDiscountValue.text)).toStringAsFixed(2);
   }
 
-  void deletItemDetails(Invoices_PurchaseDetails itemDetails) {
+  void deletItemDetails(Invoices_SalesReturnedDetails itemDetails) {
     sharedControls.confirmDelete(
       context,
       product_bloc.instance.getNameByID(itemDetails.IDProduct),
       () {
-        purchase_bloc.instance.add(deleteItemPurchaseDetails_Event(itemDetails: itemDetails));
+        salesReturned_bloc.instance.add(deleteItemSalesReturnedDetails_Event(itemDetails: itemDetails));
         lstDetailsDeleted.add(itemDetails);
       },
     );
   }
 
   bool checkIsSavedClosed() {
-    if (widget.frmMode == en_FormMode.EditMode && (widget.itemPurchase!.IsClosed!))
+    if (widget.frmMode == en_FormMode.EditMode && (widget.itemSalesReturned!.IsClosed!))
       return true;
     else
       return false;
@@ -865,38 +849,37 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
     if (frmKey.currentState != null && frmKey.currentState!.validate()) {
       //********************************************************************
       if (widget.frmMode == en_FormMode.NewMode) {
-        selectedID = await bllInvoices_Purchase.getMaxID_firestore();
-        widget.itemPurchase = Invoices_Purchase();
+        selectedID = await bllInvoices_SalesReturned.getMaxID_firestore();
+        widget.itemSalesReturned = Invoices_SalesReturned();
       } else if (widget.frmMode == en_FormMode.EditMode) {
-        selectedID = widget.itemPurchase!.ID!;
+        selectedID = widget.itemSalesReturned!.ID!;
       }
 
-      widget.itemPurchase!.ID = selectedID;
-      widget.itemPurchase!.IDBranch = branchID;
-      widget.itemPurchase!.Code = int.tryParse(contCode.text);
-      widget.itemPurchase!.IDStock = stockID;
-      widget.itemPurchase!.Date = contDate.text;
-      widget.itemPurchase!.Time = contTime.text;
-      widget.itemPurchase!.IDEmployee = contEmployee.selectEmployee!.ID;
-      widget.itemPurchase!.IDVendor = vendorID;
-      widget.itemPurchase!.VendorSerial = contVendorSerial.text;
+      widget.itemSalesReturned!.ID = selectedID;
+      widget.itemSalesReturned!.IDBranch = branchID;
+      widget.itemSalesReturned!.Code = int.tryParse(contCode.text);
+      widget.itemSalesReturned!.IDStock = stockID;
+      widget.itemSalesReturned!.Date = contDate.text;
+      widget.itemSalesReturned!.Time = contTime.text;
+      widget.itemSalesReturned!.IDEmployee = contEmployee.selectEmployee!.ID;
+      widget.itemSalesReturned!.IDClient = clientID;
 
-      widget.itemPurchase!.TotalValue = contTotalValue.text.isNotEmpty ? double.parse(contTotalValue.text) : 0.0;
-      widget.itemPurchase!.DiscountValue = contDiscountValue.text.isNotEmpty ? double.parse(contDiscountValue.text) : 0.0;
-      widget.itemPurchase!.DiscountPercent = contDiscountPercent.text.isNotEmpty ? double.parse(contDiscountPercent.text) : 0.0;
-      widget.itemPurchase!.NetValue = contNetValue.text.isNotEmpty ? double.parse(contNetValue.text) : 0.0;
-      widget.itemPurchase!.IsClosed = chkIsClosed;
-      widget.itemPurchase!.Note = contNote.text;
-      widget.itemPurchase!.CurrentBalance = contCurrentBalance.text.isNotEmpty ? double.parse(contCurrentBalance.text) : 0.0;
-      widget.itemPurchase!.UID = sharedHive.UID;
+      widget.itemSalesReturned!.TotalValue = contTotalValue.text.isNotEmpty ? double.parse(contTotalValue.text) : 0.0;
+      widget.itemSalesReturned!.DiscountValue = contDiscountValue.text.isNotEmpty ? double.parse(contDiscountValue.text) : 0.0;
+      widget.itemSalesReturned!.DiscountPercent = contDiscountPercent.text.isNotEmpty ? double.parse(contDiscountPercent.text) : 0.0;
+      widget.itemSalesReturned!.NetValue = contNetValue.text.isNotEmpty ? double.parse(contNetValue.text) : 0.0;
+      widget.itemSalesReturned!.IsClosed = chkIsClosed;
+      widget.itemSalesReturned!.Note = contNote.text;
+      widget.itemSalesReturned!.CurrentBalance = contCurrentBalance.text.isNotEmpty ? double.parse(contCurrentBalance.text) : 0.0;
+      widget.itemSalesReturned!.UID = sharedHive.UID;
 
       // حفظ الاساسي والتفاصيل مره واحده
-      await bllInvoices_Purchase.fire_setListMaster_And_Details(
+      await bllInvoices_SalesReturned.fire_setListMaster_And_Details(
         insertdDocID: selectedID.toString(),
-        itemInvoices_Purchase: widget.itemPurchase!,
-        collectionDetailsName: en_TablesName.Invoices_PurchaseDetails.name,
-        columnNameAsDocumentDetails: enTable_Invoices_PurchaseDetails.ID.name,
-        detais: purchase_bloc.instance.filterdLst_PurchaseDetails.map((elm) => elm.toMap()).toList(),
+        itemInvoices_SalesReturned: widget.itemSalesReturned!,
+        collectionDetailsName: en_TablesName.Invoices_SalesReturnedDetails.name,
+        columnNameAsDocumentDetails: enTable_Invoices_SalesReturnedDetails.ID.name,
+        detais: salesReturned_bloc.instance.filterdLst_SalesReturnedDetails.map((elm) => elm.toMap()).toList(),
         deletedItemsDetais: lstDetailsDeleted.map((elm) => elm.toMap()).toList(),
       );
       saveProductsQty();
@@ -912,7 +895,7 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
         cond = [
           BLLCondions(enTable_Inv_ProductsQty.IDProduct.name, en_CondionsWhere.isEqualTo, del.IDProduct),
           BLLCondions(enTable_Inv_ProductsQty.LineNumber.name, en_CondionsWhere.isEqualTo, del.ID),
-          BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.purchase.value),
+          BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.salesReturned.value),
           BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, selectedID),
         ];
       });
@@ -923,21 +906,21 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
     int index = 1;
     Inv_ProductsQty? itemProductsQty;
 
-    for (var itemDetails in purchase_bloc.instance.filterdLst_PurchaseDetails) {
+    for (var itemDetails in salesReturned_bloc.instance.filterdLst_SalesReturnedDetails) {
       itemProductsQty = lstProductsQty.where((itm) {
-        return itm.LineNumber == itemDetails.ID && itm.IDDocument == selectedID && itm.IDDocumentType == en_DocumentType.purchase.value;
+        return itm.LineNumber == itemDetails.ID && itm.IDDocument == selectedID && itm.IDDocumentType == en_DocumentType.salesReturned.value;
       }).firstOrNull;
 
       // لو فاضي يبقي صنف جديد
       if (itemProductsQty == null) {
         itemProductsQty = Inv_ProductsQty();
-        itemProductsQty.ID = '${itemDetails.IDProduct}-${index}-${en_TablesName.Invoices_Purchase.name}-${selectedID}';
+        itemProductsQty.ID = '${itemDetails.IDProduct}-${index}-${en_TablesName.Invoices_SalesReturned.name}-${selectedID}';
         lstProductsQty.add(itemProductsQty);
       }
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
-      itemProductsQty.IDDocumentType = en_DocumentType.purchase.value;
-      itemProductsQty.DocumentTypeName = en_DocumentType. purchase.name;
+      itemProductsQty.IDDocumentType = en_DocumentType.salesReturned.value;
+      itemProductsQty.DocumentTypeName = en_DocumentType.salesReturned.name;
       itemProductsQty.IDStock = stockID;
       itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockID);
       itemProductsQty.LineNumber = index;
@@ -951,9 +934,9 @@ class _scr_purchaseItemState extends State<scr_purchaseItem> {
       itemProductsQty.IDUnit = itemDetails.UnitSmall_ID;
       itemProductsQty.UnitName = unit_bloc.instance.getNameByID(itemDetails.UnitSmall_ID);
       itemProductsQty.QtyBefore = 0;
-      itemProductsQty.Qty = itemDetails.UnitSmall_Qty;
+      itemProductsQty.Qty = itemDetails.UnitSmall_Qty! ;
       itemProductsQty.QtyRepresents = 0;
-      itemProductsQty.TotalQty = itemProductsQty.Qty ;
+      itemProductsQty.TotalQty = itemProductsQty.Qty;
       itemProductsQty.QtyAfter = 0;
       itemProductsQty.Price = itemDetails.UnitSmall_Price;
       itemProductsQty.TotalPrice = itemDetails.TotalPrice;

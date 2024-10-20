@@ -13,8 +13,12 @@ enum en_DocumentType {
   recivedQty(5),
   purchase(6),
    sales(7),
-  // transfer(8),
-  // transfer(9),
+   purchaseReturned(8),
+   salesReturned(9),
+  // transfer(10),
+  // transfer(11),
+  // transfer(12),
+  // transfer(13),
   ;
 
   final int value;

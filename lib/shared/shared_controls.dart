@@ -551,7 +551,11 @@ class sharedControls {
                           //****************************** Purchase
                           if (tableName == en_TablesName.Invoices_Purchase) {
                             purchase_bloc.instance.add(refreshPurchaseDetails_Event());
-                          } else if (tableName == en_TablesName.Invoices_Sales) {
+                          }
+                          else if (tableName == en_TablesName.Invoices_PurchaseReturned) {
+                            purchaseReturned_bloc.instance.add(refreshPurchaseReturnedDetails_Event());
+                          }
+                          else if (tableName == en_TablesName.Invoices_Sales) {
                             purchase_bloc.instance.add(refreshSalesDetails_Event());
                           }
 

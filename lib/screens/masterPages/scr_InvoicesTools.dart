@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:vigil_erp/screens/invoices/1-PurchaseReturned/scr_purchaseReturnedView.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
 
 import '../invoices/1-Purchase/scr_purchaseView.dart';
 import '../invoices/3-Sales/scr_salesView.dart';
+import '../invoices/3-SalesReturned/scr_salesReturnedView.dart';
 
 class scr_InvoicesTools extends StatelessWidget {
   scr_InvoicesTools({super.key});
@@ -22,10 +24,11 @@ class scr_InvoicesTools extends StatelessWidget {
       children: [
         Container(
           padding: EdgeInsets.only(top: 2, bottom: 2, right: 15, left: 15),
-          decoration:
-              BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-                border: Border.all(color: Colors.blue  , width: 3 ),
-              ),
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+            border: Border.all(color: Colors.blue, width: 3),
+          ),
           child: const Text(
             'الفواتير',
             style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
@@ -44,7 +47,7 @@ class scr_InvoicesTools extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () async {
-                   sharedControls.navigatTo(context, scr_purchaseView());
+                  sharedControls.navigatTo(context, scr_purchaseView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -72,7 +75,7 @@ class scr_InvoicesTools extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                  sharedControls.navigatTo(context, scr_purchaseReturnedReturnedView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -100,7 +103,7 @@ class scr_InvoicesTools extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
-                   sharedControls.navigatTo(context, scr_salesView());
+                  sharedControls.navigatTo(context, scr_salesView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -128,7 +131,7 @@ class scr_InvoicesTools extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                  sharedControls.navigatTo(context, scr_salesReturnedView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -210,7 +213,6 @@ class scr_InvoicesTools extends StatelessWidget {
                   ),
                 ),
               ),
-
             ],
           ),
         ),

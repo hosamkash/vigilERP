@@ -1076,7 +1076,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
       itemProductsQty.IDDocumentType = en_DocumentType.recivedQty.value;
-      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.recivedQty.value);
+      itemProductsQty.DocumentTypeName = en_DocumentType.recivedQty .name;;
       itemProductsQty.IDStock = stockIDFromRecived;
       itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockIDFromRecived);
       itemProductsQty.LineNumber = index;

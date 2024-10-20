@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vigil_erp/bll/bllFirebase/ManageBLL.dart';
 import 'package:vigil_erp/bll/classModel/Def_CompanyStructure.dart';
 import 'package:vigil_erp/bll/classModel/Def_Stocks.dart';
-import 'package:vigil_erp/bll/classModel/Invoices_Purchase.dart';
+import 'package:vigil_erp/bll/classModel/Inv_ProductsQty.dart';
+import 'package:vigil_erp/bll/classModel/Invoices_PurchaseReturned.dart';
 import 'package:vigil_erp/blocManagment/blocDealing/dealing_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocFixTables/fix_table_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocInventory/inv_bloc.dart';
+import 'package:vigil_erp/blocManagment/blocInvoices/invoic_bloc.dart';
 import 'package:vigil_erp/blocManagment/tablesCondions.dart';
 import 'package:vigil_erp/componants/ctr_AlertDialog.dart';
 import 'package:vigil_erp/componants/ctr_TextFormField.dart';
 import 'package:vigil_erp/componants/ctr_TextHeaderPage.dart';
-import 'package:vigil_erp/screens/invoices/1-Purchase/scr_purchaseItem.dart';
+import 'package:vigil_erp/screens/invoices/1-PurchaseReturned/scr_purchaseReturnedItem.dart';
 import 'package:vigil_erp/shared/enumerators.dart';
 import 'package:vigil_erp/shared/sharedFunctions.dart';
 import 'package:vigil_erp/shared/sharedHive.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
-import '../../../bll/bllFirebase/ManageBLL.dart';
-import '../../../bll/classModel/Inv_ProductsQty.dart';
-import '../../../blocManagment/blocInvoices/invoic_bloc.dart';
 
-class scr_purchaseView extends StatefulWidget {
-  scr_purchaseView({super.key});
+class scr_purchaseReturnedReturnedView extends StatefulWidget {
+  scr_purchaseReturnedReturnedView({super.key});
 
   @override
-  State<scr_purchaseView> createState() => _scr_purchaseViewState();
+  State<scr_purchaseReturnedReturnedView> createState() => _scr_purchaseReturnedReturnedViewState();
 }
 
-class _scr_purchaseViewState extends State<scr_purchaseView> {
+class _scr_purchaseReturnedReturnedViewState extends State<scr_purchaseReturnedReturnedView> {
   GlobalKey<ScaffoldState> scaffold = GlobalKey<ScaffoldState>();
   TextEditingController controllerfilter = TextEditingController();
   TextEditingController contDateTo = TextEditingController();
@@ -80,16 +80,16 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ctr_TextHeaderPage(
-                text: 'عرض فواتير المشتريات',
+                text: 'عرض مرتجعات المشتريات',
                 style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25),
                 color: Colors.grey[300],
                 borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
               ),
-              BlocBuilder<purchase_bloc, invoic_state>(
+              BlocBuilder<purchaseReturned_bloc, invoic_state>(
                 builder: (context, state) {
-                  if (state is purchase_StateDataChanged) {
+                  if (state is purchaseReturned_StateDataChanged) {
                     return ctr_TextHeaderPage(
-                      text: state.filterdLst_Purchase.length.toString(),
+                      text: state.filterdLst_PurchaseReturned.length.toString(),
                       color: Colors.grey[300],
                       borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
                       style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
@@ -113,7 +113,7 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
                   padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
                   OnChanged: (value) {
                     if (value != null) {
-                      purchase_bloc.instance.add(filterAnyPurchase_Event(filterData: value.trim()));
+                      purchaseReturned_bloc.instance.add(filterAnyPurchaseReturned_Event(filterData: value.trim()));
                     }
                     return null;
                   },
@@ -121,7 +121,7 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
                 IconButton(
                   onPressed: () {
                     controllerfilter.clear();
-                    purchase_bloc.instance.add(resetFilterPurchase_Event());
+                    purchaseReturned_bloc.instance.add(resetFilterPurchaseReturned_Event());
                   },
                   icon: const Icon(Icons.clear),
                 ),
@@ -138,11 +138,11 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
   }
 
   Widget buildListView(BuildContext context) {
-    return BlocBuilder<purchase_bloc, invoic_state>(
+    return BlocBuilder<purchaseReturned_bloc, invoic_state>(
       builder: (context, state) {
-        if (state is purchase_StateInitial) {
+        if (state is purchaseReturned_StateInitial) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state is purchase_StateDataChanged) {
+        } else if (state is purchaseReturned_StateDataChanged) {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Column(
@@ -192,10 +192,6 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
                       SizedBox(
                           width: 80,
                           child: Text('الصافى', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
-
-
-
-
                       SizedBox(
                           width: 110,
                           child: Text('  ', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
@@ -212,10 +208,10 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
                       // physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0),
                       itemBuilder: (context, index) {
-                        return buildListViewItem(state.filterdLst_Purchase[index], context);
+                        return buildListViewItem(state.filterdLst_PurchaseReturned[index], context);
                       },
                       separatorBuilder: (context, index) => const SizedBox(height: 1),
-                      itemCount: state.filterdLst_Purchase.length,
+                      itemCount: state.filterdLst_PurchaseReturned.length,
                     ),
                   ),
                 ),
@@ -227,10 +223,10 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
                   child: Row(
                     children: [
                       SizedBox(width: 100),
-                      BlocBuilder<purchase_bloc, invoic_state>(
+                      BlocBuilder<purchaseReturned_bloc, invoic_state>(
                         builder: (context, state) {
-                          if (state is purchase_StateDataChanged) {
-                            contTotalValue.text = state.filterdLst_Purchase
+                          if (state is purchaseReturned_StateDataChanged) {
+                            contTotalValue.text = state.filterdLst_PurchaseReturned
                                 .fold(0.0, (previousValue, element) => previousValue + element.NetValue!)
                                 .toStringAsFixed(2);
                             return SizedBox(
@@ -259,7 +255,7 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
     );
   }
 
-  buildListViewItem(Invoices_Purchase item, context) {
+  buildListViewItem(Invoices_PurchaseReturned item, context) {
     return Column(
       children: [
         Divider(
@@ -275,8 +271,7 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
               children: [
                 SizedBox(
                   width: 40,
-                  child:
-                  Checkbox(
+                  child: Checkbox(
                       value: item.IsClosed,
                       onChanged: (value) {
                         // setState(() {
@@ -372,9 +367,6 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),
-
-
-
                 SizedBox(
                   width: 110,
                   child: Row(
@@ -423,7 +415,7 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
         IconButton(
           onPressed: () {
             sharedControls
-                .showFormFilterByDates(context, en_TablesName.Invoices_Purchase, branchID, contDateFrom, contDateTo, isGetAllDates)
+                .showFormFilterByDates(context, en_TablesName.Invoices_PurchaseReturned, branchID, contDateFrom, contDateTo, isGetAllDates)
                 .then((retValues) {
               if (retValues != null) {
                 isGetAllDates = retValues[0] as bool;
@@ -443,8 +435,8 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
         IconButton(
           onPressed: () {
             tablesCondions
-                .createCondionsByDates(en_TablesName.Invoices_Purchase, branchID, contDateFrom, contDateTo, isGetAllDates)
-                .then((cond) => purchase_bloc.instance.add(getListPurchase_Event(condions: cond)));
+                .createCondionsByDates(en_TablesName.Invoices_PurchaseReturned, branchID, contDateFrom, contDateTo, isGetAllDates)
+                .then((cond) => purchaseReturned_bloc.instance.add(getListPurchaseReturned_Event(condions: cond)));
           },
           icon: Icon(
             Icons.cloud_download_rounded,
@@ -483,39 +475,39 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
     contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
     contDateTo.text = contDateFrom.text;
 
-    List<BLLCondions>? cond =
-        await tablesCondions.createCondionsByDates(en_TablesName.Invoices_Purchase, sharedHive.currentBranch!.ID, contDateFrom, contDateTo, false);
-    purchase_bloc.instance.add(getListPurchase_Event(condions: cond));
+    List<BLLCondions>? cond = await tablesCondions.createCondionsByDates(
+        en_TablesName.Invoices_PurchaseReturned, sharedHive.currentBranch!.ID, contDateFrom, contDateTo, false);
+    purchaseReturned_bloc.instance.add(getListPurchaseReturned_Event(condions: cond));
 
     if (controllerfilter.text.trim().isNotEmpty) {
-      purchase_bloc.instance.add(filterAnyPurchase_Event(filterData: controllerfilter.text.trim()));
+      purchaseReturned_bloc.instance.add(filterAnyPurchaseReturned_Event(filterData: controllerfilter.text.trim()));
     }
   }
 
   void newItem() async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => scr_purchaseItem(null, en_FormMode.NewMode),
+        builder: (context) => scr_purchaseReturnedItem(null, en_FormMode.NewMode),
       ),
     );
     loadDataFromDB();
   }
 
-  void editItem(Invoices_Purchase item) async {
+  void editItem(Invoices_PurchaseReturned item) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => scr_purchaseItem(item, en_FormMode.EditMode),
+        builder: (context) => scr_purchaseReturnedItem(item, en_FormMode.EditMode),
       ),
     );
 
     if (result == null) {
-      purchase_bloc.instance.add(refreshPurchase_Event());
+      purchaseReturned_bloc.instance.add(refreshPurchaseReturned_Event());
     } else if (result == true) {
       loadDataFromDB();
     }
   }
 
-  void deleteItem(Invoices_Purchase item) {
+  void deleteItem(Invoices_PurchaseReturned item) {
     print('حذف ${item.Code}  -  ID ${item.ID}');
 
     ctr_AlertDialog.showListFilter(
@@ -561,13 +553,13 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
     );
   }
 
-  void delete(Invoices_Purchase item) async {
+  void delete(Invoices_PurchaseReturned item) async {
     // الحذف من جدول الفواتير
-    purchase_bloc.instance.add(deletePurchase_Event(deleteID: item.ID!));
+    purchaseReturned_bloc.instance.add(deletePurchaseReturned_Event(deleteID: item.ID!));
 
     // الحذف للمستند كامل من الجرد
     List<BLLCondions> cond = [
-      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.purchase.value),
+      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.purchaseReturned.value),
       BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, item.ID!),
     ];
 
@@ -577,7 +569,7 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
     Navigator.of(context).pop();
   }
 
-  void shareItem(Invoices_Purchase item) async {
+  void shareItem(Invoices_PurchaseReturned item) async {
     print('مشاركة  ${item.Code}  -  ID ${item.ID}');
   }
 }

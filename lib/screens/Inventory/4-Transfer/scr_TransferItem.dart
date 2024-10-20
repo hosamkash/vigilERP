@@ -989,7 +989,7 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
       itemProductsQty.IDDocumentType = en_DocumentType.transfer.value;
-      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.transfer.value);
+      itemProductsQty.DocumentTypeName = en_DocumentType. transfer.name;;
       itemProductsQty.IDStock = stockIDFrom;
       itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockIDFrom);
       itemProductsQty.LineNumber = index;
