@@ -10,6 +10,7 @@ import 'blocManagment/blocDealing/dealing_bloc.dart';
 import 'blocManagment/blocDefinition/definition_bloc.dart';
 import 'blocManagment/blocFixTables/fix_table_bloc.dart';
 import 'blocManagment/blocInventory/inv_bloc.dart';
+import 'blocManagment/blocInvoices/invoic_bloc.dart';
 import 'blocManagment/general/cubitGeneral.dart';
 import 'blocManagment/general/cubitStates.dart';
 import 'blocManagment/general/myBlocObserver.dart';
@@ -60,7 +61,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => militaryStatus_bloc()),
         BlocProvider(create: (context) => gender_bloc()),
         BlocProvider(create: (context) => user_bloc()),
-
         BlocProvider(create: (context) => productQty_bloc()),
         BlocProvider(create: (context) => permissionAdd_bloc()),
         BlocProvider(create: (context) => permissionDiscount_bloc()),
@@ -68,6 +68,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => requestStatus_bloc()),
         BlocProvider(create: (context) => address_bloc()),
         BlocProvider(create: (context) => transfer_bloc()),
+        BlocProvider(create: (context) => recived_bloc()),
+        BlocProvider(create: (context) => purchase_bloc()),
+        BlocProvider(create: (context) => sales_bloc()),
       ],
       child: BlocConsumer<cubitGeneral, cubitStates>(
         listener: (context, state) => state_InitialApp(),
@@ -94,7 +97,6 @@ class MyApp extends StatelessWidget {
           militaryStatus_bloc.cretaeInctance(context);
           gender_bloc.cretaeInctance(context);
           user_bloc.cretaeInctance(context);
-
           productQty_bloc.cretaeInctance(context);
           permissionAdd_bloc.cretaeInctance(context);
           permissionDiscount_bloc.cretaeInctance(context);
@@ -102,6 +104,9 @@ class MyApp extends StatelessWidget {
           requestStatus_bloc.cretaeInctance(context);
           address_bloc.cretaeInctance(context);
           transfer_bloc.cretaeInctance(context);
+          recived_bloc.cretaeInctance(context);
+          purchase_bloc.cretaeInctance(context);
+          sales_bloc.cretaeInctance(context);
 
           //*************************************
           cubitGeneral.get(context);

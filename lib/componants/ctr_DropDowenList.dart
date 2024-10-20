@@ -12,7 +12,9 @@ class ctr_DropDowenList extends StatefulWidget {
   TextStyle? itemsTextStyle;
   TextStyle? hintTextStyle;
   EdgeInsets? padding;
+
   // double? height;
+  late bool? readOnly;
   double? menuMaxHeightValue;
   BorderRadius? borderRadius;
   late int? Function(int? selectedID)? OnChanged;
@@ -28,6 +30,7 @@ class ctr_DropDowenList extends StatefulWidget {
     this.hintTextStyle,
     this.padding,
     // this.height = 50,
+    this.readOnly = false,
     this.menuMaxHeightValue,
     this.borderRadius,
     this.OnChanged,
@@ -66,34 +69,14 @@ class _ctr_DropDowenListState extends State<ctr_DropDowenList> {
               hint: Text(widget.hintLable),
               style: const TextStyle(fontSize: 17, color: Colors.black, height: 0.2),
               iconSize: 22,
-
               items: widget.lstDataSource.map((selectedItem) {
                 return DropdownMenuItem<int>(
                   value: selectedItem.valueMember,
                   child: Text('${selectedItem.displayMember}${selectedItem.displayMemberMore.isEmpty ? '' : ' ${selectedItem.displayMemberMore}'}'),
                 );
               }).toList(),
-              onChanged: (int? newId) {
-                setState(() {
-                  widget.selectedValue = newId;
-                  if (widget.OnChanged != null) {
-                    widget.OnChanged!(widget.selectedValue!);
-                    // print('Selected Id ${widget.selectedValue}');
-                  }
-                });
-              },
-
-               validator: widget.OnValidate,
-              // validator: (val) {
-              //   setState(() {
-              //     if (val == null) {
-              //       widget.height = widget.height! + 15;
-              //     } else
-              //       widget.height = 50;
-              //   });
-              //   return widget.OnValidate != null ? widget.OnValidate!(val) : null;
-              // },
-
+              onChanged: onChangedCheckReadOnly(),
+              validator: widget.OnValidate,
               icon: const Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: Colors.black,
@@ -137,5 +120,21 @@ class _ctr_DropDowenListState extends State<ctr_DropDowenList> {
           ),
       ],
     );
+  }
+
+  dynamic onChangedCheckReadOnly() {
+    if (widget.readOnly == true) {
+      return null;
+    } else {
+      return (int? newId) {
+        setState(() {
+          widget.selectedValue = newId;
+          if (widget.OnChanged != null) {
+            widget.OnChanged!(widget.selectedValue!);
+            // print('Selected Id ${widget.selectedValue}');
+          }
+        });
+      };
+    }
   }
 }

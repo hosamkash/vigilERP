@@ -156,7 +156,6 @@ class updateSettlementProductQtyByStock_Event extends inv_event {
 }
 
 //******************************** Transfer **************************************
-
 class getListTransfer_Event extends inv_event {
   final List<BLLCondions>? condions;
   getListTransfer_Event({ this.condions });
@@ -201,4 +200,51 @@ class updateTransferProductQtyByStock_Event extends inv_event {
   final int? stockID;
   final int? productID;
   updateTransferProductQtyByStock_Event({this.productID , this.stockID  });
+}
+
+//******************************** Recived **************************************
+class getListRecived_Event extends inv_event {
+  final List<BLLCondions>? condions;
+  getListRecived_Event({ this.condions });
+}
+class refreshRecived_Event extends inv_event {}
+class resetFilterRecived_Event extends inv_event {}
+class filterAnyRecived_Event extends inv_event {
+  final String? filterData;
+  filterAnyRecived_Event({ this.filterData});
+}
+class deleteRecived_Event extends inv_event {
+  final int? deleteID;
+  deleteRecived_Event({ this.deleteID});
+}
+
+class getListRecivedDetails_Event extends inv_event {
+  final int IDRecived;
+  getListRecivedDetails_Event(this.IDRecived);
+}
+class clearRecivedDetails_Event extends inv_event {}
+class filterAnyRecivedDetails_Event extends inv_event {
+  final String? filterData;
+  filterAnyRecivedDetails_Event({ this.filterData});
+}
+class addNewRecivedDetails_Event extends inv_event {
+  final customProductItem? itemCustomProduct;
+  final int? stockID;
+  addNewRecivedDetails_Event({ this.itemCustomProduct , this.stockID});
+}
+class editRowRecivedDetails_Event extends inv_event {
+  final customProductItem? itemCustomProduct;
+  final int? index;
+  editRowRecivedDetails_Event({ this.itemCustomProduct , this.index});
+}
+class deleteItemRecivedDetails_Event extends inv_event {
+  final Inv_RecivedQtyDetails? itemDetails;
+  deleteItemRecivedDetails_Event({ this.itemDetails});
+}
+class resetFilterRecivedDetails_Event extends inv_event {}
+class refreshRecivedDetails_Event extends inv_event {}
+class updateRecivedProductQtyByStock_Event extends inv_event {
+  final int? stockID;
+  final int? productID;
+  updateRecivedProductQtyByStock_Event({this.productID , this.stockID  });
 }

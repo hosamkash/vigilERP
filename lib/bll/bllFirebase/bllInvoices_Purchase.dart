@@ -1,33 +1,32 @@
-import 'package:vigil_erp/bll/classModel/Inv_TransferDetails.dart';
-
-import '../classModel/Inv_Transfer.dart';
+import '../classModel/Invoices_Purchase.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../../shared/enumerators.dart';
+import '../classModel/Invoices_PurchaseDetails.dart';
 import 'ManageBLL.dart';
 
-class bllInv_Transfer {
-  static List<String> ColumnsName = enTable_Inv_Transfer.values.map((item) => item.name).toList();
-  static late List<Inv_Transfer> lstInv_Transfer = [];
-  static late Inv_Transfer itemInv_Transfer;
+class bllInvoices_Purchase {
+  static List<String> ColumnsName = enTable_Invoices_Purchase.values.map((item) => item.name).toList();
+  static late List<Invoices_Purchase> lstInvoices_Purchase = [];
+  static late Invoices_Purchase itemInvoices_Purchase;
   static String query = '';
-  static List<Inv_TransferDetails> lstInv_TransferDetails = [];
+  static List<Invoices_PurchaseDetails> lstInvoices_PurchaseDetails = [];
 
 //**************************** general function ****************************
 
   static Future<int> getMaxID_firestore() async {
     int maxID = 0;
     await FirebaseFirestore.instance
-        .collection(en_TablesName.Inv_Transfer.name)
-        .orderBy(enTable_Inv_Transfer.ID.name, descending: true)
+        .collection(en_TablesName.Invoices_Purchase.name)
+        .orderBy(enTable_Invoices_Purchase.ID.name, descending: true)
         .limit(1)
         .get()
         .then((value) {
       if (value.docs.isEmpty) {
         maxID = 1;
       } else {
-        maxID = value.docs.first.get(enTable_Inv_Transfer.ID.name);
+        maxID = value.docs.first.get(enTable_Invoices_Purchase.ID.name);
         maxID += 1;
       }
     }).catchError((error) {
@@ -37,20 +36,20 @@ class bllInv_Transfer {
     return maxID;
   }
 
-  static Future<int> getMax_firestore(enTable_Inv_Transfer colName, {BLLCondions? condion}) async {
+  static Future<int> getMax_firestore(enTable_Invoices_Purchase colName, {BLLCondions? condion}) async {
     int maxID = 1;
     QuerySnapshot? snapshot;
     try {
       if (condion != null) {
         snapshot = await FirebaseFirestore.instance
-            .collection(en_TablesName.Inv_Transfer.name)
+            .collection(en_TablesName.Invoices_Purchase.name)
             .where(condion.columnName, isEqualTo: condion.value)
             .orderBy(colName.name, descending: true)
             .limit(1)
             .get();
       } else if (condion == null) {
         snapshot =
-            await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).orderBy(colName.name, descending: true).limit(1).get();
+            await FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name).orderBy(colName.name, descending: true).limit(1).get();
       }
       if (snapshot != null && snapshot.docs.isNotEmpty) {
         maxID = snapshot.docs.first.get(colName.name);
@@ -66,9 +65,9 @@ class bllInv_Transfer {
 //**************************** add & set ****************************
 
   /// هو إسم الكلاس والإضافة بتكون بكون عشوائي ولا يمكن للمستخدم تحديده collection وبيكون ال  FirebaseFirestore تستخدم للإضافة فى
-  static Future<String> fire_AddItem(Inv_Transfer itemInv_Transfer) async {
+  static Future<String> fire_AddItem(Invoices_Purchase itemInvoices_Purchase) async {
     String docCreatedName = '';
-    await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).add(itemInv_Transfer.toMap()).then((val) {
+    await FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name).add(itemInvoices_Purchase.toMap()).then((val) {
       docCreatedName = val.id;
     }).catchError((error) {
       print(error.toString());
@@ -77,9 +76,9 @@ class bllInv_Transfer {
     return docCreatedName;
   }
 
-  static Future<bool> fire_SetItemMap(String docName, Map<String, dynamic> itemInv_Transfer) async {
+  static Future<bool> fire_SetItemMap(String docName, Map<String, dynamic> itemInvoices_Purchase) async {
     bool result = false;
-    await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).doc(docName).set(itemInv_Transfer).then((val) {
+    await FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name).doc(docName).set(itemInvoices_Purchase).then((val) {
       result = true;
     }).catchError((error) {
       print(error.toString());
@@ -88,9 +87,9 @@ class bllInv_Transfer {
     return result;
   }
 
-  static Future<bool> fire_SetItem(String docName, Inv_Transfer itemInv_Transfer) async {
+  static Future<bool> fire_SetItem(String docName, Invoices_Purchase itemInvoices_Purchase) async {
     bool result = false;
-    await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).doc(docName).set(itemInv_Transfer.toMap()).then((val) {
+    await FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name).doc(docName).set(itemInvoices_Purchase.toMap()).then((val) {
       result = true;
     }).catchError((error) {
       print(error.toString());
@@ -101,17 +100,17 @@ class bllInv_Transfer {
 
   static Future fire_setListMaster_And_Details({
     required String insertdDocID,
-    required Inv_Transfer itemInv_Transfer,
+    required Invoices_Purchase itemInvoices_Purchase,
     required String collectionDetailsName,
     required String columnNameAsDocumentDetails,
     required List<Map<String, dynamic>> detais,
     required List<Map<String, dynamic>> deletedItemsDetais,
   }) async {
-    CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name);
+    CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name);
     DocumentReference tablemasterDocref = coll.doc(insertdDocID);
     WriteBatch batch = FirebaseFirestore.instance.batch();
     // save Master
-    batch.set(tablemasterDocref, itemInv_Transfer.toMap());
+    batch.set(tablemasterDocref, itemInvoices_Purchase.toMap());
     // delete old items it removed from list
     for (var item in deletedItemsDetais) {
       DocumentReference itemRefDelete = tablemasterDocref.collection(collectionDetailsName).doc(item[columnNameAsDocumentDetails].toString());
@@ -127,11 +126,11 @@ class bllInv_Transfer {
   }
 
   static Future fire_setListMaster({
-    required List<Inv_Transfer> lstInv_Transfer,
+    required List<Invoices_Purchase> lstInvoices_Purchase,
   }) async {
-    CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name);
+    CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name);
     WriteBatch batch = FirebaseFirestore.instance.batch();
-    lstInv_Transfer.forEach((elm) {
+    lstInvoices_Purchase.forEach((elm) {
       DocumentReference docRef = coll.doc(elm.ID.toString());
       batch.set(docRef, elm.toMap());
     });
@@ -140,78 +139,85 @@ class bllInv_Transfer {
 
 //**************************** get ****************************
 
-  static Future<Inv_Transfer> fire_getItem(String docName) async {
-    late Inv_Transfer itemInv_Transfer;
+  static Future<Invoices_Purchase> fire_getItem(String docName) async {
+    late Invoices_Purchase itemInvoices_Purchase;
     try {
-      var retValue = await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).doc(docName).get();
-      itemInv_Transfer = Inv_Transfer();
-      itemInv_Transfer.ID = retValue.data()!['ID'];
-      itemInv_Transfer.Code = retValue.data()!['Code'];
-      itemInv_Transfer.Date = retValue.data()!['Date'];
-      itemInv_Transfer.Time = retValue.data()!['Time'];
-      itemInv_Transfer.IDRequestStatus = retValue.data()!['IDRequestStatus'];
-      itemInv_Transfer.IDBranchFrom = retValue.data()!['IDBranchFrom'];
-      itemInv_Transfer.IDStockFrom = retValue.data()!['IDStockFrom'];
-      itemInv_Transfer.IDEmployee = retValue.data()!['IDEmployee'];
-      itemInv_Transfer.IDBranchTo = retValue.data()!['IDBranchTo'];
-      itemInv_Transfer.IDStockTo = retValue.data()!['IDStockTo'];
-      itemInv_Transfer.TotalValueFrom = retValue.data()!['TotalValueFrom'];
-      itemInv_Transfer.TotalValueTo = retValue.data()!['TotalValueTo'];
-      itemInv_Transfer.Note = retValue.data()!['Note'];
-      itemInv_Transfer.UID = retValue.data()!['UID'];
-      return itemInv_Transfer;
+      var retValue = await FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name).doc(docName).get();
+      itemInvoices_Purchase = Invoices_Purchase();
+      itemInvoices_Purchase.ID = retValue.data()!['ID'];
+      itemInvoices_Purchase.Code = retValue.data()!['Code'];
+      itemInvoices_Purchase.Date = retValue.data()!['Date'];
+      itemInvoices_Purchase.Time = retValue.data()!['Time'];
+      itemInvoices_Purchase.IDBranch = retValue.data()!['IDBranch'];
+      itemInvoices_Purchase.IDStock = retValue.data()!['IDStock'];
+      itemInvoices_Purchase.IDEmployee = retValue.data()!['IDEmployee'];
+      itemInvoices_Purchase.IDVendor = retValue.data()!['IDVendor'];
+      itemInvoices_Purchase.VendorSerial = retValue.data()!['VendorSerial'];
+      itemInvoices_Purchase.TotalValue = retValue.data()!['TotalValue'];
+      itemInvoices_Purchase.DiscountValue = retValue.data()!['DiscountValue'];
+      itemInvoices_Purchase.DiscountPercent = retValue.data()!['DiscountPercent'];
+      itemInvoices_Purchase.NetValue = retValue.data()!['NetValue'];
+      itemInvoices_Purchase.IsClosed = retValue.data()!['IsClosed'];
+      itemInvoices_Purchase.Note = retValue.data()!['Note'];
+      itemInvoices_Purchase.UID = retValue.data()!['UID'];
+      itemInvoices_Purchase.CurrentBalance = retValue.data()!['CurrentBalance'];
+      return itemInvoices_Purchase;
     } catch (error) {
       print(error.toString());
       throw error;
     }
   }
 
-  static Future<List<Inv_Transfer>> fire_getList() async {
-    await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).get().then((value) {
-      lstInv_Transfer.clear();
+  static Future<List<Invoices_Purchase>> fire_getList() async {
+    await FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name).get().then((value) {
+      lstInvoices_Purchase.clear();
       value.docs.forEach((element) {
-        lstInv_Transfer.add(Inv_Transfer.fromJson(element.data()));
+        lstInvoices_Purchase.add(Invoices_Purchase.fromJson(element.data()));
       });
     }).catchError((error) {
       print(error.toString());
       throw error;
     });
-    return lstInv_Transfer;
+    return lstInvoices_Purchase;
   }
 
-  static Future<List<Inv_TransferDetails>> fire_getListDetails(String IDMaster, String TableNameDetails) async {
+  static Future<List<Invoices_PurchaseDetails>> fire_getListDetails(String IDMaster, String TableNameDetails) async {
     try {
       //**************** 1 - Master Date
-      DocumentSnapshot doc = await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).doc(IDMaster).get();
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name).doc(IDMaster).get();
 
       //**************** 2 - Details Data
       QuerySnapshot<Map<String, dynamic>> collRef = await doc.reference.collection(TableNameDetails).get();
-      lstInv_TransferDetails.clear();
+      lstInvoices_PurchaseDetails.clear();
       collRef.docs.forEach((element) {
-        lstInv_TransferDetails.add(Inv_TransferDetails.fromJson(element.data()));
+        lstInvoices_PurchaseDetails.add(Invoices_PurchaseDetails.fromJson(element.data()));
       });
     } catch (error) {
       print(error.toString());
       throw error;
     }
-    return lstInv_TransferDetails;
+    return lstInvoices_PurchaseDetails;
   }
 
-  static Future<List<Inv_Transfer>> fire_getListByBranch(int branchID, String BranchColumnName) async {
-    await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).where(BranchColumnName, isEqualTo: branchID).get().then((value) {
-      lstInv_Transfer.clear();
+  static Future<List<Invoices_Purchase>> fire_getListByBranch(int branchID, String BranchColumnName) async {
+    await FirebaseFirestore.instance
+        .collection(en_TablesName.Invoices_Purchase.name)
+        .where(BranchColumnName, isEqualTo: branchID)
+        .get()
+        .then((value) {
+      lstInvoices_Purchase.clear();
       value.docs.forEach((element) {
-        lstInv_Transfer.add(Inv_Transfer.fromJson(element.data()));
+        lstInvoices_Purchase.add(Invoices_Purchase.fromJson(element.data()));
       });
     }).catchError((error) {
       print(error.toString());
       throw error;
     });
-    return lstInv_Transfer;
+    return lstInvoices_Purchase;
   }
 
-  static Future<List<Inv_Transfer>> fire_getListWithConditions({List<BLLCondions>? conditions}) async {
-    CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name);
+  static Future<List<Invoices_Purchase>> fire_getListWithConditions({List<BLLCondions>? conditions}) async {
+    CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name);
     Query query = colRef;
     if (conditions != null) {
       for (var cond in conditions) {
@@ -239,18 +245,18 @@ class bllInv_Transfer {
       }
     }
     QuerySnapshot snap = await query.get();
-    lstInv_Transfer.clear();
+    lstInvoices_Purchase.clear();
     snap.docs.forEach((element) {
-      lstInv_Transfer.add(Inv_Transfer.fromJson(element.data() as Map<String, dynamic>));
+      lstInvoices_Purchase.add(Invoices_Purchase.fromJson(element.data() as Map<String, dynamic>));
     });
-    return lstInv_Transfer;
+    return lstInvoices_Purchase;
   }
 
 //**************************** delete ****************************
 
   static Future<bool> fire_DeleteItem(String docName) async {
     bool result = false;
-    await FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name).doc(docName).delete().then((val) {
+    await FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name).doc(docName).delete().then((val) {
       result = true;
     }).catchError((error) {
       print(error.toString());
@@ -260,7 +266,7 @@ class bllInv_Transfer {
   }
 
   static Future fire_DeleteListMaster(List<BLLCondions> conditions) async {
-    CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name);
+    CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name);
     Query query = colRef;
     for (var cond in conditions) {
       if (cond.where == en_CondionsWhere.isNull)
@@ -295,7 +301,7 @@ class bllInv_Transfer {
 
   static Future<bool> fire_DeleteListMaster_And_Details(String docName, String subCollectionName) async {
     // specify Main Collection
-    CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Inv_Transfer.name);
+    CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Invoices_Purchase.name);
     // Mention to Document
     DocumentReference tablemasterDocref = coll.doc(docName);
     // Mention to subCollection
@@ -317,7 +323,7 @@ class bllInv_Transfer {
 //**************************** Upload Files ****************************
 
   static Future<String> storage_UploadFile(String fileName, File file, {String pathOnStorage = ''}) async {
-    pathOnStorage = pathOnStorage.isEmpty ? en_TablesName.Inv_Transfer.name : pathOnStorage;
+    pathOnStorage = pathOnStorage.isEmpty ? en_TablesName.Invoices_Purchase.name : pathOnStorage;
     String fileDownloadURL = '';
     await firebase_storage.FirebaseStorage.instance.ref().child('${pathOnStorage}/${fileName}').putFile(file).then((fileUpload) async {
       await fileUpload.ref.getDownloadURL().then((URL) {
@@ -332,7 +338,7 @@ class bllInv_Transfer {
 
   static Future<String> storage_GetFileDowenloadURL(String fileName) async {
     String fileDownloadURL = '';
-    await firebase_storage.FirebaseStorage.instance.ref().child('${en_TablesName.Inv_Transfer.name}/${fileName}').getDownloadURL().then((URL) {
+    await firebase_storage.FirebaseStorage.instance.ref().child('${en_TablesName.Invoices_Purchase.name}/${fileName}').getDownloadURL().then((URL) {
       fileDownloadURL = URL;
     }).catchError((error) {
       print(error.toString());
@@ -343,7 +349,7 @@ class bllInv_Transfer {
 
   static Future<bool> storage_DeleteFile(String fileName, {String pathOnStorage = ''}) async {
     bool result = false;
-    pathOnStorage = pathOnStorage.isEmpty ? en_TablesName.Inv_Transfer.name : pathOnStorage;
+    pathOnStorage = pathOnStorage.isEmpty ? en_TablesName.Invoices_Purchase.name : pathOnStorage;
     await firebase_storage.FirebaseStorage.instance.ref().child('${pathOnStorage}/${fileName}').delete().then((val) {
       result = true;
     }).catchError((error) {

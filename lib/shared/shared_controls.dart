@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vigil_erp/blocManagment/blocInvoices/invoic_bloc.dart';
 import 'package:vigil_erp/shared/sharedDesigne.dart';
 
 import '../bll/bllFirebase/ManageBLL.dart';
@@ -11,6 +12,7 @@ import '../blocManagment/tablesCondions.dart';
 import '../componants/ctr_AlertDialog.dart';
 import '../componants/ctr_Date.dart';
 import '../componants/ctr_DropDowenList.dart';
+import '../componants/ctr_TextFormField.dart';
 import '../componants/ctr_TextHeaderPage.dart';
 import '../screens/definitions/category/scr_categoryView.dart';
 import '../screens/definitions/products/scr_ProductView.dart';
@@ -114,9 +116,15 @@ class sharedControls {
     );
   }
 
-  static Future<void> confirmDialog(context,String textAddress,  String textHeader, VoidCallback OnDeleted,
-  {TextStyle? style,String? textButtonOk,String? textButtonCancle,  }) {
-
+  static Future<void> confirmDialog(
+    context,
+    String textAddress,
+    String textHeader,
+    VoidCallback OnDeleted, {
+    TextStyle? style,
+    String? textButtonOk,
+    String? textButtonCancle,
+  }) {
     return showDialog(
       context: context,
       useSafeArea: true,
@@ -151,7 +159,7 @@ class sharedControls {
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton.icon(
-                      label:  Text(textButtonCancle ?? 'الغاء', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      label: Text(textButtonCancle ?? 'الغاء', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       icon: const Icon(Icons.cancel),
                       iconAlignment: IconAlignment.end,
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 3),
@@ -397,14 +405,159 @@ class sharedControls {
                     children: [
                       TextButton(
                         onPressed: () async {
+                          //****************************** inventory
                           var cond = await tablesCondions.createCondionsByDates(tableName, branchID, contDateFrom, contDateTo, isGetAllDates);
                           if (tableName == en_TablesName.Inv_PermissionAdd)
                             permissionAdd_bloc.instance.add(getListPermissionAdd_Event(condions: cond));
-                         else if (tableName == en_TablesName.Inv_PermissionDiscount)
+                          else if (tableName == en_TablesName.Inv_PermissionDiscount)
                             permissionDiscount_bloc.instance.add(getListPermissionDiscount_Event(condions: cond));
                           else if (tableName == en_TablesName.Inv_Settlement)
                             settlement_bloc.instance.add(getListSettlement_Event(condions: cond));
+                          else if (tableName == en_TablesName.Inv_Transfer)
+                            transfer_bloc.instance.add(getListTransfer_Event(condions: cond));
+                          else if (tableName == en_TablesName.Inv_RecivedQty)
+                            recived_bloc.instance.add(getListRecived_Event(condions: cond));
+
+                          //****************************** invoices
+                          else if (tableName == en_TablesName.Invoices_Purchase) purchase_bloc.instance.add(getListPurchase_Event(condions: cond));
+
+                          //**************************************************************************************
                           List<dynamic> dates = [isGetAllDates, contDateFrom.text, contDateTo.text, branchID];
+                          Navigator.pop(context, dates);
+                        },
+                        child: Text('تأكيد', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text('إلغاء', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    if (xx != null) {
+      return xx;
+    }
+  }
+
+  static Future showEditSummtionInvoice(
+      BuildContext context, en_TablesName tableName, String totalValue, String discountValue, String discountPercent, String netValue) async {
+    var frmKey = GlobalKey<FormState>();
+    TextEditingController contTotalValue = TextEditingController(text: totalValue);
+    TextEditingController contDiscountValue = TextEditingController(text: discountValue);
+    TextEditingController contDiscountPercent = TextEditingController(text: discountPercent);
+    TextEditingController contNetValue = TextEditingController(text: netValue);
+
+    var xx = await ctr_AlertDialog.showListFilter(
+      context,
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Form(
+            key: frmKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // يجعل الارتفاع يتناسب مع المحتويات
+              children: [
+                Text(
+                  'تعديل خصم الفاتورة',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                ctr_TextFormField(
+                  Controller: contTotalValue,
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                  Lable: 'إجمالى الفاتورة',
+                  TextType: TextInputType.numberWithOptions(decimal: true),
+                  readOnly: true,
+                  OnValidate: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'لابد من إدخال قيمة';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 5),
+                ctr_TextFormField(
+                  Controller: contDiscountValue,
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                  Lable: 'قيمة الخصم',
+                  TextType: TextInputType.numberWithOptions(decimal: true),
+                  sufix: IconButton(
+                      onPressed: () {
+                        contDiscountValue.text = contDiscountPercent.text = '0.0';
+                        contNetValue.text = contTotalValue.text;
+                      },
+                      icon: Icon(Icons.clear)),
+                  OnChanged: (val) {
+                    contDiscountPercent.text = ((double.parse(contDiscountValue.text) * 100) / double.parse(contTotalValue.text)).toStringAsFixed(2);
+                    contNetValue.text = (double.parse(contTotalValue.text) - double.parse(contDiscountValue.text)).toStringAsFixed(2);
+                    return null;
+                  },
+                  OnValidate: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'لابد من إدخال قيمة';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 5),
+                ctr_TextFormField(
+                  Controller: contDiscountPercent,
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                  Lable: 'نسبة الخصم',
+                  TextType: TextInputType.numberWithOptions(decimal: true),
+                  sufix: IconButton(
+                      onPressed: () {
+                        contDiscountValue.text = contDiscountPercent.text = '0.0';
+                        contNetValue.text = contTotalValue.text;
+                      },
+                      icon: Icon(Icons.clear)),
+                  OnChanged: (val) {
+                    contDiscountValue.text = ((double.parse(contTotalValue.text) * double.parse(contDiscountPercent.text)) / 100).toStringAsFixed(2);
+                    contNetValue.text = (double.parse(contTotalValue.text) - double.parse(contDiscountValue.text)).toStringAsFixed(2);
+                    return null;
+                  },
+                  OnValidate: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'لابد من إدخال قيمة';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 5),
+                ctr_TextFormField(
+                  Controller: contNetValue,
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                  Lable: 'الصافى',
+                  TextType: TextInputType.numberWithOptions(decimal: true),
+                  readOnly: true,
+                  OnValidate: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'لابد من إدخال قيمة';
+                    }
+                    return null;
+                  },
+                ),
+                Center(
+                  child: Row(
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          //****************************** Purchase
+                          if (tableName == en_TablesName.Invoices_Purchase) {
+                            purchase_bloc.instance.add(refreshPurchaseDetails_Event());
+                          } else if (tableName == en_TablesName.Invoices_Sales) {
+                            purchase_bloc.instance.add(refreshSalesDetails_Event());
+                          }
+
+
+                          //**************************************************************************************
+                          List<dynamic> dates = [contTotalValue.text, contDiscountValue.text, contDiscountPercent.text, contNetValue.text];
                           Navigator.pop(context, dates);
                         },
                         child: Text('تأكيد', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),

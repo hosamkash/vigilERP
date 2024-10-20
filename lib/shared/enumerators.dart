@@ -10,7 +10,11 @@ enum en_DocumentType {
   permissionDiscount(2),
   settlement(3),
   transfer(4),
-  // transfer(5),
+  recivedQty(5),
+  purchase(6),
+   sales(7),
+  // transfer(8),
+  // transfer(9),
   ;
 
   final int value;
@@ -99,7 +103,7 @@ enum en_Monthes {
 }
 
 enum en_RequestStatus {
-  OnDemand(1), // تحت الطلب
+  OnDemand(1), // قيد الطلب
   RequestCompleted(2), // تم إنهاء الطلب
   UnderReview(3), // قيد المراجعة
   ReviewError(4), // خطأ فى المراجعة
@@ -109,9 +113,10 @@ enum en_RequestStatus {
   PreparedIncomplete(8), // تم التجهيز - ناقص
   Sending(9), // قيد الإرسال
   Sent(10), // تم الإرسال
+
   ReceivedReview(11), // قيد مراجعة الإستلام
-  Received(12), // تم الإستلام
-  ReceivedWithCorrection(13); // تم الإستلام مع التصحيح
+  Received(12); // تم الإستلام
+  // ReceivedWithCorrection(13); // تم الإستلام مع التصحيح
 
   final int? value;
   const en_RequestStatus(this.value);

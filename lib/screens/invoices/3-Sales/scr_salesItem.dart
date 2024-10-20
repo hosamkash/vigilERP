@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllInvoices_Sales.dart';
 import 'package:vigil_erp/bll/classModel/Def_Categories.dart';
 import 'package:vigil_erp/bll/classModel/Def_ProductStructure.dart';
 import 'package:vigil_erp/bll/classModel/Def_Stocks.dart';
 import 'package:vigil_erp/bll/classModel/Def_Units.dart';
+import 'package:vigil_erp/bll/classModel/Invoices_Sales.dart';
+import 'package:vigil_erp/bll/classModel/Invoices_SalesDetails.dart';
 import 'package:vigil_erp/blocManagment/blocDealing/dealing_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocFixTables/fix_table_bloc.dart';
-import 'package:vigil_erp/blocManagment/blocInventory/inv_bloc.dart';
+import 'package:vigil_erp/blocManagment/blocInvoices/invoic_bloc.dart';
 import 'package:vigil_erp/componants/ctr_Date.dart';
 import 'package:vigil_erp/componants/ctr_DropDowenList.dart';
 import 'package:vigil_erp/componants/ctr_SelectEmployee.dart';
@@ -22,45 +25,47 @@ import 'package:vigil_erp/shared/sharedHive.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
 import '../../../bll/bllFirebase/ManageBLL.dart';
 import '../../../bll/bllFirebase/bllDealing_Employees.dart';
-import '../../../bll/bllFirebase/bllInv_PermissionAdd.dart';
 import '../../../bll/bllFirebase/bllInv_ProductsQty.dart';
-import '../../../bll/classModel/Inv_PermissionAdd.dart';
-import '../../../bll/classModel/Inv_PermissionAddDetails.dart';
 import '../../../bll/classModel/Inv_ProductsQty.dart';
 
-class scr_PermissionAddItem extends StatefulWidget {
-  scr_PermissionAddItem(this.itemPermissionAdd, this.frmMode, {super.key});
+class scr_salesItem extends StatefulWidget {
+  scr_salesItem(this.itemSales, this.frmMode, {super.key});
 
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  Inv_PermissionAdd? itemPermissionAdd;
+  Invoices_Sales? itemSales;
   en_FormMode frmMode;
 
   @override
-  State<scr_PermissionAddItem> createState() => _scr_PermissionAddItemState();
+  State<scr_salesItem> createState() => _scr_salesItemState();
 }
 
 var frmKey = GlobalKey<FormState>();
-List<Inv_PermissionAddDetails> lstDetailsDeleted = [];
+List<Invoices_SalesDetails> lstDetailsDeleted = [];
+List<Inv_ProductsQty> lstProductsQty = [];
+TextEditingController controllerfilter = TextEditingController();
+
 int selectedID = -1;
-int? branchID;
-int? stockID;
-TextEditingController_Employee contEmployee = TextEditingController_Employee();
 TextEditingController contCode = TextEditingController();
 TextEditingController contDate = TextEditingController();
 TextEditingController contTime = TextEditingController();
 TimeOfDay? timeWorkFrom;
-int? requestStatusID;
-TextEditingController contNote = TextEditingController();
-TextEditingController contValue = TextEditingController();
+int? branchID;
+int? stockID;
+TextEditingController_Employee contEmployee = TextEditingController_Employee();
+int? clientID;
+TextEditingController contClientSerial = TextEditingController();
 
-final TextEditingController contQty = TextEditingController();
-final TextEditingController contPrice = TextEditingController();
+TextEditingController contTotalValue = TextEditingController(text: '0.0');
+TextEditingController contDiscountValue = TextEditingController(text: '0.0');
+TextEditingController contDiscountPercent = TextEditingController(text: '0.0');
+TextEditingController contNetValue = TextEditingController(text: '0.0');
+
+bool chkIsClosed = false;
+TextEditingController contNote = TextEditingController(text: '');
+TextEditingController contCurrentBalance = TextEditingController(text: '0.0');
 bool? isBigUnit;
 
-List<Inv_ProductsQty> lstProductsQty = [];
-TextEditingController controllerfilter = TextEditingController();
-
-class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
+class _scr_salesItemState extends State<scr_salesItem> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,44 +98,58 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
       child: Column(
         children: [
           ctr_TextHeaderPage(
-            text:  'بيانات إذن الإضافة',
-            color: checkIsRecivedDocument() ? Colors.red[100] : Colors.grey[300],
+            text: 'بيانات فاتورة المبيعات',
+            color: checkIsSavedClosed() ? Colors.red[100] : Colors.grey[300],
             borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
           ),
           const SizedBox(height: 5),
-          ctr_DropDowenList(
-            hintLable: 'الفرع',
-            padding: EdgeInsets.only(right: 5, left: 5),
-            lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
-            hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-            itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-            menuMaxHeightValue: 300,
-            showClearIcon: true,
-            selectedValue: branchID,
-            OnChanged: (returnID) {
-              branchID = returnID;
+          Row(
+            children: [
+              Expanded(
+                child: ctr_DropDowenList(
+                  hintLable: 'الفرع',
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                  lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
+                  hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+                  itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+                  menuMaxHeightValue: 300,
+                  showClearIcon: true,
+                  selectedValue: branchID,
+                  OnChanged: (returnID) {
+                    branchID = returnID;
 
-              // reset Employee and populate with New branch
-              contEmployee.selectEmployee = null;
-              contEmployee.text = '';
-              employee_bloc.instance.add(getLstEmployeeAsDataSource_Event());
-              ctr_SelectEmployee.branchID = branchID;
+                    // reset Employee and populate with New branch
+                    contEmployee.selectEmployee = null;
+                    contEmployee.text = '';
+                    employee_bloc.instance.add(getLstEmployeeAsDataSource_Event());
+                    ctr_SelectEmployee.branchID = branchID;
 
-              // reset Stock and populate with New branch
-              stockID = null;
-              stock_bloc.instance.add(getLstStocksAsDataSource_Event(
-                  branchID: branchID, condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
-              return null;
-            },
-            OnValidate: (value) {
-              if (value == null) {
-                return 'لابد من إختيار قيمة';
-              }
-              return null;
-            },
+                    // reset Stock and populate with New branch
+                    stockID = null;
+                    stock_bloc.instance.add(getLstStocksAsDataSource_Event(
+                        branchID: branchID, condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
+                    return null;
+                  },
+                  OnValidate: (value) {
+                    if (value == null) {
+                      return 'لابد من إختيار قيمة';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Checkbox(
+                  value: chkIsClosed,
+                  onChanged: (value) {
+                    // setState(() {
+                    //   chkIsClosed = !chkIsClosed;
+                    // });
+                  }),
+              const Text('مغلقة', style: TextStyle(fontSize: 17)),
+            ],
           ),
           SizedBox(
-            height: 560,
+            height: 515,
             child: Card(
               color: Colors.grey[100],
               child: ctr_TabBar(
@@ -140,28 +159,29 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                     children: [
                       Text('الأصناف', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       SizedBox(width: 20),
-                      IconButton(
-                          onPressed: () {
-                            print('00000000000000000000');
-                            if (widget.scaffoldKey.currentState != null) {
-                              widget.scaffoldKey.currentState!.openEndDrawer();
-                            }
-                          },
-                          icon: Icon(
-                            Icons.production_quantity_limits,
-                            color: Colors.red,
-                            size: 35,
-                          ))
+                      if (!checkIsSavedClosed())
+                        IconButton(
+                            onPressed: () {
+                              if (widget.scaffoldKey.currentState != null) {
+                                widget.scaffoldKey.currentState!.openEndDrawer();
+                              }
+                            },
+                            icon: Icon(
+                              Icons.production_quantity_limits,
+                              color: Colors.red,
+                              size: 35,
+                            ))
                     ],
                   )
                 ],
                 LstTabBarViewWidget: [
                   BuildMasterData(),
-                  BuildDetailsProduct_SumValues(),
+                  BuildDetailsProduct(),
                 ],
               ),
             ),
           ),
+          BuildSumValues(),
         ],
       ),
     );
@@ -169,134 +189,26 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
 
   Widget BuildMasterData() {
     return SingleChildScrollView(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          BlocBuilder<stock_bloc, definition_state>(
-            builder: (context, state) {
-              bool isStockState = state is getLstStocksAsDataSource_State;
-              List<DropDowenDataSource> lstStocks =
-              branchID != null && isStockState ? state.LstStocksAsDataSource : [];
-
-              return ctr_DropDowenList(
-                hintLable: 'المخزن',
-                padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-                lstDataSource: lstStocks,
-                hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-                itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-                menuMaxHeightValue: 300,
-                showClearIcon: true,
-                selectedValue: stockID = lstStocks.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocks.first.valueMember : stockID,
-                OnChanged: (returnID) {
-                  stockID = returnID;
-                  return stockID;
-                },
-                OnValidate: (value) {
-                  stockID = value;
-                  if (value == null || stockID == null) {
-                    return 'لابد من إختيار قيمة';
-                  }
-                  return null;
-                },
-              );
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 5),
+          ctr_TextFormField(
+            Controller: contCode,
+            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+            Lable: 'الكود',
+            TextType: TextInputType.number,
+            OnValidate: (value) {
+              if (value == null || value.isEmpty) {
+                return 'لابد من إدخال قيمة';
+              }
+              return null;
             },
           ),
           Row(
             children: [
-              ctr_SelectEmployee(
-                Controller: contEmployee,
-                padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-                labelText: 'القائم بالطلب',
-                isOpenSelectorOnTap: true,
-                // branchID: branchID,
-                onSelectEmployee: (Dealing) {
-                  print(Dealing.Name);
-                  contEmployee.selectEmployee = Dealing;
-                },
-                OnValidate: (employee) {
-                  if (employee != null && employee.isEmpty) {
-                    return 'لابد من إختيار قيمة';
-                  }
-                  return null;
-                },
-              ),
-            ],
-          ),
-          Row(
-            children: [
               SizedBox(
-                width: 80,
-                child: ctr_TextFormField(
-                  Controller: contCode,
-                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-                  Lable: 'الكود',
-                  TextType: TextInputType.number,
-                  OnValidate: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'لابد من إدخال قيمة';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Expanded(
-                child: ctr_DropDowenList(
-                  hintLable: 'حالة الطلب',
-                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-                  lstDataSource: requestStatus_bloc.instance.lstRequestStatusAsDataSource,
-                  hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-                  itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-                  menuMaxHeightValue: 300,
-                  showClearIcon: true,
-                  selectedValue: requestStatusID =
-                  requestStatus_bloc.instance.lstRequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-                      ? requestStatus_bloc.instance.lstRequestStatusAsDataSource.first.valueMember
-                      : requestStatusID,
-                  OnChanged: (returnID) {
-                    requestStatusID = returnID;
-                    return requestStatusID;
-                  },
-                  OnValidate: (value) {
-                    if (value == null) {
-                      return 'لابد من إختيار قيمة';
-                    }
-                    return null;
-                  },
-                ),
-
-                // BlocBuilder<requestStatus_bloc, fixTable_state >(
-                //   builder: (context, state) {
-                //     if (state is getListRequestStatus_State) {
-                //       return ctr_DropDowenList(
-                //         hintLable: 'حالة الطلب',
-                //         padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
-                //         lstDataSource: state.lst_RequestStatus,
-                //         hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-                //         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-                //         menuMaxHeightValue: 300,
-                //         showClearIcon: true,
-                //         selectedValue: requestStatusID = state.lstrequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-                //             ? state.lstrequestStatusAsDataSource.first.valueMember
-                //             : requestStatusID,
-                //         OnChanged: (returnID) {
-                //           requestStatusID = returnID;
-                //           return requestStatusID;
-                //         },
-                //         OnValidate: (value) {
-                //           if (value == null) {
-                //             return 'لابد من إختيار قيمة';
-                //           }
-                //           return null;
-                //         },
-                //       );
-                //     } else
-                //       return SizedBox();
-                //   },
-                // ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
+                width: 175,
                 child: ctr_Date(
                   text: 'التاريخ',
                   dtController: contDate,
@@ -315,7 +227,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                 ),
               ),
               SizedBox(
-                width: 160,
+                width: 175,
                 child: ctr_Time(
                   text: 'الساعة',
                   dtController: contTime,
@@ -338,35 +250,131 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
               ),
             ],
           ),
-          SizedBox(height: 20),
-          if(!checkIsRecivedDocument())
-          ElevatedButton.icon(
-            label: Text(
-              'تم الإستلام',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.blue[800]),
-            ),
-            icon: Icon(Icons.done_outline),
-            style: ElevatedButton.styleFrom(elevation: 3, backgroundColor: Colors.white),
-            onPressed: () {
-              sharedControls.confirmDialog(
-                  context, 'تأكيد الإستلام',
-                  'فى حالة تأكيد الإستلام سيتم التأثير على رصيد المخزن وإغلاق المستند ولا يمكن التعديل فيه نهائياً',
-                      () {
-                    requestStatusID = en_RequestStatus.Received.value;
-                    saveData();
-                    saveProductsQty();
-                  });
+          BlocBuilder<stock_bloc, definition_state>(
+            builder: (context, state) {
+              bool isStockState = state is getLstStocksAsDataSource_State;
+              List<DropDowenDataSource> lstStocks = branchID != null && isStockState ? state.LstStocksAsDataSource : [];
+
+              return ctr_DropDowenList(
+                hintLable: 'المخزن',
+                padding: EdgeInsets.only(right: 5, left: 0),
+                lstDataSource: lstStocks,
+                hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+                itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+                menuMaxHeightValue: 300,
+                showClearIcon: true,
+                selectedValue: stockID = lstStocks.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocks.first.valueMember : stockID,
+                OnChanged: (returnID) {
+                  stockID = returnID;
+                  return stockID;
+                },
+                OnValidate: (value) {
+                  stockID = value;
+                  if (value == null || stockID == null) {
+                    return 'لابد من إختيار قيمة';
+                  }
+                  return null;
+                },
+              );
             },
           ),
-        ]));
+          const SizedBox(height: 5),
+          BlocBuilder<client_bloc, dealing_state>(
+            builder: (context, state) {
+              bool isState = state is getListClientAsDataSource_StateDataChanged;
+              List<DropDowenDataSource> lstClients = isState ? state.filterdLst_ClientAsDataSource : [];
+
+              return ctr_DropDowenList(
+                hintLable: 'العميل',
+                padding: EdgeInsets.only(right: 5, left: 5),
+                lstDataSource: lstClients,
+                hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
+                itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
+                menuMaxHeightValue: 300,
+                showClearIcon: true,
+                selectedValue: clientID,
+                OnChanged: (returnID) {
+                  clientID = returnID;
+                  return clientID;
+                },
+                OnValidate: (value) {
+                  if (value == null) {
+                    return 'لابد من إختيار قيمة';
+                  }
+                  return null;
+                },
+              );
+            },
+          ),
+          SizedBox(height: 5),
+          ctr_TextFormField(
+            Controller: contCurrentBalance,
+            padding: EdgeInsets.only(right: 5, left: 0),
+            Lable: 'الرصيد الحالى',
+            TextType: TextInputType.number,
+            OnValidate: (value) {
+              if (value == null || value.isEmpty) {
+                return 'لابد من إدخال قيمة';
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 5),
+          Row(
+            children: [
+              ctr_SelectEmployee(
+                Controller: contEmployee,
+                padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                labelText: 'القائم بالطلب',
+                isOpenSelectorOnTap: true,
+                onSelectEmployee: (Dealing) {
+                  print(Dealing.Name);
+                  contEmployee.selectEmployee = Dealing;
+                },
+                OnValidate: (employee) {
+                  if (employee != null && employee.isEmpty) {
+                    return 'لابد من إختيار قيمة';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+          ctr_TextFormField(
+            Controller: contNote,
+            padding: EdgeInsets.only(right: 5, left: 0),
+            Lable: 'ملاحظات',
+          ),
+          // SizedBox(height: 5),
+
+          // حفظ وغلق الفاتورة
+          if (!checkIsSavedClosed())
+            ElevatedButton.icon(
+              label: Text(
+                'حفظ وغلق الفاتورة',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.blue[800]),
+              ),
+              icon: Icon(Icons.done_outline),
+              style: ElevatedButton.styleFrom(elevation: 3, backgroundColor: Colors.white),
+              onPressed: () {
+                sharedControls.confirmDialog(context, 'حفظ وإغلاق', 'فى حالة التأكيد سيتم غلق الفاتورة ولا يمكن التعديل فيها نهائياً', () {
+                  chkIsClosed = true;
+                  saveData();
+                  saveProductsQty();
+                });
+              },
+            ),
+        ],
+      ),
+    );
   }
 
   BuildListView(BuildContext context) {
-    return BlocBuilder<permissionAdd_bloc, inv_state>(
+    return BlocBuilder<sales_bloc, invoic_state>(
       builder: (context, state) {
-        if (state is permissionAddDetails_StateInitial) {
+        if (state is salesDetails_StateInitial) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state is permissionAddDetails_StateDataChanged) {
+        } else if (state is salesDetails_StateDataChanged) {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Column(
@@ -385,7 +393,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                             padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
                             OnChanged: (value) {
                               if (value != null) {
-                                permissionAdd_bloc.instance.add(filterAnyPermissionAddDetails_Event(filterData: value.trim()));
+                                sales_bloc.instance.add(filterAnySalesDetails_Event(filterData: value.trim()));
                               }
                               return null;
                             },
@@ -393,7 +401,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                       IconButton(
                         onPressed: () {
                           controllerfilter.clear();
-                          permissionAdd_bloc.instance.add(resetFilterPermissionAddDetails_Event());
+                          sales_bloc.instance.add(resetFilterSalesDetails_Event());
                         },
                         icon: const Icon(Icons.clear),
                       ),
@@ -424,7 +432,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                       SizedBox(
                           width: 220,
                           child:
-                          Text('الكمية والسعر', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                              Text('الكمية والسعر', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
                       SizedBox(
                           width: 90,
                           child: Text('  ', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
@@ -440,9 +448,9 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                     child: ListView.builder(
                       physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
-                        return buildListViewItem(state.filterdLst_PermissionAddDetails[index], context, index);
+                        return buildListViewItem(state.filterdLst_SalesDetails[index], context, index);
                       },
-                      itemCount: state.filterdLst_PermissionAddDetails.length,
+                      itemCount: state.filterdLst_SalesDetails.length,
                     ),
                   ),
                 ),
@@ -456,11 +464,11 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     );
   }
 
-  buildListViewItem(Inv_PermissionAddDetails itemDetails, context, int index) {
+  buildListViewItem(Invoices_SalesDetails itemDetails, context, int index) {
     return InkWell(
       onDoubleTap: () => editItemDetails(itemDetails, index),
       child: Container(
-        padding: const EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 0),
+        padding: const EdgeInsets.only(top: 0, right: 0),
         color: Colors.white,
         height: itemDetails.isBigUnit! ? 62 : 42, // لو الصنف بوحدة كبيرة يكبر إرتفاع السطر
         child: Column(
@@ -561,7 +569,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     );
   }
 
-  Widget BuildDetailsProduct_SumValues() {
+  Widget BuildDetailsProduct() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -571,37 +579,55 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
             child: BuildListView(context),
           ),
         ),
-
-        // ***************  Summtion
-        Container(
-          color: Colors.yellow[200],
-          child: BlocBuilder<permissionAdd_bloc, inv_state>(
-            builder: (context, state) {
-              if (state is permissionAddDetails_StateDataChanged) {
-                contValue.text = state.filterdLst_PermissionAddDetails
-                    .fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!)
-                    .toStringAsFixed(2);
-
-                return Row(
-                  children: [
-                    Text('العدد:', style: const TextStyle(fontSize: 14)),
-                    Text('${state.filterdLst_PermissionAddDetails.length}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text('   الكمية :', style: const TextStyle(fontSize: 14)),
-                    Text('${state.filterdLst_PermissionAddDetails.fold(0, (previousValue, element) => previousValue + element.UnitSmall_Qty!)}',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text('    الإجمالى:', style: const TextStyle(fontSize: 14)),
-                    Text(
-                        '${state.filterdLst_PermissionAddDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!)
-                            .toStringAsFixed(2)}',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  ],
-                );
-              } else
-                return SizedBox();
-            },
-          ),
-        ),
       ],
+    );
+  }
+
+  Widget BuildSumValues() {
+    return InkWell(
+      onDoubleTap: () {
+        editCalcSumValues(context);
+      },
+      child: Container(
+        color: Colors.yellow[200],
+        child: BlocBuilder<sales_bloc, invoic_state>(
+          builder: (context, state) {
+            if (state is salesDetails_StateDataChanged) {
+              contTotalValue.text =
+                  state.filterdLst_SalesDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2);
+              calcSumValues(context);
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      Text('العدد:', style: const TextStyle(fontSize: 14)),
+                      Text('${state.filterdLst_SalesDetails.length}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('   الكمية :', style: const TextStyle(fontSize: 14)),
+                      Text('${state.filterdLst_SalesDetails.fold(0, (previousValue, element) => previousValue + element.UnitSmall_Qty!)}',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      // الإجمالى
+                      Text('    الإجمالى:', style: const TextStyle(fontSize: 14)),
+                      Text(contTotalValue.text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text('الخصم:', style: const TextStyle(fontSize: 14)),
+                      Text(contDiscountValue.text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('   الخصم% :', style: const TextStyle(fontSize: 14)),
+                      Text(contDiscountPercent.text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      // الصافى
+                      Text('    الصافى:', style: const TextStyle(fontSize: 14)),
+                      Text(contNetValue.text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ],
+              );
+            } else
+              return SizedBox();
+          },
+        ),
+      ),
     );
   }
 
@@ -617,7 +643,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
                 padding: const EdgeInsets.only(top: 0, right: 5, bottom: 10, left: 0),
                 child: ctr_SelectProduct(
                   onAddProduct: (customProductItem prod) {
-                    permissionAdd_bloc.instance.add(addNewPermissionAddDetails_Event(itemCustomProduct: prod));
+                    sales_bloc.instance.add(addNewSalesDetails_Event(itemCustomProduct: prod));
                   },
                   priceTypeID: en_PriceType.salesPrice1.value,
                 ),
@@ -637,36 +663,36 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     // ];
 
     product_bloc.instance.add(getListProduct_Event([BLLCondions(enTable_Def_ProductStructure.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
-    requestStatus_bloc.instance.getLst_requestStatusAsDataSource();
     priceType_bloc.instance.getLst_PriceTypeAsDataSource();
     categories_bloc.instance.add(getListCategories_Event([BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
+    client_bloc.instance.add(getListClientAsDataSource_Event());
     categories_bloc.instance
         .getList_CategoryAsDataSource(condions: [BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true)]);
     unit_bloc.instance.add(getListUnit_Event([BLLCondions(enTable_Def_Units.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     clearCachedData();
 
     if (widget.frmMode == en_FormMode.NewMode)
-      NewMode();
+      newMode();
     else if (widget.frmMode == en_FormMode.EditMode) {
-      EditMode();
+      editMode();
     }
   }
 
   Widget buildCustomBar() {
     return Row(
       children: [
-        if(!checkIsRecivedDocument())
+        if (!checkIsSavedClosed())
           IconButton(
-          onPressed: () {
-            saveData();
-          },
-          icon: Icon(
-            Icons.save,
-            color: Colors.blue[900],
-            size: 30,
+            onPressed: () {
+              saveData();
+            },
+            icon: Icon(
+              Icons.save,
+              color: Colors.blue[900],
+              size: 30,
+            ),
+            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
           ),
-          padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
-        ),
         IconButton(
           onPressed: () {
             Navigator.of(context).pop();
@@ -712,71 +738,61 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     // stock_bloc.instance.add(resetFilterStock_Event());
     // employee_bloc.instance.add(resetFilterEmployee_Event());
     //
-    // // permissionAdd_bloc.instance.filterdLst_PermissionAddDetails.clear();
+    // // sales_bloc.instance.filterdLst_SalesDetails.clear();
     // // مسح البيانات من التفاصيل عشان التعريف الجديد القادم
-    // permissionAdd_bloc.instance.add(clearPermissionAddDetails_Event());
+    // sales_bloc.instance.add(clearSalesDetails_Event());
   }
 
   void clearCachedData() {
     stockID = null;
 
-    contEmployee.text = '';
-    ctr_SelectEmployee.branchID = branchID = null;
-
-    contEmployee.selectEmployee = null;
+    ctr_SelectEmployee.branchID = branchID = contEmployee.selectEmployee = clientID = null;
+    contNote.text = contCurrentBalance.text =
+        contTotalValue.text = contDiscountPercent.text = contDiscountValue.text = contNetValue.text = contEmployee.text = '';
     employee_bloc.instance.add(resetFilterEmployee_Event());
 
     lstDetailsDeleted.clear();
     lstProductsQty.clear();
-    permissionAdd_bloc.instance.add(clearPermissionAddDetails_Event());
-    requestStatusID = null;
+    sales_bloc.instance.add(clearSalesDetails_Event());
   }
 
-  void NewMode() async {
-    bllInv_PermissionAdd.getMax_firestore(enTable_Inv_PermissionAdd.Code).then((val) {
+  void newMode() async {
+    bllInvoices_Sales.getMax_firestore(enTable_Invoices_Sales.Code).then((val) {
       contCode.text = val.toString();
     }).toString();
     contDate.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
     contTime.text = sharedFunctions_Dates.convertDateTime_TimeString(DateTime.now());
   }
 
-  void EditMode() async {
-    selectedID = widget.itemPermissionAdd!.ID!;
-    branchID = widget.itemPermissionAdd!.IDBranch;
+  void editMode() async {
+    selectedID = widget.itemSales!.ID!;
+    branchID = widget.itemSales!.IDBranch;
     // stock_bloc.instance.getLstStockAsDataSource();
     stock_bloc.instance
         .add(getLstStocksAsDataSource_Event(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]));
     // stock_bloc.instance.getLstStockAsDataSource(condions: [BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchID)]);
- stockID = widget.itemPermissionAdd!.IDStock!;
-    requestStatusID = widget.itemPermissionAdd!.IDRequestStatus!;
-
-    contCode.text = widget.itemPermissionAdd!.Code.toString();
-    contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemPermissionAdd!.IDEmployee!.toString());
+    stockID = widget.itemSales!.IDStock!;
+    clientID = widget.itemSales!.IDClient;
+    chkIsClosed = widget.itemSales!.IsClosed!;
+    contCode.text = widget.itemSales!.Code.toString();
+    contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemSales!.IDEmployee!.toString());
     contEmployee.text = contEmployee.selectEmployee!.Name!;
     ctr_SelectEmployee.branchID = branchID;
-    contDate.text = widget.itemPermissionAdd!.Date!;
-    contTime.text = widget.itemPermissionAdd!.Time!;
+    contDate.text = widget.itemSales!.Date!;
+    contTime.text = widget.itemSales!.Time!;
 
-    contNote.text = widget.itemPermissionAdd!.Note!;
-    contValue.text = widget.itemPermissionAdd!.Value.toString();
-    permissionAdd_bloc.instance.add(getListPermissionAddDetails_Event(widget.itemPermissionAdd!.ID!));
+    contNote.text = widget.itemSales!.Note!;
+    contCurrentBalance.text = widget.itemSales!.CurrentBalance.toString();
+    sales_bloc.instance.add(getListSalesDetails_Event(widget.itemSales!.ID!));
 
     List<BLLCondions> cond = [
-      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.permissionAdd.value),
+      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.sales.value),
       BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, selectedID),
     ];
     lstProductsQty = await bllInv_ProductsQty.fire_getListWithConditions(conditions: cond);
   }
 
-  bool checkIsRecivedDocument() {
-    if (widget.frmMode == en_FormMode.EditMode &&
-        widget.itemPermissionAdd!.IDRequestStatus == en_RequestStatus.Received.value)
-      return true;
-    else
-      return false;
-  }
-
-  void editItemDetails(Inv_PermissionAddDetails itemDetails, index) async {
+  void editItemDetails(Invoices_SalesDetails itemDetails, index) async {
     await ctr_SelectProduct(onAddProduct: (c) {})
       ..editProduct(
         context,
@@ -788,54 +804,90 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
         // index,
       ).then((cProduct) {
         if (cProduct != null) {
-          permissionAdd_bloc.instance.add(editRowPermissionAddDetails_Event(itemCustomProduct: cProduct, index: index));
+          sales_bloc.instance.add(editRowSalesDetails_Event(itemCustomProduct: cProduct, index: index));
         }
       });
   }
 
-  void deletItemDetails(Inv_PermissionAddDetails itemDetails) {
+  void editCalcSumValues(context) {
+    sharedControls
+        .showEditSummtionInvoice(
+            context, en_TablesName.Invoices_Sales, contTotalValue.text, contDiscountValue.text, contDiscountPercent.text, contNetValue.text)
+        .then((retValues) {
+      if (retValues != null) {
+        contTotalValue.text = retValues[0] as String;
+        contDiscountValue.text = retValues[1] as String;
+        contDiscountPercent.text = retValues[2] as String;
+        contNetValue.text = retValues[3] as String;
+      }
+    });
+  }
+
+  void calcSumValues(context) {
+    contDiscountPercent.text = contDiscountPercent.text.isNotEmpty ? contDiscountPercent.text : '0.0';
+    contDiscountValue.text = contDiscountValue.text.isNotEmpty ? contDiscountValue.text : '0.0';
+
+    contDiscountValue.text = ((double.parse(contTotalValue.text) * double.parse(contDiscountPercent.text)) / 100).toStringAsFixed(2);
+    //contDiscountPercent.text = ((double.parse(contDiscountValue.text) * 100) / double.parse(contTotalValue.text)).toStringAsFixed(2);
+    contNetValue.text = (double.parse(contTotalValue.text) - double.parse(contDiscountValue.text)).toStringAsFixed(2);
+  }
+
+  void deletItemDetails(Invoices_SalesDetails itemDetails) {
     sharedControls.confirmDelete(
       context,
       product_bloc.instance.getNameByID(itemDetails.IDProduct),
-          () {
-        permissionAdd_bloc.instance.add(deleteItemPermissionAddDetails_Event(itemDetails: itemDetails));
+      () {
+        sales_bloc.instance.add(deleteItemSalesDetails_Event(itemDetails: itemDetails));
         lstDetailsDeleted.add(itemDetails);
       },
     );
+  }
+
+  bool checkIsSavedClosed() {
+    if (widget.frmMode == en_FormMode.EditMode && (widget.itemSales!.IsClosed!))
+      return true;
+    else
+      return false;
   }
 
   void saveData() async {
     if (frmKey.currentState != null && frmKey.currentState!.validate()) {
       //********************************************************************
       if (widget.frmMode == en_FormMode.NewMode) {
-        selectedID = await bllInv_PermissionAdd.getMaxID_firestore();
-        widget.itemPermissionAdd = Inv_PermissionAdd();
+        selectedID = await bllInvoices_Sales.getMaxID_firestore();
+        widget.itemSales = Invoices_Sales();
       } else if (widget.frmMode == en_FormMode.EditMode) {
-        selectedID = widget.itemPermissionAdd!.ID!;
+        selectedID = widget.itemSales!.ID!;
       }
 
-      widget.itemPermissionAdd!.ID = selectedID;
-      widget.itemPermissionAdd!.IDBranch = branchID;
-      widget.itemPermissionAdd!.Code = int.tryParse(contCode.text);
-      widget.itemPermissionAdd!.IDStock = stockID;
-      widget.itemPermissionAdd!.Date = contDate.text;
-      widget.itemPermissionAdd!.Time = contTime.text;
-      widget.itemPermissionAdd!.IDEmployee = contEmployee.selectEmployee!.ID;
-      widget.itemPermissionAdd!.IDRequestStatus = requestStatusID;
-      widget.itemPermissionAdd!.Note = contNote.text;
-      widget.itemPermissionAdd!.Value = contValue.text.isNotEmpty ? double.parse(contValue.text) : 0;
-      widget.itemPermissionAdd!.UID = sharedHive.UID;
+      widget.itemSales!.ID = selectedID;
+      widget.itemSales!.IDBranch = branchID;
+      widget.itemSales!.Code = int.tryParse(contCode.text);
+      widget.itemSales!.IDStock = stockID;
+      widget.itemSales!.Date = contDate.text;
+      widget.itemSales!.Time = contTime.text;
+      widget.itemSales!.IDEmployee = contEmployee.selectEmployee!.ID;
+      widget.itemSales!.IDClient = clientID;
+
+      widget.itemSales!.TotalValue = contTotalValue.text.isNotEmpty ? double.parse(contTotalValue.text) : 0.0;
+      widget.itemSales!.DiscountValue = contDiscountValue.text.isNotEmpty ? double.parse(contDiscountValue.text) : 0.0;
+      widget.itemSales!.DiscountPercent = contDiscountPercent.text.isNotEmpty ? double.parse(contDiscountPercent.text) : 0.0;
+      widget.itemSales!.NetValue = contNetValue.text.isNotEmpty ? double.parse(contNetValue.text) : 0.0;
+      widget.itemSales!.IsClosed = chkIsClosed;
+      widget.itemSales!.Note = contNote.text;
+      widget.itemSales!.CurrentBalance = contCurrentBalance.text.isNotEmpty ? double.parse(contCurrentBalance.text) : 0.0;
+      widget.itemSales!.UID = sharedHive.UID;
 
       // حفظ الاساسي والتفاصيل مره واحده
-      await bllInv_PermissionAdd.fire_setListMaster_And_Details(
+      await bllInvoices_Sales.fire_setListMaster_And_Details(
         insertdDocID: selectedID.toString(),
-        itemInv_PermissionAdd: widget.itemPermissionAdd!,
-        collectionDetailsName: en_TablesName.Inv_PermissionAddDetails.name,
-        columnNameAsDocumentDetails: enTable_Inv_PermissionAddDetails.ID.name,
-        detais: permissionAdd_bloc.instance.filterdLst_PermissionAddDetails.map((elm) => elm.toMap()).toList(),
+        itemInvoices_Sales: widget.itemSales!,
+        collectionDetailsName: en_TablesName.Invoices_SalesDetails.name,
+        columnNameAsDocumentDetails: enTable_Invoices_SalesDetails.ID.name,
+        detais: sales_bloc.instance.filterdLst_SalesDetails.map((elm) => elm.toMap()).toList(),
         deletedItemsDetais: lstDetailsDeleted.map((elm) => elm.toMap()).toList(),
       );
-
+      saveProductsQty();
       Navigator.pop(context, true);
     }
   }
@@ -848,7 +900,7 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
         cond = [
           BLLCondions(enTable_Inv_ProductsQty.IDProduct.name, en_CondionsWhere.isEqualTo, del.IDProduct),
           BLLCondions(enTable_Inv_ProductsQty.LineNumber.name, en_CondionsWhere.isEqualTo, del.ID),
-          BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.permissionAdd.value),
+          BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.sales.value),
           BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, selectedID),
         ];
       });
@@ -859,21 +911,21 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
     int index = 1;
     Inv_ProductsQty? itemProductsQty;
 
-    for (var itemDetails in permissionAdd_bloc.instance.filterdLst_PermissionAddDetails) {
+    for (var itemDetails in sales_bloc.instance.filterdLst_SalesDetails) {
       itemProductsQty = lstProductsQty.where((itm) {
-        return itm.LineNumber == itemDetails.ID && itm.IDDocument == selectedID && itm.IDDocumentType == en_DocumentType.permissionAdd.value;
+        return itm.LineNumber == itemDetails.ID && itm.IDDocument == selectedID && itm.IDDocumentType == en_DocumentType.sales.value;
       }).firstOrNull;
 
       // لو فاضي يبقي صنف جديد
       if (itemProductsQty == null) {
         itemProductsQty = Inv_ProductsQty();
-        itemProductsQty.ID = '${itemDetails.IDProduct}-${index}-${en_TablesName.Inv_PermissionAdd.name}-${selectedID}';
+        itemProductsQty.ID = '${itemDetails.IDProduct}-${index}-${en_TablesName.Invoices_Sales.name}-${selectedID}';
         lstProductsQty.add(itemProductsQty);
       }
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
-      itemProductsQty.IDDocumentType = en_DocumentType.permissionAdd.value;
-      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.permissionAdd.value);
+      itemProductsQty.IDDocumentType = en_DocumentType.sales.value;
+      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.sales.value);
       itemProductsQty.IDStock = stockID;
       itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockID);
       itemProductsQty.LineNumber = index;
@@ -887,9 +939,9 @@ class _scr_PermissionAddItemState extends State<scr_PermissionAddItem> {
       itemProductsQty.IDUnit = itemDetails.UnitSmall_ID;
       itemProductsQty.UnitName = unit_bloc.instance.getNameByID(itemDetails.UnitSmall_ID);
       itemProductsQty.QtyBefore = 0;
-      itemProductsQty.Qty = itemDetails.UnitSmall_Qty;
+      itemProductsQty.Qty = itemDetails.UnitSmall_Qty! * -1;
       itemProductsQty.QtyRepresents = 0;
-      itemProductsQty.TotalQty = itemDetails.UnitSmall_Qty;
+      itemProductsQty.TotalQty = itemProductsQty.Qty;
       itemProductsQty.QtyAfter = 0;
       itemProductsQty.Price = itemDetails.UnitSmall_Price;
       itemProductsQty.TotalPrice = itemDetails.TotalPrice;

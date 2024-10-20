@@ -162,10 +162,10 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
               TextAlignValue: TextAlign.end,
               Lable: 'العنوان',
               autoSelectData: true,
-              OnValidate: (value) {
-                if (value == null || value.isEmpty) return 'لابد من إدخال قيمة';
-                return null;
-              },
+              // OnValidate: (value) {
+              //   if (value == null || value.isEmpty) return 'لابد من إدخال قيمة';
+              //   return null;
+              // },
             ),
 
             Row(
@@ -322,7 +322,7 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
           Phone: contPhone.text,
           Mobile: contMobile.text,
           Address: contAddress.text,
-          CurrentBalance: double.parse(contCurrentBalance.text),
+          CurrentBalance: contCurrentBalance.text.isNotEmpty ? double.parse(contCurrentBalance.text) : 0.0,
           BalanceType: balanceTypeID,
           Note: contNote.text,
         );

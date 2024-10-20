@@ -79,7 +79,7 @@ final class settlementDetails_StateDataChanged extends inv_state {
 
 final class clearSettlementDetails extends inv_state {}
 
-//********************************  **************************************
+//******************************** Transfer **************************************
 final class transfer_StateInitial extends inv_state {}
 
 final class transfer_StateDataChanged extends inv_state {
@@ -87,15 +87,27 @@ final class transfer_StateDataChanged extends inv_state {
 
   transfer_StateDataChanged({required this.filterdLst_Transfer});
 }
-
 final class transferDetails_StateInitial extends inv_state {}
-
 final class transferDetails_StateDataChanged extends inv_state {
   final List<Inv_TransferDetails> filterdLst_TransferDetails;
 
   transferDetails_StateDataChanged({required this.filterdLst_TransferDetails});
 }
-
 final class clearTransferDetails extends inv_state {}
 
+//******************************** Recived **************************************
+final class recived_StateInitial extends inv_state {}
+
+final class recived_StateDataChanged extends inv_state {
+  final List<Inv_RecivedQty> filterdLst_Recived;
+
+  recived_StateDataChanged({required this.filterdLst_Recived});
+}
+final class recivedDetails_StateInitial extends inv_state {}
+final class recivedDetails_StateDataChanged extends inv_state {
+  final List<Inv_RecivedQtyDetails> filterdLst_RecivedDetails;
+
+  recivedDetails_StateDataChanged({required this.filterdLst_RecivedDetails});
+}
+final class clearRecivedDetails extends inv_state {}
 

@@ -90,12 +90,12 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
 
                   if (result != null) {
                     contName.text = (result as Contact).displayName!;
-                    contNote.text = (result as Contact).androidAccountName!;
-                    if ((result as Contact).phones != null && (result as Contact).phones!.length == 1) {
-                      contMobile.text = (result as Contact).phones!.first.value.toString();
-                    } else if ((result as Contact).phones != null && (result as Contact).phones!.length >= 2) {
-                      contMobile.text = (result as Contact).phones![0].value.toString();
-                      contMobile.text = (result as Contact).phones![1].value.toString();
+                    contNote.text = result.androidAccountName!;
+                    if (result.phones != null && result.phones!.length == 1) {
+                      contMobile.text = (result).phones!.first.value.toString();
+                    } else if ((result).phones != null && result.phones!.length >= 2) {
+                      contMobile.text = result.phones![0].value.toString();
+                      contMobile.text = result.phones![1].value.toString();
                     }
                   }
                 }),
@@ -282,89 +282,6 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
       ),
     );
   }
-
-  // Widget buildAddress() {
-  //   return Column(
-  //     children: [
-  //       ctr_DropDowenList(
-  //         hintLable: 'المحافظة',
-  //         padding: EdgeInsets.only(right: 5, left: 5, top: 5, bottom: 5),
-  //         height: 50,
-  //         lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
-  //         hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-  //         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-  //         menuMaxHeightValue: 300,
-  //         showClearIcon: false,
-  //         // selectedValue: branchID,
-  //         OnChanged: (returnID) {},
-  //       ),
-  //       ctr_DropDowenList(
-  //         hintLable: 'المركز - المدينة',
-  //         padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-  //         height: 50,
-  //         lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
-  //         hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-  //         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-  //         menuMaxHeightValue: 300,
-  //         showClearIcon: false,
-  //         // selectedValue: branchID,
-  //         OnChanged: (returnID) {},
-  //       ),
-  //       ctr_DropDowenList(
-  //         hintLable: 'البلد - القرية',
-  //         padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-  //         height: 50,
-  //         lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
-  //         hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-  //         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-  //         menuMaxHeightValue: 300,
-  //         showClearIcon: false,
-  //         // selectedValue: branchID,
-  //         OnChanged: (returnID) {},
-  //       ),
-  //       ctr_DropDowenList(
-  //         hintLable: 'الحي - المنطقة',
-  //         padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-  //         height: 50,
-  //         lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
-  //         hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-  //         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-  //         menuMaxHeightValue: 300,
-  //         showClearIcon: false,
-  //         // selectedValue: branchID,
-  //         OnChanged: (returnID) {},
-  //       ),
-  //       ctr_DropDowenList(
-  //         hintLable: 'المنشأة - جهة العمل',
-  //         padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-  //         height: 50,
-  //         lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
-  //         hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
-  //         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
-  //         menuMaxHeightValue: 300,
-  //         showClearIcon: false,
-  //         // selectedValue: branchID,
-  //         OnChanged: (returnID) {},
-  //       ),
-  //       SizedBox(
-  //         height: 80,
-  //         child: ctr_TextFormField(
-  //           Controller: contAddress,
-  //           padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 0),
-  //           TextType: TextInputType.multiline,
-  //           TextAlignValue: TextAlign.end,
-  //           Lable: 'العنوان',
-  //           autoSelectData: true,
-  //           minLines: 3,
-  //           OnValidate: (value) {
-  //             if (value == null || value.isEmpty) return 'لابد من إدخال قيمة';
-  //             return null;
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Widget buildLocationMap() {
     return Column(

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vigil_erp/bll/bllFirebase/bllDef_Stocks.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllInv_RecivedQty.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllInv_Transfer.dart';
 import 'package:vigil_erp/bll/classModel/Def_ProductStructure.dart';
 import 'package:vigil_erp/bll/classModel/Def_Units.dart';
-
+import 'package:vigil_erp/bll/classModel/Inv_RecivedQty.dart';
+import 'package:vigil_erp/bll/classModel/Inv_RecivedQtyDetails.dart';
+import 'package:vigil_erp/bll/classModel/Inv_Transfer.dart';
 import 'package:vigil_erp/blocManagment/blocDealing/dealing_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocFixTables/fix_table_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocInventory/inv_bloc.dart';
-import 'package:vigil_erp/blocManagment/general/cubitGeneral.dart';
-import 'package:vigil_erp/blocManagment/general/cubitStates.dart';
 import 'package:vigil_erp/componants/ctr_Date.dart';
 import 'package:vigil_erp/componants/ctr_DropDowenList.dart';
 import 'package:vigil_erp/componants/ctr_SelectEmployee.dart';
@@ -22,23 +23,19 @@ import 'package:vigil_erp/shared/enumerators.dart';
 import 'package:vigil_erp/shared/sharedFunctions.dart';
 import 'package:vigil_erp/shared/sharedHive.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
-
 import '../../../bll/bllFirebase/ManageBLL.dart';
 import '../../../bll/bllFirebase/bllDealing_Employees.dart';
 import '../../../bll/bllFirebase/bllInv_ProductsQty.dart';
-import '../../../bll/bllFirebase/bllInv_Transfer.dart';
-import '../../../bll/classModel/Def_Categories.dart';
 import '../../../bll/classModel/Def_Stocks.dart';
 import '../../../bll/classModel/Inv_ProductsQty.dart';
-import '../../../bll/classModel/Inv_Transfer.dart';
 import '../../../bll/classModel/Inv_TransferDetails.dart';
-import '../../../bll/classModel/Inv_Transfer.dart';
 
 class scr_RecivedQtyItem extends StatefulWidget {
-  scr_RecivedQtyItem(this.itemTransfer, this.frmMode, {super.key});
+  scr_RecivedQtyItem(this.itemRecived, this.frmMode, {super.key, this.itemTransferQty});
 
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  Inv_Transfer? itemTransfer;
+  Inv_Transfer? itemTransferQty;
+  Inv_RecivedQty? itemRecived;
   en_FormMode frmMode;
 
   @override
@@ -47,12 +44,12 @@ class scr_RecivedQtyItem extends StatefulWidget {
 
 var frmKey = GlobalKey<FormState>();
 
-List<Inv_TransferDetails> lstDetailsDeleted = [];
+List<Inv_RecivedQtyDetails> lstDetailsDeleted = [];
 int selectedID = -1;
-int? branchIDFrom;
-int? branchIDTo;
-int? stockIDFrom;
-int? stockIDTo;
+int? branchIDFromRecived;
+int? branchIDToRecived;
+int? stockIDFromRecived;
+int? stockIDToRecived;
 TextEditingController_Employee contEmployee = TextEditingController_Employee();
 TextEditingController contCode = TextEditingController();
 TextEditingController contDate = TextEditingController();
@@ -88,7 +85,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
         ],
       ),
       drawer: sharedControls.buildMainMenu(context),
-      endDrawer: buildDrawerProductsInvoice(context),
+      // endDrawer: buildDrawerProductsInvoice(context),
       body: Container(
         color: Colors.white,
         child: buildPageContent(),
@@ -123,6 +120,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                       }
                       return null;
                     },
+                    readOnly: true,
                   ),
                 ),
 
@@ -135,15 +133,20 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                       ctr_DropDowenList(
                     hintLable: 'حالة الطلب',
                     padding: EdgeInsets.only(right: 5, left: 0),
-                    lstDataSource: requestStatus_bloc.instance.lstRequestStatusAsDataSource,
+                    lstDataSource: requestStatus_bloc.instance.lstRequestStatusAsDataSource.where((elm) {
+                      return elm.valueMember == en_RequestStatus.ReceivedReview.value ||
+                          elm.valueMember == en_RequestStatus.ReviewError.value ||
+                          elm.valueMember == en_RequestStatus.Received.value;
+                    }).toList(),
                     hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                     itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
                     menuMaxHeightValue: 300,
                     showClearIcon: true,
-                    selectedValue: requestStatusID =
-                        requestStatus_bloc.instance.lstRequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
-                            ? requestStatus_bloc.instance.lstRequestStatusAsDataSource.first.valueMember
-                            : requestStatusID,
+                    selectedValue: requestStatusID,
+                    // selectedValue: requestStatusID =
+                    //     requestStatus_bloc.instance.lstRequestStatusAsDataSource.length > 0 && widget.frmMode == en_FormMode.NewMode
+                    //         ? requestStatus_bloc.instance.lstRequestStatusAsDataSource.first.valueMember
+                    //         : requestStatusID,
                     OnChanged: (returnID) {
                       requestStatusID = returnID;
                       return requestStatusID;
@@ -170,28 +173,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                 child: ctr_TabBar(
                   LstTabBarViewHeaderWidget: [
                     Text('البيانات الأساسية', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Row(
-                      children: [
-                        Text('الأصناف', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                        SizedBox(width: 20),
-                        IconButton(
-                            onPressed: () {
-                              if (stockIDFrom == null) {
-                                sharedControls.toastNotification('لابد من إختيار الفرع والمخزن أولاً لإضافة الأصناف', false);
-                                return;
-                              }
-
-                              if (widget.scaffoldKey.currentState != null) {
-                                widget.scaffoldKey.currentState!.openEndDrawer();
-                              }
-                            },
-                            icon: Icon(
-                              Icons.production_quantity_limits,
-                              color: Colors.red,
-                              size: 35,
-                            ))
-                      ],
-                    )
+                    Text('الأصناف', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   ],
                   LstTabBarViewWidget: [
                     BuildMasterData(),
@@ -266,30 +248,31 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
         menuMaxHeightValue: 300,
         showClearIcon: true,
-        selectedValue: branchIDFrom,
+        selectedValue: branchIDFromRecived,
+        readOnly: true,
         OnChanged: (returnID) {
-          branchIDFrom = returnID;
+          branchIDFromRecived = returnID;
           // reset Employee and populate with New branch
           contEmployee.selectEmployee = null;
           contEmployee.text = '';
           employee_bloc.instance.add(getLstEmployeeAsDataSource_Event());
-          ctr_SelectEmployee.branchID = branchIDFrom;
+          ctr_SelectEmployee.branchID = branchIDFromRecived;
 
           // reset Stock and populate with New branch
-          stockIDFrom = null;
+          stockIDFromRecived = null;
           stock_bloc.instance.add(
             getLstStocksAsDataSource_Event(
-              branchID: branchIDFrom,
-              branchID2: branchIDTo,
+              branchID: branchIDFromRecived,
+              branchID2: branchIDToRecived,
               condions: [
-                BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDFrom),
-                BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDTo),
+                BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDFromRecived),
+                BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDToRecived),
               ],
             ),
           );
 
-          stockIDFrom =
-              stock_bloc.instance.LstStocksAsDataSource.length > 0 ? stock_bloc.instance.LstStocksAsDataSource.first.valueMember : stockIDFrom;
+          stockIDFromRecived =
+              stock_bloc.instance.LstStocksAsDataSource.length > 0 ? stock_bloc.instance.LstStocksAsDataSource.first.valueMember : stockIDFromRecived;
           return null;
         },
         OnValidate: (value) {
@@ -303,8 +286,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
       BlocBuilder<stock_bloc, definition_state>(
         builder: (context, state) {
           bool isStockState = state is getLstStocksAsDataSource_State;
-          List<DropDowenDataSource> lstStocks =
-              branchIDFrom != null && isStockState ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource : [];
+          List<DropDowenDataSource> lstStocks = branchIDFromRecived != null && isStockState ? state.LstStocksAsDataSource : [];
 
           return ctr_DropDowenList(
             hintLable: 'من مخزن',
@@ -314,14 +296,16 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
             itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
             menuMaxHeightValue: 300,
             showClearIcon: true,
-            selectedValue: stockIDFrom = lstStocks.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocks.first.valueMember : stockIDFrom,
+            readOnly: true,
+            selectedValue: stockIDFromRecived =
+                lstStocks.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocks.first.valueMember : stockIDFromRecived,
             OnChanged: (returnID) {
-              stockIDFrom = returnID;
-              return stockIDFrom;
+              stockIDFromRecived = returnID;
+              return stockIDFromRecived;
             },
             OnValidate: (value) {
-              stockIDFrom = value;
-              if (value == null || stockIDFrom == null) {
+              stockIDFromRecived = value;
+              if (value == null || stockIDFromRecived == null) {
                 return 'لابد من إختيار قيمة';
               }
               return null;
@@ -361,23 +345,24 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
         itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
         menuMaxHeightValue: 300,
         showClearIcon: true,
-        selectedValue: branchIDTo,
+        readOnly: true,
+        selectedValue: branchIDToRecived,
         OnChanged: (returnID) {
-          branchIDTo = returnID;
+          branchIDToRecived = returnID;
           // reset Stock and populate with New branch
-          stockIDTo = null;
+          stockIDToRecived = null;
           stock_bloc.instance.add(
             getLstStocksAsDataSource_Event(
-              branchID: branchIDFrom,
-              branchID2: branchIDTo,
+              branchID: branchIDFromRecived,
+              branchID2: branchIDToRecived,
               condions: [
-                BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDFrom),
-                BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDTo),
+                BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDFromRecived),
+                BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDToRecived),
               ],
             ),
           );
-          stockIDTo =
-              stock_bloc.instance.LstStocksAsDataSource2.length > 0 ? stock_bloc.instance.LstStocksAsDataSource2.first.valueMember : stockIDTo;
+          stockIDToRecived =
+              stock_bloc.instance.LstStocksAsDataSource2.length > 0 ? stock_bloc.instance.LstStocksAsDataSource2.first.valueMember : stockIDToRecived;
           return null;
         },
         OnValidate: (value) {
@@ -391,8 +376,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
       BlocBuilder<stock_bloc, definition_state>(
         builder: (context, state) {
           bool isStockStateTo = state is getLstStocksAsDataSource_State;
-          List<DropDowenDataSource> lstStocksTo =
-              branchIDTo != null && isStockStateTo ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource2 : [];
+          List<DropDowenDataSource> lstStocksTo = branchIDToRecived != null && isStockStateTo ? state.LstStocksAsDataSource2 : [];
 
           return ctr_DropDowenList(
             hintLable: 'إلى مخزن',
@@ -402,14 +386,16 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
             itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
             menuMaxHeightValue: 300,
             showClearIcon: true,
-            selectedValue: stockIDTo = lstStocksTo.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocksTo.first.valueMember : stockIDTo,
+            readOnly: true,
+            selectedValue: stockIDToRecived =
+                lstStocksTo.length > 0 && widget.frmMode == en_FormMode.NewMode ? lstStocksTo.first.valueMember : stockIDToRecived,
             OnChanged: (returnID) {
-              stockIDTo = returnID;
-              return stockIDTo;
+              stockIDToRecived = returnID;
+              return stockIDToRecived;
             },
             OnValidate: (value) {
-              stockIDTo = value;
-              if (value == null || stockIDTo == null) {
+              stockIDToRecived = value;
+              if (value == null || stockIDToRecived == null) {
                 return 'لابد من إختيار قيمة';
               }
               return null;
@@ -428,17 +414,20 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
       if (!checkIsSentDocument())
         ElevatedButton.icon(
           label: Text(
-            'تم الإرسال',
+            'تم إستلام طلب التحويل',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.blue[800]),
           ),
           icon: Icon(Icons.done_outline),
           style: ElevatedButton.styleFrom(elevation: 3, backgroundColor: Colors.white),
           onPressed: () {
-            sharedControls.confirmDialog(
-                context, 'تأكيد إرسال', 'فى حالة تأكيد الإرسال سيتم التأثير على رصيد المخزن وإغلاق المستند ولا يمكن التعديل فيه نهائياً', () {
-              requestStatusID = en_RequestStatus.Sent.value;
+            sharedControls.confirmDialog(context, 'تأكيد الإستلام',
+                'فى حالة تأكيد إستلام طلب التحويل سيتم التأثير على رصيد المخزن بالزيادة وإغلاق المستند ولا يمكن التعديل فيه نهائياً', () {
+              requestStatusID = en_RequestStatus.Received.value;
               saveData();
               saveProductsQty();
+              // تحديث مستند التحويل عشان مينفعش يتفتح تاني
+              widget.itemTransferQty!.IDRequestStatus = requestStatusID;
+              bllInv_Transfer.fire_SetItem(widget.itemTransferQty!.ID.toString(), widget.itemTransferQty!);
             });
           },
         ),
@@ -446,11 +435,11 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
   }
 
   Widget BuildListView(BuildContext context) {
-    return BlocBuilder<transfer_bloc, inv_state>(
+    return BlocBuilder<recived_bloc, inv_state>(
       builder: (context, state) {
-        if (state is transferDetails_StateInitial) {
+        if (state is recivedDetails_StateInitial) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state is transferDetails_StateDataChanged) {
+        } else if (state is recivedDetails_StateDataChanged) {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Column(
@@ -458,7 +447,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                 // Filter
                 SizedBox(
                   height: 60,
-                  width: 690,
+                  width: 910,
                   child: Row(
                     children: [
                       SizedBox(
@@ -469,7 +458,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                           padding: const EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 0),
                           OnChanged: (value) {
                             if (value != null) {
-                              transfer_bloc.instance.add(filterAnyTransferDetails_Event(filterData: value.trim()));
+                              recived_bloc.instance.add(filterAnyRecivedDetails_Event(filterData: value.trim()));
                             }
                             return null;
                           },
@@ -478,7 +467,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                       IconButton(
                         onPressed: () {
                           contFilter.clear();
-                          transfer_bloc.instance.add(resetFilterTransferDetails_Event());
+                          recived_bloc.instance.add(resetFilterRecivedDetails_Event());
                         },
                         icon: const Icon(Icons.clear),
                       ),
@@ -489,7 +478,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                 // Column Header
                 Container(
                   color: Colors.grey[300],
-                  width: 690,
+                  width: 910,
                   height: 30,
                   child: Row(
                     children: [
@@ -507,8 +496,12 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                           child: Text('فئة السعر', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
                       SizedBox(
                           width: 220,
-                          child:
-                              Text('الكمية والسعر', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                          child: Text('الكمية والسعر المحول',
+                              textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                      SizedBox(
+                          width: 220,
+                          child: Text('الكميات المستلمة فعليا',
+                              textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.red[700]))),
                       SizedBox(
                           width: 90,
                           child: Text(
@@ -521,16 +514,16 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                 // ListView - Rows
                 Expanded(
                   child: SizedBox(
-                    width: 690,
+                    width: 910,
                     height: 500,
                     child: ListView.separated(
                       physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.only(right: 2, left: 2),
                       itemBuilder: (context, index) {
-                        return buildListViewItem(state.filterdLst_TransferDetails[index], context, index);
+                        return buildListViewItem(state.filterdLst_RecivedDetails[index], context, index);
                       },
                       separatorBuilder: (context, index) => const SizedBox(height: 1),
-                      itemCount: state.filterdLst_TransferDetails.length,
+                      itemCount: state.filterdLst_RecivedDetails.length,
                     ),
                   ),
                 ),
@@ -544,9 +537,9 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
     );
   }
 
-  buildListViewItem(Inv_TransferDetails itemDetails, context, int index) {
+  buildListViewItem(Inv_RecivedQtyDetails itemDetails, context, int index) {
     return InkWell(
-      onDoubleTap: () => editItemDetails(itemDetails, index),
+      onDoubleTap: () => recivedQtyDetails(itemDetails, index),
       child: Container(
         padding: const EdgeInsets.only(top: 0, right: 0, bottom: 0, left: 0),
         color: Colors.white,
@@ -614,6 +607,42 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                     ],
                   ),
                 ),
+                // الكميات المستلمة فعليا
+                SizedBox(
+                  width: 220,
+                  child: Column(
+                    children: [
+                      // يظهر السطر فى حالة اضافة وحدة كبري
+                      if (itemDetails.RecivedisBigUnit != null && itemDetails.RecivedisBigUnit!)
+                        Row(
+                          children: [
+                            Text('${itemDetails.RecivedUnitBig_Qty} ${unit_bloc.instance.getNameByID(itemDetails.RecivedUnitBig_ID)}',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.red[700])),
+                            Text(' x ', style: const TextStyle(fontSize: 14)),
+                            Text('${itemDetails.RecivedUnitBig_Price}',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.red[700])),
+                            Text(' = ', style: const TextStyle(fontSize: 14)),
+                            Text('${itemDetails.RecivedTotalPrice!.toStringAsFixed(2)}',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.red[700])),
+                          ],
+                        ),
+                      // خاص ببيانات الوحدة الصغري
+                      if (itemDetails.RecivedisBigUnit != null)
+                        Row(
+                          children: [
+                            Text('${itemDetails.RecivedUnitSmall_Qty} ${unit_bloc.instance.getNameByID(itemDetails.RecivedUnitSmall_ID)}',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.red[700])),
+                            Text(' x ', style: const TextStyle(fontSize: 14)),
+                            Text('${itemDetails.RecivedUnitSmall_Price}',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.red[700])),
+                            Text(' = ', style: const TextStyle(fontSize: 14)),
+                            Text('${itemDetails.RecivedTotalPrice!.toStringAsFixed(2)}',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.red[700])),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
                 SizedBox(
                   width: 90,
                   child: Row(
@@ -625,7 +654,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
                           ],
                         ),
                         onTap: () async {
-                          editItemDetails(itemDetails, index);
+                          recivedQtyDetails(itemDetails, index);
                         },
                       ),
                       const SizedBox(width: 10),
@@ -664,50 +693,25 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
     );
   }
 
-  Widget buildDrawerProductsInvoice(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 50),
-      child: Drawer(
-        backgroundColor: Colors.white,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 0, right: 5, bottom: 10, left: 0),
-                child: ctr_SelectProduct(
-                  onAddProduct: (customProductItem prod) {
-                    transfer_bloc.instance.add(addNewTransferDetails_Event(itemCustomProduct: prod, stockID: stockIDFrom));
-                    calcSumValue();
-                  },
-                  priceTypeID: en_PriceType.salesPrice1.value,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget buildCalcSummtion() {
     return Container(
       color: Colors.yellow[200],
-      child: BlocBuilder<transfer_bloc, inv_state>(
+      child: BlocBuilder<recived_bloc, inv_state>(
         builder: (context, state) {
-          if (state is transferDetails_StateDataChanged) {
+          if (state is recivedDetails_StateDataChanged) {
             contTotalValueFrom.text =
-                state.filterdLst_TransferDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2);
+                state.filterdLst_RecivedDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2);
 
             return Row(
               children: [
                 Text('العدد:', style: const TextStyle(fontSize: 14)),
-                Text('${state.filterdLst_TransferDetails.length}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('${state.filterdLst_RecivedDetails.length}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Text('   الكمية :', style: const TextStyle(fontSize: 14)),
-                Text('${state.filterdLst_TransferDetails.fold(0, (previousValue, element) => previousValue + element.UnitSmall_Qty!)}',
+                Text('${state.filterdLst_RecivedDetails.fold(0, (previousValue, element) => previousValue + element.UnitSmall_Qty!)}',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Text('    الإجمالى:', style: const TextStyle(fontSize: 14)),
                 Text(
-                    '${state.filterdLst_TransferDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2)}',
+                    '${state.filterdLst_RecivedDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2)}',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ],
             );
@@ -729,10 +733,13 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
     unit_bloc.instance.add(getListUnit_Event([BLLCondions(enTable_Def_Units.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     clearCachedData();
 
-    if (widget.frmMode == en_FormMode.NewMode)
-      NewMode();
+    // if (widget.frmMode == en_FormMode.NewMode && widget.itemTransferQty == null)
+    //   newMode();
+    // لو كنت فى تحويل المخازن وبعمل استلام تحويل
+    if (widget.frmMode == en_FormMode.NewMode && widget.itemTransferQty != null)
+      newModeWithTransferQty(widget.itemTransferQty);
     else if (widget.frmMode == en_FormMode.EditMode) {
-      EditMode();
+      editMode();
     }
   }
 
@@ -743,6 +750,9 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
           IconButton(
             onPressed: () {
               saveData();
+              // تحديث مستند التحويل عشان مينفعش يتفتح تاني
+              widget.itemTransferQty!.IDRequestStatus = requestStatusID;
+              bllInv_Transfer.fire_SetItem(widget.itemTransferQty!.ID.toString(), widget.itemTransferQty!);
             },
             icon: Icon(
               Icons.save,
@@ -790,100 +800,183 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
   }
 
   void clearCachedData() {
-    branchIDFrom = branchIDTo = stockIDTo = stockIDFrom = contEmployee.selectEmployee = ctr_SelectEmployee.branchID = requestStatusID = null;
+    branchIDFromRecived = branchIDToRecived =
+        stockIDToRecived = stockIDFromRecived = contEmployee.selectEmployee = ctr_SelectEmployee.branchID = requestStatusID = null;
     contEmployee.text = '';
     employee_bloc.instance.add(resetFilterEmployee_Event());
     lstDetailsDeleted.clear();
     lstProductsQty.clear();
-    transfer_bloc.instance.add(clearTransferDetails_Event());
+    recived_bloc.instance.add(clearRecivedDetails_Event());
     contTotalValueFrom.text = contTotalValueTo.text = '';
   }
 
   void calcSumValue() {
-    contTotalValueFrom.text = transfer_bloc.instance.filterdLst_TransferDetails
-        .fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!)
-        .toStringAsFixed(2);
+    contTotalValueFrom.text =
+        recived_bloc.instance.filterdLst_RecivedDetails.fold(0.0, (previousValue, element) => previousValue + element.TotalPrice!).toStringAsFixed(2);
     contTotalValueTo.text = '0';
-    //transfer_bloc.instance.filterdLst_TransferDetails
+    //recived_bloc.instance.filterdLst_RecivedDetails
     //     .fold(0.0, (previousValue, element) => previousValue + element.TotalPriceTo!)
     //     .toStringAsFixed(2);
   }
 
-  void NewMode() async {
-    bllInv_Transfer.getMax_firestore(enTable_Inv_Transfer.Code).then((val) {
+  void newMode() async {
+    bllInv_RecivedQty.getMax_firestore(enTable_Inv_RecivedQty.Code).then((val) {
       contCode.text = val.toString();
     }).toString();
     contDate.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
     contTime.text = sharedFunctions_Dates.convertDateTime_TimeString(DateTime.now());
   }
 
-  void EditMode() async {
-    selectedID = widget.itemTransfer!.ID!;
-    contCode.text = widget.itemTransfer!.Code.toString();
-    contDate.text = widget.itemTransfer!.Date!;
-    contTime.text = widget.itemTransfer!.Time!;
-    requestStatusID = widget.itemTransfer!.IDRequestStatus;
+  void newModeWithTransferQty(Inv_Transfer? itemTransfer) async {
+    // selectedID = itemTransfer!.ID!;
+    bllInv_RecivedQty.getMax_firestore(enTable_Inv_RecivedQty.Code).then((val) {
+      contCode.text = val.toString();
+    }).toString();
+    contDate.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
+    contTime.text = sharedFunctions_Dates.convertDateTime_TimeString(DateTime.now());
 
-    branchIDFrom = widget.itemTransfer!.IDBranchFrom;
-    branchIDTo = widget.itemTransfer!.IDBranchTo;
+    // contCode.text = itemTransfer.Code!.toString();
+    // contDate.text = itemTransfer.Date!;
+    // contTime.text = itemTransfer.Time!;
+    requestStatusID = en_RequestStatus.ReceivedReview.value;
+
+    branchIDFromRecived = itemTransfer!.IDBranchFrom;
+    branchIDToRecived = itemTransfer.IDBranchTo;
     stock_bloc.instance.add(
       getLstStocksAsDataSource_Event(
-        branchID: branchIDFrom,
-        branchID2: branchIDTo,
+        branchID: branchIDFromRecived,
+        branchID2: branchIDToRecived,
         condions: [
-          BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDFrom),
-          BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDTo),
+          BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDFromRecived),
+          BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDToRecived),
         ],
       ),
     );
-    stockIDFrom = widget.itemTransfer!.IDStockFrom!;
-    stockIDTo = widget.itemTransfer!.IDStockTo!;
-    contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemTransfer!.IDEmployee!.toString());
+    stockIDFromRecived = itemTransfer.IDStockFrom!;
+    stockIDToRecived = itemTransfer.IDStockTo!;
+    contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(itemTransfer.IDEmployee!.toString());
     contEmployee.text = contEmployee.selectEmployee!.Name!;
-    ctr_SelectEmployee.branchID = branchIDFrom;
+    ctr_SelectEmployee.branchID = branchIDFromRecived;
 
-    contNote.text = widget.itemTransfer!.Note!;
-    contTotalValueFrom.text = widget.itemTransfer!.TotalValueFrom.toString();
-    contTotalValueTo.text = widget.itemTransfer!.TotalValueTo.toString();
-    transfer_bloc.instance.add(getListTransferDetails_Event(widget.itemTransfer!.ID!));
+    // contNote.text = itemTransfer.Note!;
+    contTotalValueFrom.text = itemTransfer.TotalValueFrom.toString();
+    contTotalValueTo.text = itemTransfer.TotalValueTo.toString();
+
+    //********************** Details ******************************
+    // List<BLLCondions> cond = [
+    //   BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.transfer.value),
+    //   BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, selectedID),
+    // ];
+    List<Inv_TransferDetails> lstTransferDetails = [];
+    await transfer_bloc.instance.getList_transferDetails(itemTransfer.ID!).then((val) {
+      lstTransferDetails = val;
+    });
+    lstTransferDetails.forEach((elm) {
+      recived_bloc.instance.filterdLst_RecivedDetails.add(Inv_RecivedQtyDetails(
+        ID: recived_bloc.instance.filterdLst_RecivedDetails.length + 1,
+        IDProduct: elm.IDProduct,
+        Barcode: elm.Barcode,
+        IDClassefication: elm.IDClassefication,
+        IDProductionCompanies: elm.IDProductionCompanies,
+        PriceType: elm.PriceType,
+        UnitBig_ID: elm.UnitBig_ID,
+        UnitBig_Qty: elm.UnitBig_Qty,
+        UnitBig_Price: elm.UnitBig_Price,
+        isBigUnit: elm.isBigUnit,
+        UnitCountOf: elm.UnitCountOf,
+        UnitSmall_ID: elm.UnitSmall_ID,
+        UnitSmall_Qty: elm.UnitSmall_Qty,
+        UnitSmall_Price: elm.UnitSmall_Price,
+        TotalPrice: elm.TotalPrice,
+        RecivedTotalPrice: 0,
+        RecivedUnitBig_Price: 0,
+        RecivedUnitSmall_Price: 0,
+        RecivedUnitBig_ID: elm.UnitBig_ID,
+        RecivedUnitBig_Qty: elm.UnitBig_Qty,
+        RecivedUnitSmall_ID: elm.UnitSmall_ID,
+        RecivedUnitSmall_Qty: elm.UnitSmall_Qty,
+        RecivedisBigUnit: elm.isBigUnit,
+      ));
+    });
+    // لتحديث اللسته بعد التعبئة وعرضها فى الشاشة
+    recived_bloc.instance.add(refreshRecivedDetails_Event());
+  }
+
+  void editMode() async {
+    selectedID = widget.itemRecived!.ID!;
+    contCode.text = widget.itemRecived!.Code.toString();
+    contDate.text = widget.itemRecived!.Date!;
+    contTime.text = widget.itemRecived!.Time!;
+    requestStatusID = widget.itemRecived!.IDRequestStatus;
+
+    branchIDFromRecived = widget.itemRecived!.IDBranchFrom;
+    branchIDToRecived = widget.itemRecived!.IDBranchTo;
+    stock_bloc.instance.add(
+      getLstStocksAsDataSource_Event(
+        branchID: branchIDFromRecived,
+        branchID2: branchIDToRecived,
+        condions: [
+          BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDFromRecived),
+          BLLCondions(enTable_Def_Stocks.IDBranch.name, en_CondionsWhere.isEqualTo, branchIDToRecived),
+        ],
+      ),
+    );
+    stockIDFromRecived = widget.itemRecived!.IDStockFrom!;
+    stockIDToRecived = widget.itemRecived!.IDStockTo!;
+    contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemRecived!.IDEmployee!.toString());
+    contEmployee.text = contEmployee.selectEmployee!.Name!;
+    ctr_SelectEmployee.branchID = branchIDFromRecived;
+
+    contNote.text = widget.itemRecived!.Note!;
+    contTotalValueFrom.text = widget.itemRecived!.TotalValueFrom.toString();
+    contTotalValueTo.text = widget.itemRecived!.TotalValueTo.toString();
+    recived_bloc.instance.add(getListRecivedDetails_Event(widget.itemRecived!.ID!));
 
     List<BLLCondions> cond = [
-      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.transfer.value),
+      BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.recivedQty.value),
       BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, selectedID),
     ];
     lstProductsQty = await bllInv_ProductsQty.fire_getListWithConditions(conditions: cond);
   }
 
   bool checkIsSentDocument() {
-    if (widget.frmMode == en_FormMode.EditMode && widget.itemTransfer!.IDRequestStatus == en_RequestStatus.Sent.value)
+    if (widget.frmMode == en_FormMode.EditMode &&
+        (widget.itemRecived!.IDRequestStatus == en_RequestStatus.Sent.value ||
+            widget.itemRecived!.IDRequestStatus == en_RequestStatus.ReceivedReview.value ||
+            widget.itemRecived!.IDRequestStatus == en_RequestStatus.ReviewError.value ||
+            widget.itemRecived!.IDRequestStatus == en_RequestStatus.Received.value))
       return true;
     else
       return false;
   }
 
-  void editItemDetails(Inv_TransferDetails itemDetails, index) async {
+  recivedQtyDetails(Inv_RecivedQtyDetails itemDetails, int index) async {
+    itemDetails.RecivedisBigUnit = itemDetails.RecivedisBigUnit ?? itemDetails.isBigUnit!;
+    itemDetails.RecivedUnitSmall_Qty = itemDetails.RecivedUnitSmall_Qty ?? itemDetails.UnitSmall_Qty!;
+    itemDetails.RecivedUnitBig_Qty = itemDetails.RecivedUnitBig_Qty ?? itemDetails.UnitBig_Qty!;
+
     await ctr_SelectProduct(onAddProduct: (c) {})
       ..editProduct(
         context,
         itemDetails.IDProduct!,
         itemDetails.PriceType!,
         itemDetails.isBigUnit!,
-        itemDetails.isBigUnit! ? itemDetails.UnitBig_Price! : itemDetails.UnitSmall_Price!,
-        itemDetails.isBigUnit! ? itemDetails.UnitBig_Qty! : itemDetails.UnitSmall_Qty!,
+        itemDetails.RecivedisBigUnit! ? itemDetails.UnitBig_Price! : itemDetails.UnitSmall_Price!,
+        itemDetails.RecivedisBigUnit! ? itemDetails.RecivedUnitBig_Qty! : itemDetails.RecivedUnitSmall_Qty!,
         // index,
       ).then((cProduct) {
         if (cProduct != null) {
-          transfer_bloc.instance.add(editRowTransferDetails_Event(itemCustomProduct: cProduct, index: index));
+          recived_bloc.instance.add(editRowRecivedDetails_Event(itemCustomProduct: cProduct, index: index));
         }
       });
   }
 
-  void deletItemDetails(Inv_TransferDetails itemDetails) {
+  void deletItemDetails(Inv_RecivedQtyDetails itemDetails) {
     sharedControls.confirmDelete(
       context,
       product_bloc.instance.getNameByID(itemDetails.IDProduct),
       () {
-        transfer_bloc.instance.add(deleteItemTransferDetails_Event(itemDetails: itemDetails));
+        recived_bloc.instance.add(deleteItemRecivedDetails_Event(itemDetails: itemDetails));
         lstDetailsDeleted.add(itemDetails);
         calcSumValue();
       },
@@ -916,37 +1009,33 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
     if (frmKey.currentState != null && frmKey.currentState!.validate() && otherValidate()) {
       //********************************************************************
       if (widget.frmMode == en_FormMode.NewMode) {
-        selectedID = await bllInv_Transfer.getMaxID_firestore();
-        widget.itemTransfer = Inv_Transfer();
+        selectedID = await bllInv_RecivedQty.getMaxID_firestore();
+        widget.itemRecived = Inv_RecivedQty();
       } else if (widget.frmMode == en_FormMode.EditMode) {
-        selectedID = widget.itemTransfer!.ID!;
+        selectedID = widget.itemRecived!.ID!;
       }
-
-      widget.itemTransfer!.ID = selectedID;
-      widget.itemTransfer!.Code = int.tryParse(contCode.text);
-      widget.itemTransfer!.Date = contDate.text;
-      widget.itemTransfer!.Time = contTime.text;
-      widget.itemTransfer!.IDRequestStatus = requestStatusID;
-
-      widget.itemTransfer!.IDBranchFrom = branchIDFrom;
-      widget.itemTransfer!.IDStockFrom = stockIDFrom;
-      widget.itemTransfer!.IDEmployee = contEmployee.selectEmployee!.ID;
-
-      widget.itemTransfer!.IDBranchTo = branchIDTo;
-      widget.itemTransfer!.IDStockTo = stockIDTo;
-
-      widget.itemTransfer!.Note = contNote.text;
-      widget.itemTransfer!.UID = sharedHive.UID;
-      widget.itemTransfer!.TotalValueFrom = double.parse(contTotalValueFrom.text);
-      widget.itemTransfer!.TotalValueTo = double.parse(contTotalValueTo.text);
+      widget.itemRecived!.ID = selectedID;
+      widget.itemRecived!.Code = int.tryParse(contCode.text);
+      widget.itemRecived!.Date = contDate.text;
+      widget.itemRecived!.Time = contTime.text;
+      widget.itemRecived!.IDRequestStatus = requestStatusID;
+      widget.itemRecived!.IDBranchFrom = branchIDFromRecived;
+      widget.itemRecived!.IDStockFrom = stockIDFromRecived;
+      widget.itemRecived!.IDEmployee = contEmployee.selectEmployee!.ID;
+      widget.itemRecived!.IDBranchTo = branchIDToRecived;
+      widget.itemRecived!.IDStockTo = stockIDToRecived;
+      widget.itemRecived!.Note = contNote.text;
+      widget.itemRecived!.UID = sharedHive.UID;
+      widget.itemRecived!.TotalValueFrom = double.parse(contTotalValueFrom.text);
+      widget.itemRecived!.TotalValueTo = double.parse(contTotalValueTo.text);
 
       // حفظ الاساسي والتفاصيل مره واحده
-      await bllInv_Transfer.fire_setListMaster_And_Details(
+      await bllInv_RecivedQty.fire_setListMaster_And_Details(
         insertdDocID: selectedID.toString(),
-        itemInv_Transfer: widget.itemTransfer!,
-        collectionDetailsName: en_TablesName.Inv_TransferDetails.name,
-        columnNameAsDocumentDetails: enTable_Inv_TransferDetails.ID.name,
-        detais: transfer_bloc.instance.filterdLst_TransferDetails.map((elm) => elm.toMap()).toList(),
+        itemInv_RecivedQty: widget.itemRecived!,
+        collectionDetailsName: en_TablesName.Inv_RecivedQtyDetails.name,
+        columnNameAsDocumentDetails: enTable_Inv_RecivedQtyDetails.ID.name,
+        detais: recived_bloc.instance.filterdLst_RecivedDetails.map((elm) => elm.toMap()).toList(),
         deletedItemsDetais: lstDetailsDeleted.map((elm) => elm.toMap()).toList(),
       );
 
@@ -962,7 +1051,7 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
         cond = [
           BLLCondions(enTable_Inv_ProductsQty.IDProduct.name, en_CondionsWhere.isEqualTo, del.IDProduct),
           BLLCondions(enTable_Inv_ProductsQty.LineNumber.name, en_CondionsWhere.isEqualTo, del.ID),
-          BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.transfer.value),
+          BLLCondions(enTable_Inv_ProductsQty.IDDocumentType.name, en_CondionsWhere.isEqualTo, en_DocumentType.recivedQty.value),
           BLLCondions(enTable_Inv_ProductsQty.IDDocument.name, en_CondionsWhere.isEqualTo, selectedID),
         ];
       });
@@ -973,23 +1062,23 @@ class _scr_RecivedQtyItemState extends State<scr_RecivedQtyItem> {
     int index = 1;
     Inv_ProductsQty? itemProductsQty;
 
-    for (var itemDetails in transfer_bloc.instance.filterdLst_TransferDetails) {
+    for (var itemDetails in recived_bloc.instance.filterdLst_RecivedDetails) {
       itemProductsQty = lstProductsQty.where((itm) {
-        return itm.LineNumber == itemDetails.ID && itm.IDDocument == selectedID && itm.IDDocumentType == en_DocumentType.transfer.value;
+        return itm.LineNumber == itemDetails.ID && itm.IDDocument == selectedID && itm.IDDocumentType == en_DocumentType.recivedQty.value;
       }).firstOrNull;
 
       // لو فاضي يبقي صنف جديد
       if (itemProductsQty == null) {
         itemProductsQty = Inv_ProductsQty();
-        itemProductsQty.ID = '${itemDetails.IDProduct}-${index}-${en_TablesName.Inv_Transfer.name}-${selectedID}';
+        itemProductsQty.ID = '${itemDetails.IDProduct}-${index}-${en_TablesName.Inv_RecivedQty.name}-${selectedID}';
         lstProductsQty.add(itemProductsQty);
       }
       itemProductsQty.DateInserted = contDate.text;
       itemProductsQty.IDDocument = selectedID;
-      itemProductsQty.IDDocumentType = en_DocumentType.transfer.value;
-      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.transfer.value);
-      itemProductsQty.IDStock = stockIDFrom;
-      itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockIDFrom);
+      itemProductsQty.IDDocumentType = en_DocumentType.recivedQty.value;
+      itemProductsQty.DocumentTypeName = requestStatus_bloc.instance.getNameByID(en_DocumentType.recivedQty.value);
+      itemProductsQty.IDStock = stockIDFromRecived;
+      itemProductsQty.StockName = stock_bloc.instance.getNameByID(stockIDFromRecived);
       itemProductsQty.LineNumber = index;
       itemProductsQty.BarCode = itemDetails.Barcode;
       itemProductsQty.IDProduct = itemDetails.IDProduct;

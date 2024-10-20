@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllInv_RecivedQty.dart';
+import 'package:vigil_erp/bll/classModel/Inv_RecivedQty.dart';
 import 'package:vigil_erp/bll/classModel/Inv_Transfer.dart';
 import 'package:vigil_erp/bll/classModel/Inv_TransferDetails.dart';
 import '../../bll/bllFirebase/ManageBLL.dart';
@@ -13,6 +15,7 @@ import '../../bll/classModel/Inv_PermissionAddDetails.dart';
 import '../../bll/classModel/Inv_PermissionDiscount.dart';
 import '../../bll/classModel/Inv_PermissionDiscountDetails.dart';
 import '../../bll/classModel/Inv_ProductsQty.dart';
+import '../../bll/classModel/Inv_RecivedQtyDetails.dart';
 import '../../bll/classModel/Inv_Settlement.dart';
 import '../../bll/classModel/Inv_SettlementDetails.dart';
 import '../../componants/ctr_SelectProduct.dart';
@@ -857,9 +860,10 @@ class transfer_bloc extends Bloc<inv_event, inv_state> {
   Future getList_transferDetails(int IDTransfer) async {
     try {
       filterdLst_TransferDetails.clear();
-      await bllInv_Transfer.fire_getListDetails(IDTransfer.toString(), en_TablesName.Inv_TransferDetails.name).then((val) {
+       await bllInv_Transfer.fire_getListDetails(IDTransfer.toString(), en_TablesName.Inv_TransferDetails.name).then((val) {
         filterdLst_TransferDetails = val;
       });
+      return filterdLst_TransferDetails;
     } catch (error) {
       print(error.toString());
       throw error;
@@ -1006,3 +1010,206 @@ class transfer_bloc extends Bloc<inv_event, inv_state> {
   }
 }
 
+class recived_bloc extends Bloc<inv_event, inv_state> {
+  static late recived_bloc instance;
+
+  static recived_bloc cretaeInctance(BuildContext context) {
+    instance = BlocProvider.of<recived_bloc>(context);
+    return instance;
+  }
+
+  // **************************************************************
+  List<Inv_RecivedQty> filterdLst_Recived = [];
+  List<Inv_RecivedQtyDetails> filterdLst_RecivedDetails = [];
+
+  Future getList_recived({List<BLLCondions>? conditions}) async {
+    try {
+      await bllInv_RecivedQty.fire_getListWithConditions(conditions: conditions).then((val) {
+        filterdLst_Recived = val;
+      });
+    } catch (error) {
+      print(error.toString());
+      throw error;
+    }
+  }
+
+  resetFilter_recived() {
+    filterdLst_Recived.clear();
+    filterdLst_Recived = bllInv_RecivedQty.lstInv_RecivedQty;
+  }
+
+  filterAny_recived({String? filterData}) async {
+    if (filterData == null || filterData.isEmpty) {
+      resetFilter_recived();
+    }
+    filterdLst_Recived = await bllInv_RecivedQty.lstInv_RecivedQty.where((item) {
+      String branchName = company_bloc.instance.getNameByID(item.IDBranchFrom);
+      String stockName = stock_bloc.instance.getNameByID(item.IDStockFrom);
+      String employeeName = employee_bloc.instance.getNameByID(item.IDEmployee);
+      String requestStatusName = requestStatus_bloc.instance.getNameByID(item.IDRequestStatus);
+
+      return (item.Code == null ? false : item.Code!.toString().contains(filterData!)) ||
+          (item.Date == null ? false : item.Date!.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (item.Time == null ? false : item.Time!.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (branchName.isEmpty ? false : branchName.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (stockName.isEmpty ? false : stockName.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (employeeName.isEmpty ? false : employeeName.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (requestStatusName.isEmpty ? false : requestStatusName.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (item.TotalValueFrom == null ? false : item.TotalValueFrom.toString().contains(filterData!.toLowerCase()));
+    }).toList();
+  }
+
+  Future getList_recivedDetails(int IDRecived) async {
+    try {
+      filterdLst_RecivedDetails.clear();
+      await bllInv_RecivedQty.fire_getListDetails(IDRecived.toString(), en_TablesName.Inv_RecivedQtyDetails.name).then((val) {
+        filterdLst_RecivedDetails = val;
+      });
+    } catch (error) {
+      print(error.toString());
+      throw error;
+    }
+  }
+
+  Future addNewRecivedDetails(customProductItem customProduct) async {
+    try {
+      double price = customProduct.isBigUnit! ? customProduct.UnitBigPrice! : customProduct.UnitSmllPrice!;
+
+      Inv_RecivedQtyDetails itemInsert = Inv_RecivedQtyDetails(
+          ID: filterdLst_RecivedDetails.length + 1,
+          IDProduct: customProduct.ID,
+          Barcode: customProduct.BarCode,
+          IDClassefication: customProduct.IDCategory,
+          IDProductionCompanies: customProduct.IDProductionCompany,
+          // Balance: 0,
+          // وحدة كبري
+          UnitBig_ID: customProduct.isBigUnit! ? customProduct.UnitBig_ID : null,
+          UnitBig_Price: customProduct.isBigUnit! ? customProduct.UnitBigPrice : 0,
+          UnitBig_Qty: customProduct.isBigUnit! ? int.parse(customProduct.controller!.text) : 0,
+          //
+          UnitCountOf: customProduct.UnitCountOf,
+          // وحدة صغري
+          UnitSmall_ID: customProduct.UnitSmall_ID,
+          UnitSmall_Price: customProduct.UnitSmllPrice,
+          UnitSmall_Qty: customProduct.isBigUnit!
+              ? int.parse(customProduct.controller!.text) * customProduct.UnitCountOf!
+              : int.parse(customProduct.controller!.text),
+          TotalPrice: price * int.parse(customProduct.controller!.text),
+          PriceType: customProduct.IDPriceType,
+          isBigUnit: customProduct.isBigUnit);
+
+      // filterdLst_RecivedDetails.add(itemInsert);
+      bllInv_RecivedQty.lstInv_RecivedQtyDetails.add(itemInsert);
+      await resetFilter_recivedDetails();
+    } catch (error) {
+      print(error.toString());
+      throw error;
+    }
+  }
+
+  Future recivedQtyDetails(customProductItem customProductItem, int index) async {
+    try {
+      filterdLst_RecivedDetails[index].PriceType = customProductItem.IDPriceType;
+      filterdLst_RecivedDetails[index].RecivedisBigUnit = customProductItem.isBigUnit;
+      // وحدة كبري
+      filterdLst_RecivedDetails[index].RecivedUnitBig_ID = customProductItem.isBigUnit! ? customProductItem.UnitBig_ID : null;
+      filterdLst_RecivedDetails[index].RecivedUnitBig_Price = customProductItem.isBigUnit! ? customProductItem.UnitBigPrice : 0;
+      filterdLst_RecivedDetails[index].RecivedUnitBig_Qty = customProductItem.isBigUnit! ? int.parse(customProductItem.controller!.text) : 0;
+      //
+      filterdLst_RecivedDetails[index].UnitCountOf = customProductItem.UnitCountOf;
+      // وحدة صغري
+      filterdLst_RecivedDetails[index].RecivedUnitSmall_ID = customProductItem.UnitSmall_ID;
+      filterdLst_RecivedDetails[index].RecivedUnitSmall_Price = customProductItem.UnitSmllPrice;
+      filterdLst_RecivedDetails[index].RecivedUnitSmall_Qty = customProductItem.isBigUnit!
+          ? int.parse(customProductItem.controller!.text) * customProductItem.UnitCountOf!
+          : int.parse(customProductItem.controller!.text);
+
+      double price = customProductItem.isBigUnit! ? customProductItem.UnitBigPrice! : customProductItem.UnitSmllPrice!;
+      filterdLst_RecivedDetails[index].RecivedTotalPrice = price * int.parse(customProductItem.controller!.text);
+    } catch (error) {
+      print(error.toString());
+      throw error;
+    }
+  }
+
+  Future deleteItemRecivedDetails(Inv_RecivedQtyDetails itemDetails) async {
+    try {
+      filterdLst_RecivedDetails.remove(itemDetails);
+    } catch (error) {
+      print(error.toString());
+      throw error;
+    }
+  }
+
+  filterAny_recivedDetails({String? filterData}) async {
+    if (filterData == null || filterData.isEmpty) {
+      resetFilter_recivedDetails();
+      return;
+    }
+    filterdLst_RecivedDetails = await filterdLst_RecivedDetails.where((item) {
+      String productName = product_bloc.instance.getNameByID(item.IDProduct);
+
+      return (item.Barcode == null ? false : item.Barcode!.toString().contains(filterData)) ||
+          (productName.isEmpty ? false : productName.toLowerCase().contains(filterData.toLowerCase()));
+    }).toList();
+  }
+
+  resetFilter_recivedDetails() async {
+    // filterdLst_RecivedDetails.clear();
+    filterdLst_RecivedDetails = await bllInv_RecivedQty.lstInv_RecivedQtyDetails.where((item) {
+      return item != 0;
+    }).toList();
+  }
+
+  recived_bloc() : super(recived_StateInitial()) {
+    on<inv_event>((event, emit) async {
+      if (event is getListRecived_Event) {
+        await getList_recived(conditions: event.condions);
+        emit(recived_StateDataChanged(filterdLst_Recived: filterdLst_Recived));
+      } else if (event is refreshRecived_Event) {
+        emit(recived_StateDataChanged(filterdLst_Recived: filterdLst_Recived));
+      } else if (event is resetFilterRecived_Event) {
+        await resetFilter_recived();
+        emit(recived_StateDataChanged(filterdLst_Recived: filterdLst_Recived));
+      } else if (event is filterAnyRecived_Event) {
+        await filterAny_recived(filterData: event.filterData);
+        emit(recived_StateDataChanged(filterdLst_Recived: filterdLst_Recived));
+      } else if (event is deleteRecived_Event) {
+        await bllInv_RecivedQty.fire_DeleteListMaster_And_Details(event.deleteID.toString(), en_TablesName.Inv_RecivedQtyDetails.name);
+        await bllInv_RecivedQty.fire_getList().then((val) {
+          filterdLst_Recived = val;
+        });
+        emit(recived_StateDataChanged(filterdLst_Recived: filterdLst_Recived));
+      }
+
+      // **********************   Details
+
+      else if (event is getListRecivedDetails_Event) {
+        await getList_recivedDetails(event.IDRecived);
+        emit(recivedDetails_StateDataChanged(filterdLst_RecivedDetails: filterdLst_RecivedDetails));
+      } else if (event is addNewRecivedDetails_Event) {
+        await addNewRecivedDetails(event.itemCustomProduct!);
+        emit(recivedDetails_StateDataChanged(filterdLst_RecivedDetails: filterdLst_RecivedDetails));
+      } else if (event is editRowRecivedDetails_Event) {
+        await recivedQtyDetails(event.itemCustomProduct!, event.index!);
+        emit(recivedDetails_StateDataChanged(filterdLst_RecivedDetails: filterdLst_RecivedDetails));
+      } else if (event is deleteItemRecivedDetails_Event) {
+        await deleteItemRecivedDetails(event.itemDetails!);
+        emit(recivedDetails_StateDataChanged(filterdLst_RecivedDetails: filterdLst_RecivedDetails));
+      } else if (event is clearRecivedDetails_Event) {
+        filterdLst_RecivedDetails.clear();
+        bllInv_RecivedQty.lstInv_RecivedQtyDetails.clear();
+        emit(clearRecivedDetails());
+      } else if (event is filterAnyRecivedDetails_Event) {
+        await filterAny_recivedDetails(filterData: event.filterData);
+        emit(recivedDetails_StateDataChanged(filterdLst_RecivedDetails: filterdLst_RecivedDetails));
+      } else if (event is resetFilterRecivedDetails_Event) {
+        await resetFilter_recivedDetails();
+        emit(recivedDetails_StateDataChanged(filterdLst_RecivedDetails: filterdLst_RecivedDetails));
+      }
+      else if (event is refreshRecivedDetails_Event) {
+        emit(recivedDetails_StateDataChanged(filterdLst_RecivedDetails: filterdLst_RecivedDetails));
+      }
+    });
+  }
+}

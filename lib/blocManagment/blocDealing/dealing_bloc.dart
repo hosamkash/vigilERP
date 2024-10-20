@@ -177,7 +177,9 @@ class client_bloc extends Bloc<dealing_event, dealing_state> {
 
   Future getLstClientAsDataSource() async {
     LstClientAsDataSource.clear();
-    if (bllDealing_Clients.lstDealing_Clients.length == 0) await bllDealing_Clients.fire_getList();
+    if (bllDealing_Clients.lstDealing_Clients.length == 0) {
+      await getList_Client();
+    }
     for (var item in bllDealing_Clients.lstDealing_Clients) {
       LstClientAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
     }
@@ -185,6 +187,9 @@ class client_bloc extends Bloc<dealing_event, dealing_state> {
 
   String getNameByID(int? ID) {
     String ret = '';
+    if(bllDealing_Clients.lstDealing_Clients.length == 0)
+      bllDealing_Clients.fire_getList();
+
     if (bllDealing_Clients.lstDealing_Clients.isNotEmpty && ID != null) {
       ret = bllDealing_Clients.lstDealing_Clients.firstWhere((elm) {
         return elm.ID == ID;
@@ -198,7 +203,12 @@ class client_bloc extends Bloc<dealing_event, dealing_state> {
       if (event is getListClient_Event) {
         await getList_Client();
         emit(getListClient_StateDataChanged(filterdLst_Client: filterdLst_Client));
-      } else if (event is filterAnyClient_Event) {
+      }
+      else if (event is getListClientAsDataSource_Event) {
+        await getLstClientAsDataSource();
+        emit(getListClientAsDataSource_StateDataChanged(filterdLst_ClientAsDataSource: LstClientAsDataSource));
+      }
+      else if (event is filterAnyClient_Event) {
         await filterAny_Client(filterData: event.filterData);
         emit(getListClient_StateDataChanged(filterdLst_Client: filterdLst_Client));
       } else if (event is resetFilterClient_Event) {
@@ -250,8 +260,8 @@ class vendor_bloc extends Bloc<dealing_event, dealing_state> {
     filterdLst_Vendor = bllDealing_Vendors.lstDealing_Vendors;
   }
 
-  Future getLstVendorAsDataSource() async {
-    LstVendorAsDataSource.clear();
+  Future getList_VendorAsDataSource() async {
+     LstVendorAsDataSource.clear();
     if (bllDealing_Vendors.lstDealing_Vendors.length == 0) {
       await bllDealing_Vendors.fire_getList();
     }
@@ -275,7 +285,12 @@ class vendor_bloc extends Bloc<dealing_event, dealing_state> {
       if (event is getListVendor_Event) {
         await getList_Vendor();
         emit(getListVendor_StateDataChanged(filterdLst_Vendor: filterdLst_Vendor));
-      } else if (event is filterAnyVendor_Event) {
+      }
+      else if (event is getListVendorAsDataSource_Event) {
+        await getList_VendorAsDataSource();
+        emit(getListVendorAsDataSource_StateDataChanged(filterdLst_VendorAsDataSource: LstVendorAsDataSource));
+      }
+      else if (event is filterAnyVendor_Event) {
         await filterAny_Vendor(filterData: event.filterData);
         emit(getListVendor_StateDataChanged(filterdLst_Vendor: filterdLst_Vendor));
       } else if (event is resetFilterVendor_Event) {

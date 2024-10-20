@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vigil_erp/bll/bllFirebase/bllDef_Stocks.dart';
 import 'package:vigil_erp/bll/classModel/Def_ProductStructure.dart';
 import 'package:vigil_erp/bll/classModel/Def_Units.dart';
-
 import 'package:vigil_erp/blocManagment/blocDealing/dealing_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocFixTables/fix_table_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocInventory/inv_bloc.dart';
-import 'package:vigil_erp/blocManagment/general/cubitGeneral.dart';
-import 'package:vigil_erp/blocManagment/general/cubitStates.dart';
 import 'package:vigil_erp/componants/ctr_Date.dart';
 import 'package:vigil_erp/componants/ctr_DropDowenList.dart';
 import 'package:vigil_erp/componants/ctr_SelectEmployee.dart';
@@ -22,17 +18,14 @@ import 'package:vigil_erp/shared/enumerators.dart';
 import 'package:vigil_erp/shared/sharedFunctions.dart';
 import 'package:vigil_erp/shared/sharedHive.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
-
 import '../../../bll/bllFirebase/ManageBLL.dart';
 import '../../../bll/bllFirebase/bllDealing_Employees.dart';
 import '../../../bll/bllFirebase/bllInv_ProductsQty.dart';
 import '../../../bll/bllFirebase/bllInv_Transfer.dart';
-import '../../../bll/classModel/Def_Categories.dart';
 import '../../../bll/classModel/Def_Stocks.dart';
 import '../../../bll/classModel/Inv_ProductsQty.dart';
 import '../../../bll/classModel/Inv_Transfer.dart';
 import '../../../bll/classModel/Inv_TransferDetails.dart';
-import '../../../bll/classModel/Inv_Transfer.dart';
 
 class scr_TransferItem extends StatefulWidget {
   scr_TransferItem(this.itemTransfer, this.frmMode, {super.key});
@@ -136,6 +129,13 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
                     hintLable: 'حالة الطلب',
                     padding: EdgeInsets.only(right: 5, left: 0),
                     lstDataSource: requestStatus_bloc.instance.lstRequestStatusAsDataSource,
+                    // .where((elm) {
+                    //   return
+                    //       elm.valueMember == en_RequestStatus.OnDemand.value ||
+                    //       elm.valueMember == en_RequestStatus.ReceivedReview.value ||
+                    //       elm.valueMember == en_RequestStatus.ReviewError.value ||
+                    //       elm.valueMember == en_RequestStatus.Received.value;
+                    // }).toList(),
                     hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                     itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
                     menuMaxHeightValue: 300,
@@ -303,8 +303,7 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
       BlocBuilder<stock_bloc, definition_state>(
         builder: (context, state) {
           bool isStockState = state is getLstStocksAsDataSource_State;
-          List<DropDowenDataSource> lstStocks =
-              branchIDFrom != null && isStockState ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource : [];
+          List<DropDowenDataSource> lstStocks = branchIDFrom != null && isStockState ? state.LstStocksAsDataSource : [];
 
           return ctr_DropDowenList(
             hintLable: 'من مخزن',
@@ -391,8 +390,7 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
       BlocBuilder<stock_bloc, definition_state>(
         builder: (context, state) {
           bool isStockStateTo = state is getLstStocksAsDataSource_State;
-          List<DropDowenDataSource> lstStocksTo =
-              branchIDTo != null && isStockStateTo ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource2 : [];
+          List<DropDowenDataSource> lstStocksTo = branchIDTo != null && isStockStateTo ? state.LstStocksAsDataSource2 : [];
 
           return ctr_DropDowenList(
             hintLable: 'إلى مخزن',
@@ -730,9 +728,9 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
     clearCachedData();
 
     if (widget.frmMode == en_FormMode.NewMode)
-      NewMode();
+      newMode();
     else if (widget.frmMode == en_FormMode.EditMode) {
-      EditMode();
+      editMode();
     }
   }
 
@@ -796,7 +794,7 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
     lstDetailsDeleted.clear();
     lstProductsQty.clear();
     transfer_bloc.instance.add(clearTransferDetails_Event());
-    contTotalValueFrom.text = contTotalValueTo.text = '';
+    contTotalValueFrom.text = contTotalValueTo.text = contNote.text = '';
   }
 
   void calcSumValue() {
@@ -809,7 +807,7 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
     //     .toStringAsFixed(2);
   }
 
-  void NewMode() async {
+  void newMode() async {
     bllInv_Transfer.getMax_firestore(enTable_Inv_Transfer.Code).then((val) {
       contCode.text = val.toString();
     }).toString();
@@ -817,7 +815,7 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
     contTime.text = sharedFunctions_Dates.convertDateTime_TimeString(DateTime.now());
   }
 
-  void EditMode() async {
+  void editMode() async {
     selectedID = widget.itemTransfer!.ID!;
     contCode.text = widget.itemTransfer!.Code.toString();
     contDate.text = widget.itemTransfer!.Date!;
@@ -855,7 +853,11 @@ class _scr_TransferItemState extends State<scr_TransferItem> {
   }
 
   bool checkIsSentDocument() {
-    if (widget.frmMode == en_FormMode.EditMode && widget.itemTransfer!.IDRequestStatus == en_RequestStatus.Sent.value)
+    if (widget.frmMode == en_FormMode.EditMode &&
+        (widget.itemTransfer!.IDRequestStatus == en_RequestStatus.Sent.value ||
+            widget.itemTransfer!.IDRequestStatus == en_RequestStatus.ReceivedReview.value ||
+            widget.itemTransfer!.IDRequestStatus == en_RequestStatus.ReviewError.value ||
+            widget.itemTransfer!.IDRequestStatus == en_RequestStatus.Received.value))
       return true;
     else
       return false;

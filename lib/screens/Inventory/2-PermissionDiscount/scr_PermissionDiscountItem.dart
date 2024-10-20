@@ -183,7 +183,7 @@ class _scr_PermissionDiscountItemState extends State<scr_PermissionDiscountItem>
         builder: (context, state) {
           bool isStockState = state is getLstStocksAsDataSource_State;
           List<DropDowenDataSource> lstStocks =
-              branchID != null && isStockState ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource : [];
+              branchID != null && isStockState ? state.LstStocksAsDataSource : [];
 
           return ctr_DropDowenList(
             hintLable: 'المخزن',

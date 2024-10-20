@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
 
+import '../invoices/1-Purchase/scr_purchaseView.dart';
+import '../invoices/3-Sales/scr_salesView.dart';
+
 class scr_InvoicesTools extends StatelessWidget {
   scr_InvoicesTools({super.key});
 
@@ -41,7 +44,7 @@ class scr_InvoicesTools extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                   sharedControls.navigatTo(context, scr_purchaseView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -97,7 +100,7 @@ class scr_InvoicesTools extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                   sharedControls.navigatTo(context, scr_salesView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(

@@ -16,7 +16,7 @@ class sharedHive {
     final ApppDirectory = await getApplicationDocumentsDirectory();
     path = ApppDirectory.path;
     Hive.init(ApppDirectory.path);
-    currentBranch =await bllDef_CompanyStructure.fire_getItem('1');
+     currentBranch =await bllDef_CompanyStructure.fire_getItem('1');
   }
 
   static resetAllData() async {

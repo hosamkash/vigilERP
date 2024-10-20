@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vigil_erp/bll/bllFirebase/bllDef_Stocks.dart';
 import 'package:vigil_erp/bll/classModel/Def_ProductStructure.dart';
 import 'package:vigil_erp/bll/classModel/Def_Units.dart';
-
 import 'package:vigil_erp/blocManagment/blocDealing/dealing_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocFixTables/fix_table_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocInventory/inv_bloc.dart';
-import 'package:vigil_erp/blocManagment/general/cubitGeneral.dart';
-import 'package:vigil_erp/blocManagment/general/cubitStates.dart';
 import 'package:vigil_erp/componants/ctr_Date.dart';
 import 'package:vigil_erp/componants/ctr_DropDowenList.dart';
 import 'package:vigil_erp/componants/ctr_SelectEmployee.dart';
@@ -22,12 +18,10 @@ import 'package:vigil_erp/shared/enumerators.dart';
 import 'package:vigil_erp/shared/sharedFunctions.dart';
 import 'package:vigil_erp/shared/sharedHive.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
-
 import '../../../bll/bllFirebase/ManageBLL.dart';
 import '../../../bll/bllFirebase/bllDealing_Employees.dart';
 import '../../../bll/bllFirebase/bllInv_ProductsQty.dart';
 import '../../../bll/bllFirebase/bllInv_Settlement.dart';
-import '../../../bll/classModel/Def_Categories.dart';
 import '../../../bll/classModel/Def_Stocks.dart';
 import '../../../bll/classModel/Inv_ProductsQty.dart';
 import '../../../bll/classModel/Inv_Settlement.dart';
@@ -191,7 +185,7 @@ class _scr_SettlementItemState extends State<scr_SettlementItem> {
         builder: (context, state) {
           bool isStockState = state is getLstStocksAsDataSource_State;
           List<DropDowenDataSource> lstStocks =
-              branchID != null && isStockState ? (state as getLstStocksAsDataSource_State).LstStocksAsDataSource : [];
+              branchID != null && isStockState ? state  .LstStocksAsDataSource : [];
           // عند تغيير المخزن لابد من تغيير الكمية الدفترية
           stockID = lstStocks.length > 0 ? lstStocks.first.valueMember : stockID;
           settlement_bloc.instance.add(updateSettlementProductQtyByStock_Event(stockID: stockID));

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vigil_erp/bll/classModel/Def_Stocks.dart';
 import 'package:vigil_erp/blocManagment/blocDealing/dealing_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocInventory/inv_bloc.dart';
@@ -8,6 +7,7 @@ import 'package:vigil_erp/componants/ctr_AlertDialog.dart';
 import 'package:vigil_erp/componants/ctr_TextFormField.dart';
 import 'package:vigil_erp/componants/ctr_TextHeaderPage.dart';
 import 'package:vigil_erp/screens/Inventory/4-Transfer/scr_TransferItem.dart';
+import 'package:vigil_erp/screens/Inventory/5-RecivedQty/scr_RecivedQtyItem.dart';
 import 'package:vigil_erp/shared/enumerators.dart';
 import 'package:vigil_erp/shared/sharedHive.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
@@ -148,7 +148,7 @@ class _scr_TransferViewState extends State<scr_TransferView> {
                 Container(
                   color: Colors.grey[300],
                   padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0),
-                  width: 1090,
+                  width: 1160,
                   height: 30,
                   child: Row(
                     children: [
@@ -193,7 +193,7 @@ class _scr_TransferViewState extends State<scr_TransferView> {
                 // ListView - Rows
                 Expanded(
                   child: SizedBox(
-                    width: 1090,
+                    width: 1160,
                     height: 480,
                     child: ListView.separated(
                       // physics: const BouncingScrollPhysics(),
@@ -209,7 +209,7 @@ class _scr_TransferViewState extends State<scr_TransferView> {
 
                 // Summary
                 SizedBox(
-                  width: 1090,
+                  width: 1160,
                   height: 35,
                   child: Row(
                     children: [
@@ -272,7 +272,7 @@ class _scr_TransferViewState extends State<scr_TransferView> {
         InkWell(
           onDoubleTap: () => editItem(item),
           child: Container(
-            color: item.IDRequestStatus == en_RequestStatus.Sent.value ? Colors.red[100] : Colors.white,
+            color: setRowColorByStatus(item),
             height: 25,
             child: Row(
               children: [
@@ -357,7 +357,7 @@ class _scr_TransferViewState extends State<scr_TransferView> {
                   ),
                 ),
                 SizedBox(
-                  width: 110,
+                  width: 180,
                   child: Row(
                     children: [
                       const SizedBox(width: 10),
@@ -375,6 +375,20 @@ class _scr_TransferViewState extends State<scr_TransferView> {
                         child: Icon(Icons.share, color: Colors.green[700]),
                         onTap: () => shareItem(item),
                       ),
+                      const SizedBox(width: 10),
+                      if (item.IDRequestStatus == en_RequestStatus.Sent.value) // تم الإرسال
+                        InkWell(
+                          child: Row(
+                            children: [
+                              Icon(Icons.file_open_rounded, color: Colors.deepPurple[700]),
+                              Text(
+                                'إستلام',
+                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          onTap: () => recivedItem(item),
+                        ),
                     ],
                   ),
                 ),
@@ -487,7 +501,7 @@ class _scr_TransferViewState extends State<scr_TransferView> {
 
     if (result == null) {
       transfer_bloc.instance.add(refreshTransfer_Event());
-      stock_bloc.instance.getLstStockAsDataSourceAllData( );
+      stock_bloc.instance.getLstStockAsDataSourceAllData();
     } else if (result == true) {
       loadDataFromDB();
     }
@@ -556,5 +570,28 @@ class _scr_TransferViewState extends State<scr_TransferView> {
 
   void shareItem(Inv_Transfer item) async {
     print('مشاركة  ${item.Code}  -  ID ${item.ID}');
+  }
+
+  void recivedItem(Inv_Transfer item) async {
+    var result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => scr_RecivedQtyItem(null, en_FormMode.NewMode, itemTransferQty: item),
+      ),
+    );
+
+    if (result == null) {
+    } else
+      loadDataFromDB();
+  }
+
+  Color setRowColorByStatus(item) {
+    if (item.IDRequestStatus == en_RequestStatus.Sent.value)
+      return Colors.red[100]!;
+    else if (item.IDRequestStatus == en_RequestStatus.ReceivedReview.value ||
+        item.IDRequestStatus == en_RequestStatus.ReviewError.value ||
+        item.IDRequestStatus == en_RequestStatus.Received.value)
+      return Colors.yellow[100]!;
+    else
+      return Colors.white;
   }
 }

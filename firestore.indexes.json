@@ -1,57 +1,97 @@
 {
   "indexes": [
-
-
     {
       "collectionGroup": "Fix_Address_City",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "IDGovernment", "order": "ASCENDING" },
-        { "fieldPath": "ID", "order": "ASCENDING" }
+        {
+          "fieldPath": "IDGovernment",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ID",
+          "order": "ASCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "Def_ProductStructure",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "IDCategory", "order": "ASCENDING" },
-        { "fieldPath": "BarCode", "order": "ASCENDING" }
+        {
+          "fieldPath": "IDCategory",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "BarCode",
+          "order": "ASCENDING"
+        }
       ]
     },
-
     {
       "collectionGroup": "Inv_PermissionAdd",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "IDBranch", "order": "ASCENDING" },
-        { "fieldPath": "Date", "order": "ASCENDING" }
-
+        {
+          "fieldPath": "IDBranch",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Date",
+          "order": "ASCENDING"
+        }
       ]
     },
-
     {
       "collectionGroup": "Inv_PermissionDiscount",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "IDBranch", "order": "ASCENDING" },
-        { "fieldPath": "Date", "order": "ASCENDING" }
+        {
+          "fieldPath": "IDBranch",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Date",
+          "order": "ASCENDING"
+        }
       ]
     },
     {
       "collectionGroup": "Inv_Settlement",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "IDBranch", "order": "ASCENDING" },
-        { "fieldPath": "Date", "order": "ASCENDING" }
+        {
+          "fieldPath": "IDBranch",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Date",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Inv_Transfer",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "IDBranchFrom",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Date",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Inv_RecivedQty",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranchTo","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
       ]
     }
-
-
-
-
-
-
-
 
 
   ]
