@@ -37,7 +37,10 @@ final class getListJobs_StateDataChanged extends definition_state {
   final List<Def_Jobs> filterdLst_Jobs;
   getListJobs_StateDataChanged({required this.filterdLst_Jobs});
 }
-
+final class getListJobsAsDataSource_StateDataChanged extends definition_state {
+  final List<DropDowenDataSource> lst_JobsAsDataSource;
+  getListJobsAsDataSource_StateDataChanged({required this.lst_JobsAsDataSource});
+}
 //*************************** FinancialCluses *******************************
 final class financialCluses_StateInitial  extends definition_state {}
 final class getListFinancialCluses_StateDataChanged extends definition_state {

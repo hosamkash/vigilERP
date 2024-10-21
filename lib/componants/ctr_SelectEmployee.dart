@@ -26,6 +26,7 @@ class ctr_SelectEmployee extends StatefulWidget {
   String? labelText;
   TextStyle? labelStyle;
   late bool isOpenSelectorOnTap;
+  Color?  colorBorder;
   // double? height;
   final void Function(Dealing_Employees) onSelectEmployee;
   late String? Function(String?)? OnValidate;
@@ -38,6 +39,7 @@ class ctr_SelectEmployee extends StatefulWidget {
     this.prefixIcon,
     this.labelText,
     this.labelStyle,
+    this.colorBorder,
     this.isOpenSelectorOnTap = false,
     // this.height = 50,
     required this.onSelectEmployee,
@@ -62,12 +64,14 @@ class _ctr_SelectEmployeeState extends State<ctr_SelectEmployee> {
                   readOnly: true,
                   style: const TextStyle(fontSize: 17, color: Colors.black),
                   decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
+                    border:  OutlineInputBorder(),
+                    enabledBorder:  OutlineInputBorder(borderSide: BorderSide(color: widget.colorBorder ?? Colors.black)),
+                    focusedBorder:  OutlineInputBorder(borderSide: BorderSide(color: widget.colorBorder ?? Colors.black)),
                     fillColor: Colors.white,
                     filled: true,
                     labelText: widget.labelText,
                     labelStyle: widget.labelStyle ?? const TextStyle(fontSize: 17, color: Colors.grey),
-                    prefixIcon: widget.suffixIcon,
+                    prefixIcon: widget.prefixIcon,
                     contentPadding: EdgeInsets.symmetric(vertical: 0.3, horizontal: 2),
                     // حشوة داخلية ثابتة
                     disabledBorder: const OutlineInputBorder(),
@@ -78,7 +82,7 @@ class _ctr_SelectEmployeeState extends State<ctr_SelectEmployee> {
                           widget.Controller!.clear();
                         });
                       },
-                      icon: widget.prefixIcon ?? const Icon(Icons.clear),
+                      icon: widget.suffixIcon ?? const Icon(Icons.clear),
                       color: Colors.black,
                     ),
                   ),

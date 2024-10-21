@@ -50,6 +50,10 @@ class getListJobs_Event extends definition_event {
   List<BLLCondions>? condions  ;
   getListJobs_Event(this.condions);
 }
+class getListJobsAsDataSource_Event extends definition_event {
+  List<BLLCondions>? condions  ;
+  getListJobsAsDataSource_Event({this.condions});
+}
 class resetFilterJobs_Event extends definition_event {}
 class filterAnyJobs_Event extends definition_event {
   final String? filterData;

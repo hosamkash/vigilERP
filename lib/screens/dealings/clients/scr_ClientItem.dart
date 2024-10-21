@@ -133,7 +133,7 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
               },
             ),
             SizedBox(
-              height: 470,
+              height: 450,
               child: Card(
                 color: Colors.grey[100],
                 child: ctr_TabBar(
@@ -170,10 +170,12 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          SizedBox(height: 5),
           Row(
             children: [
+
               SizedBox(
-                width: 150,
+                width: 200,
                 child: ctr_TextFormField(
                   Controller: contCode,
                   Lable: 'الكود',
@@ -197,6 +199,7 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
               const Text('نشط', style: TextStyle(fontSize: 17)),
             ],
           ),
+          SizedBox(height: 5),
           Row(
             children: [
               Expanded(
@@ -221,7 +224,7 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
           ),
           ctr_DropDowenList(
             hintLable: 'فئة السعر',
-            padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+            padding: EdgeInsets.only(right: 5, left: 0),
             lstDataSource: priceType_bloc.instance.lstPriceTypeAsDataSource,
             hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
             itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -232,30 +235,34 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
               return priceTypeID;
             },
           ),
+          SizedBox(height: 5),
           ctr_TextFormField(
             Controller: contCreditLimit,
-            padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
+            padding: EdgeInsets.only(right: 5, left: 5),
             TextType: TextInputType.phone,
             TextAlignValue: TextAlign.center,
             Lable: 'الحد الإئتماني',
             autoSelectData: true,
           ),
+          SizedBox(height: 5),
           Row(
             children: [
               Expanded(
                 child: ctr_TextFormField(
                   Controller: contCurrentBalance,
-                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                  padding: EdgeInsets.only(right: 5, left: 0),
                   TextType: TextInputType.phone,
                   TextAlignValue: TextAlign.center,
                   Lable: 'الرصيد الحالى',
                   autoSelectData: true,
                 ),
               ),
-              Expanded(
+              SizedBox(
+                 height: 50,
+                width: 190,
                 child: ctr_DropDowenList(
                   hintLable: 'الحالة',
-                  padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                  padding: EdgeInsets.only(right: 5, left: 0),
                   lstDataSource: balanceType_bloc.instance.lstBalanceTypeAsDataSource,
                   hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                   itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -269,10 +276,11 @@ class _scr_ClientItemState extends State<scr_ClientItem> {
               ),
             ],
           ),
+          SizedBox(height: 5),
           ctr_TextFormField(
             Controller: contNote,
-            padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-            TextType: TextInputType.phone,
+            padding: EdgeInsets.only(right: 5, left: 5),
+            TextType: TextInputType.multiline,
             TextAlignValue: TextAlign.center,
             Lable: 'ملاحظات',
             autoSelectData: true,

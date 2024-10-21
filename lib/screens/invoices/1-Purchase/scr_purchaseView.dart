@@ -32,7 +32,10 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
   TextEditingController controllerfilter = TextEditingController();
   TextEditingController contDateTo = TextEditingController();
   TextEditingController contDateFrom = TextEditingController();
-  TextEditingController contTotalValue = TextEditingController();
+  // TextEditingController contTotalValue = TextEditingController();
+  // TextEditingController contDiscountValue = TextEditingController();
+  // TextEditingController contDiscountPercent = TextEditingController();
+  // TextEditingController contNetValue = TextEditingController();
   bool isGetAllDates = false;
   int? branchID;
 
@@ -226,21 +229,65 @@ class _scr_purchaseViewState extends State<scr_purchaseView> {
                   height: 35,
                   child: Row(
                     children: [
-                      SizedBox(width: 100),
+                      SizedBox(width: 75),
                       BlocBuilder<purchase_bloc, invoic_state>(
                         builder: (context, state) {
                           if (state is purchase_StateDataChanged) {
                             contTotalValue.text = state.filterdLst_Purchase
                                 .fold(0.0, (previousValue, element) => previousValue + element.NetValue!)
                                 .toStringAsFixed(2);
-                            return SizedBox(
-                              width: 200,
-                              child: ctr_TextFormField(
-                                Controller: contTotalValue,
-                                Lable: 'الإجمالى',
-                                readOnly: true,
-                                textStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
-                              ),
+                            contDiscountValue.text = state.filterdLst_Purchase
+                                .fold(0.0, (previousValue, element) => previousValue + element.DiscountValue!)
+                                .toStringAsFixed(2);
+                            contDiscountPercent.text = state.filterdLst_Purchase
+                                .fold(0.0, (previousValue, element) => previousValue + element.DiscountPercent!)
+                                .toStringAsFixed(2);
+                            contNetValue.text = state.filterdLst_Purchase
+                                .fold(0.0, (previousValue, element) => previousValue + element.NetValue!)
+                                .toStringAsFixed(2);
+
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width: 130,
+                                  child: ctr_TextFormField(
+                                    Controller: contTotalValue,
+                                    Lable: 'الإجمالى',
+                                    readOnly: true,
+                                    textStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                ),
+                                SizedBox(width: 5),
+                                SizedBox(
+                                  width: 100,
+                                  child: ctr_TextFormField(
+                                    Controller: contDiscountValue,
+                                    Lable: 'قيمة الخصم',
+                                    readOnly: true,
+                                    textStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                ),
+                                SizedBox(width: 5),
+                                SizedBox(
+                                  width: 100,
+                                  child: ctr_TextFormField(
+                                    Controller: contDiscountPercent,
+                                    Lable: 'نسبة الخصم',
+                                    readOnly: true,
+                                    textStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                ),
+                                SizedBox(width: 5),
+                                SizedBox(
+                                  width: 130,
+                                  child: ctr_TextFormField(
+                                    Controller: contNetValue,
+                                    Lable: 'الصافي',
+                                    readOnly: true,
+                                    textStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                ),
+                              ],
                             );
                           } else
                             return SizedBox();

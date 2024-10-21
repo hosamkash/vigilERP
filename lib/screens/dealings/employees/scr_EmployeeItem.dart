@@ -470,6 +470,7 @@ class _scr_EmployeeItemState extends State<scr_EmployeeItem> {
                 isReadOnly: true,
                 isVisibleSearchIcon: false,
                 selectedTime: timeWorkTo,
+                isOpenSelectorOnTap: true,
                 OnChanged: (val) {
                   timeWorkTo = val;
                   calcTimeTotalWorkHour();

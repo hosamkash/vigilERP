@@ -190,3 +190,11 @@ enum en_HideZeroFrom {
   }
 
 }
+
+enum en_BounsType {
+  Day(2),
+  MonyValue(1);
+
+ final int? value;
+  const en_BounsType(this.value);
+}

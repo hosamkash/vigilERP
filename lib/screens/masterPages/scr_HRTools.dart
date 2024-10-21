@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:vigil_erp/screens/dealings/employees/scr_EmployeeView.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
+
+import '../HR/1-bonus/scr_bonusView.dart';
+import '../HR/2-discount/scr_discountView.dart';
+
 
 class scr_HRTools extends StatelessWidget {
   scr_HRTools({super.key});
@@ -41,7 +46,7 @@ class scr_HRTools extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                    sharedControls.navigatTo(context, scr_EmployeeView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -69,7 +74,37 @@ class scr_HRTools extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                  sharedControls.navigatTo(context, scr_bonusView());
+                },
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+                  ),
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.home,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                      Text(
+                        'المكافئات',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+
+              InkWell(
+                onTap: () async {
+                  sharedControls.navigatTo(context, scr_discountView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -151,62 +186,8 @@ class scr_HRTools extends StatelessWidget {
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-                },
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      Text(
-                        'المكافئات',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-                },
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      Text(
-                        'مشتريات الموظفين',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+
+
               InkWell(
                 onTap: () async {
                   // sharedControls.navigatTo(context, scr_InvoicesRepresentView());

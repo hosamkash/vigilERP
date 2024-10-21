@@ -80,4 +80,13 @@ final class getListAddressAreaAsDataSource_State extends fixTable_state {
   getListAddressAreaAsDataSource_State({required this.lst_AddressAreaAsDataSource });
 }
 
-
+//*************************** BonusType *******************************
+final class bonusType_StateInitial extends fixTable_state {}
+final class getListBonusType_State extends fixTable_state {
+  final List<Fix_BounsType> lst_BonusType;
+  getListBonusType_State({required this.lst_BonusType});
+}
+final class getListBonusTypeAsDataSource_State extends fixTable_state {
+  final List<DropDowenDataSource> lst_BonusTypeAsDataSource;
+  getListBonusTypeAsDataSource_State({required this.lst_BonusTypeAsDataSource});
+}

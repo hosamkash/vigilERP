@@ -91,7 +91,61 @@
         {"fieldPath": "IDBranchTo","order": "ASCENDING" },
         {"fieldPath": "Date","order": "ASCENDING"}
       ]
+    },
+
+
+
+    {
+      "collectionGroup": "Invoices_Purchase",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "Invoices_PurchaseReturned",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "Invoices_Sales",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "Invoices_SalesReturned",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
+    },
+
+
+    {
+      "collectionGroup": "HR_Bonus",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "HR_Discount",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
     }
+
 
 
   ]

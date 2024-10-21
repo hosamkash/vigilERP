@@ -40,15 +40,16 @@ class refreshAddressCity_Event extends fixTable_event {}
 
 //*************************** Address City*******************************
 class getListAddressAreaAsDataSource_Event extends fixTable_event {
- int? cityID;
+ final int? cityID;
  getListAddressAreaAsDataSource_Event({this.cityID});
 }
 class getListAddressArea_Event extends fixTable_event {
- int? cityID;
+ final int? cityID;
  getListAddressArea_Event({this.cityID});
 }
-
 class refreshAddressArea_Event extends fixTable_event {}
 
-
+//*************************** Bonus Type *******************************
+class getListBonusType_Event extends fixTable_event {}
+class getListBonusTypeAsDataSource_Event extends fixTable_event {}
 

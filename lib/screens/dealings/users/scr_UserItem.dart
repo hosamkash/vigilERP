@@ -202,7 +202,7 @@ class _scr_UserItemState extends State<scr_UserItem> {
             ctr_TextFormField(
               Controller: contNote,
               padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-              TextType: TextInputType.text,
+              TextType: TextInputType.multiline,
               TextAlignValue: TextAlign.center,
               Lable: 'ملاحظات',
             ),

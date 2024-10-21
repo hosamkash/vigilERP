@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vigil_erp/blocManagment/blocHR/hr_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocInvoices/invoic_bloc.dart';
 import 'package:vigil_erp/shared/sharedDesigne.dart';
+import 'package:vigil_erp/shared/sharedFunctions.dart';
 
 import '../bll/bllFirebase/ManageBLL.dart';
 import '../blocManagment/blocDefinition/definition_bloc.dart';
@@ -338,12 +340,6 @@ class sharedControls {
                     branchID = returnID;
                     return null;
                   },
-                  OnValidate: (value) {
-                    if (value == null) {
-                      return 'لابد من إختيار قيمة';
-                    }
-                    return null;
-                  },
                 ),
                 Row(
                   children: [
@@ -361,13 +357,40 @@ class sharedControls {
                               isEnableDates = true;
                           });
                         }),
-                    const Text(
-                      'كل التواريخ',
-                      style: TextStyle(fontSize: 15),
-                    ),
+                    const Text('كل التواريخ', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   ],
                 ),
-                ctr_Date(
+                Row(
+                  children: [
+
+                    TextButton(
+                        onPressed: () {
+                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
+                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
+                        },
+                        child: Text('يوم', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold))),
+
+                    TextButton(
+                        onPressed: () {
+                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
+                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 7)));
+                        },
+                        child: Text('أسبوع', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold))),
+                    TextButton(
+                        onPressed: () {
+                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
+                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 30)));
+                        },
+                        child: Text('شهر', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold))),
+                    TextButton(
+                        onPressed: () {
+                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
+                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 365)));
+                        },
+                        child: Text('سنة', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold))),
+                  ],
+                ),
+                ctr_Date( 
                   text: 'من تاريخ',
                   dtController: contDateFrom,
                   padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 10),
@@ -405,8 +428,10 @@ class sharedControls {
                     children: [
                       TextButton(
                         onPressed: () async {
-                          //****************************** inventory
+
                           var cond = await tablesCondions.createCondionsByDates(tableName, branchID, contDateFrom, contDateTo, isGetAllDates);
+
+                          //****************************** inventory
                           if (tableName == en_TablesName.Inv_PermissionAdd)
                             permissionAdd_bloc.instance.add(getListPermissionAdd_Event(condions: cond));
                           else if (tableName == en_TablesName.Inv_PermissionDiscount)
@@ -419,7 +444,27 @@ class sharedControls {
                             recived_bloc.instance.add(getListRecived_Event(condions: cond));
 
                           //****************************** invoices
-                          else if (tableName == en_TablesName.Invoices_Purchase) purchase_bloc.instance.add(getListPurchase_Event(condions: cond));
+                          else if (tableName == en_TablesName.Invoices_Purchase)
+                            purchase_bloc.instance.add(getListPurchase_Event(condions: cond));
+                          else if (tableName == en_TablesName.Invoices_PurchaseReturned)
+                            purchase_bloc.instance.add(getListPurchase_Event(condions: cond));
+                          else if (tableName == en_TablesName.Invoices_Sales)
+                            purchase_bloc.instance.add(getListPurchase_Event(condions: cond));
+                          else if (tableName == en_TablesName.Invoices_SalesReturned)
+                            purchase_bloc.instance.add(getListPurchase_Event(condions: cond));
+
+                          //****************************** HR
+                          else if (tableName == en_TablesName.HR_Bonus) {
+                            bonus_bloc.instance.add(getListBonus_Event(conditions: cond));
+                          }
+                          else if (tableName == en_TablesName.HR_Discount) {
+                            discount_bloc.instance.add(getListDiscount_Event(conditions: cond));
+                          }
+
+
+
+
+
 
                           //**************************************************************************************
                           List<dynamic> dates = [isGetAllDates, contDateFrom.text, contDateTo.text, branchID];
@@ -551,14 +596,11 @@ class sharedControls {
                           //****************************** Purchase
                           if (tableName == en_TablesName.Invoices_Purchase) {
                             purchase_bloc.instance.add(refreshPurchaseDetails_Event());
-                          }
-                          else if (tableName == en_TablesName.Invoices_PurchaseReturned) {
+                          } else if (tableName == en_TablesName.Invoices_PurchaseReturned) {
                             purchaseReturned_bloc.instance.add(refreshPurchaseReturnedDetails_Event());
-                          }
-                          else if (tableName == en_TablesName.Invoices_Sales) {
+                          } else if (tableName == en_TablesName.Invoices_Sales) {
                             purchase_bloc.instance.add(refreshSalesDetails_Event());
                           }
-
 
                           //**************************************************************************************
                           List<dynamic> dates = [contTotalValue.text, contDiscountValue.text, contDiscountPercent.text, contNetValue.text];

@@ -67,7 +67,7 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
                 Expanded(
                   child: ctr_DropDowenList(
                     hintLable: 'الفرع',
-                    padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                    padding: EdgeInsets.only(right: 5, left: 0),
                     lstDataSource: company_bloc.instance.LstBranchesAsDataSource,
                     hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                     itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -88,14 +88,14 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
                 ),
               ],
             ),
-
+            SizedBox(height: 5),
             Row(
               children: [
                 SizedBox(
                   width: 150,
                   child: ctr_TextFormField(
                     Controller: contCode,
-                    padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                    padding: EdgeInsets.only(right: 5, left: 0),
                     Lable: 'الكود',
                     TextType: TextInputType.number,
                     OnValidate: (value) {
@@ -116,10 +116,10 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
                 const Text('نشط', style: TextStyle(fontSize: 17)),
               ],
             ),
-
+            SizedBox(height: 5),
             ctr_TextFormField(
               Controller: contName,
-              padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
+              padding: EdgeInsets.only(right: 5, left: 5),
               TextType: TextInputType.text,
               TextAlignValue: TextAlign.end,
               Lable: 'الإســــم',
@@ -129,14 +129,13 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
                 return null;
               },
             ),
-
+            SizedBox(height: 5),
             Row(
               children: [
                 Expanded(
                   child: ctr_ContactsNumber(
                     Controller: contMobile,
-                    padding: EdgeInsets.only(right: 5, left: 2, top: 0, bottom: 5),
-
+                    padding: EdgeInsets.only(right: 5, left: 2),
                     TextAlignValue: TextAlign.center,
                     Lable: 'الموبيل',
                     autoSelectData: true,
@@ -145,8 +144,7 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
                 Expanded(
                   child: ctr_ContactsNumber(
                     Controller: contPhone,
-                    padding: EdgeInsets.only(right: 2, left: 5, top: 0, bottom: 5),
-
+                    padding: EdgeInsets.only(right: 2, left: 5),
                     TextAlignValue: TextAlign.center,
                     Lable: 'الهاتف',
                     autoSelectData: true,
@@ -154,10 +152,10 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
                 ),
               ],
             ),
-
+            SizedBox(height: 5),
             ctr_TextFormField(
               Controller: contAddress,
-              padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
+              padding: EdgeInsets.only(right: 5, left: 5),
               TextType: TextInputType.text,
               TextAlignValue: TextAlign.end,
               Lable: 'العنوان',
@@ -167,13 +165,13 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
               //   return null;
               // },
             ),
-
+            SizedBox(height: 5),
             Row(
               children: [
                 Expanded(
                   child: ctr_TextFormField(
                     Controller: contCurrentBalance,
-                    padding: EdgeInsets.only(right: 5, left: 0, top: 0, bottom: 5),
+                    padding: EdgeInsets.only(right: 5, left: 0),
                     TextType: TextInputType.phone,
                     TextAlignValue: TextAlign.center,
                     Lable: 'الرصيد الحالى',
@@ -181,10 +179,11 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
                   ),
                 ),
                 SizedBox(
+                  height: 50,
                   width: 180,
                   child: ctr_DropDowenList(
                     hintLable: 'الحالة',
-                    padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
+                    padding: EdgeInsets.only(right: 5, left: 5),
                     lstDataSource: balanceType_bloc.instance.lstBalanceTypeAsDataSource,
                     hintTextStyle: const TextStyle(fontSize: 17.0, color: Colors.grey),
                     itemsTextStyle: const TextStyle(fontSize: 17.0, color: Colors.purple, fontWeight: FontWeight.bold),
@@ -198,15 +197,15 @@ class _scr_VendorItemState extends State<scr_VendorItem> {
                 ),
               ],
             ),
+            SizedBox(height: 5),
             ctr_TextFormField(
               Controller: contNote,
-              padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 5),
-              TextType: TextInputType.phone,
+              padding: EdgeInsets.only(right: 5, left: 5),
+              TextType: TextInputType.multiline,
               TextAlignValue: TextAlign.center,
               Lable: 'ملاحظات',
               autoSelectData: true,
             ),
-
           ],
         ),
       ),

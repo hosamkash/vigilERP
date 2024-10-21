@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllFix_BounsType.dart';
 import '../../bll/bllFirebase/ManageBLL.dart';
 import '../../bll/bllFirebase/bllFix_Address_City.dart';
 import '../../bll/bllFirebase/bllFix_Address_DistrictArea.dart';
@@ -15,6 +16,7 @@ import '../../bll/classModel/Fix_Address_City.dart';
 import '../../bll/classModel/Fix_Address_DistrictArea.dart';
 import '../../bll/classModel/Fix_Address_Government.dart';
 import '../../bll/classModel/Fix_BalanceType.dart';
+import '../../bll/classModel/Fix_BounsType.dart';
 import '../../bll/classModel/Fix_Gender.dart';
 import '../../bll/classModel/Fix_MaritalStatus.dart';
 import '../../bll/classModel/Fix_MilitaryStatus.dart';
@@ -370,6 +372,59 @@ class requestStatus_bloc extends Bloc<fixTable_event, fixTable_state> {
   }
 }
 
+class bonusType_bloc extends Bloc<fixTable_event, fixTable_state> {
+  static late bonusType_bloc instance;
+
+  static bonusType_bloc cretaeInctance(BuildContext context) {
+    instance = BlocProvider.of<bonusType_bloc>(context);
+    return instance;
+  }
+
+  List<Fix_BounsType> lst_bonusType = [];
+  List<DropDowenDataSource> lstBonusTypeAsDataSource = [];
+
+  Future getLst_bonusType() async {
+    try {
+      lst_bonusType.clear();
+      lst_bonusType = await bllFix_BounsType.fire_getList();
+    } catch (error) {
+      print(error.toString());
+    }
+  }
+
+  Future getLst_bonusTypeAsDataSource() async {
+    lstBonusTypeAsDataSource.clear();
+    if (bllFix_BounsType.lstFix_BounsType.length == 0) await bllFix_BounsType.fire_getList();
+    for (var item in bllFix_BounsType.lstFix_BounsType) {
+      lstBonusTypeAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
+    }
+  }
+
+  String getNameByID(int? ID) {
+    String ret = '';
+    if (bllFix_BounsType.lstFix_BounsType.isNotEmpty && ID != null) {
+      ret = bllFix_BounsType.lstFix_BounsType.firstWhere((elm) {
+        return elm.ID == ID;
+      }).Name!;
+    }
+    return ret;
+  }
+
+  bonusType_bloc() : super(bonusType_StateInitial()) {
+    on<fixTable_event>((event, emit) async {
+      if (event is getListBonusType_Event) {
+        await getLst_bonusType();
+        emit(getListBonusType_State(lst_BonusType: lst_bonusType));
+      }
+     else if (event is getListBonusTypeAsDataSource_Event) {
+        await getLst_bonusTypeAsDataSource();
+        emit(getListBonusTypeAsDataSource_State(lst_BonusTypeAsDataSource: lstBonusTypeAsDataSource));
+      }
+
+    });
+  }
+}
+
 class address_bloc extends Bloc<fixTable_event, fixTable_state> {
   static late address_bloc instance;
 
@@ -414,6 +469,7 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
   //****************************** City ************************************
   List<Fix_Address_City> lst_AddressCity = [];
   List<DropDowenDataSource> lst_AddressCityAsDataSource = [];
+
   Future getList_AddressCity(int? governmentID) async {
     try {
       // lst_AddressCity.clear();
@@ -428,6 +484,7 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
       print(error.toString());
     }
   }
+
   Future getLst_AddressCityAsDataSource(int? governmentID) async {
     lst_AddressCityAsDataSource.clear();
     if (bllFix_Address_City.lstFix_Address_City.length == 0) {
@@ -437,6 +494,7 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
       lst_AddressCityAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
     }
   }
+
   String getNameCityByID(int? ID) {
     String ret = '';
     if (bllFix_Address_City.lstFix_Address_City.isNotEmpty && ID != null) {
@@ -450,6 +508,7 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
   //******************************  District Area ************************************
   List<Fix_Address_DistrictArea> lst_AddressArea = [];
   List<DropDowenDataSource> lst_AddressAreaAsDataSource = [];
+
   Future getLst_AddressArea(int? cityID) async {
     try {
       lst_AddressArea = await bllFix_Address_DistrictArea.fire_getListWithConditions(conditions: [
@@ -463,6 +522,7 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
       print(error.toString());
     }
   }
+
   Future getLst_AddressAreaAsDataSource(int? cityID) async {
     lst_AddressAreaAsDataSource.clear();
     if (bllFix_Address_DistrictArea.lstFix_Address_DistrictArea.length == 0) {
@@ -472,6 +532,7 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
       lst_AddressAreaAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
     }
   }
+
   String getNameAreaByID(int? ID) {
     String ret = '';
     if (bllFix_Address_DistrictArea.lstFix_Address_DistrictArea.isNotEmpty && ID != null) {
@@ -481,8 +542,6 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
     }
     return ret;
   }
-
-
 
   address_bloc() : super(address_StateInitial()) {
     on<fixTable_event>((event, emit) async {
@@ -495,11 +554,9 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
       else if (event is getListAddressCity_Event) {
         await getList_AddressCity(event.governmentID);
         emit(getListAddressCity_State(lst_AddressCity: lst_AddressCity));
-      }
-      else if (event is refreshAddressCity_Event) {
+      } else if (event is refreshAddressCity_Event) {
         emit(getListAddressCity_State(lst_AddressCity: lst_AddressCity));
-      }
-      else if (event is getListAddressCityAsDataSource_Event) {
+      } else if (event is getListAddressCityAsDataSource_Event) {
         await getLst_AddressCityAsDataSource(event.governmentID);
         emit(getListAddressCityAsDataSource_State(lst_AddressCityAsDataSource: lst_AddressCityAsDataSource));
       }
@@ -508,16 +565,12 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
       else if (event is getListAddressArea_Event) {
         await getLst_AddressArea(event.cityID);
         emit(getListAddressArea_State(lst_AddressArea: lst_AddressArea));
-      }
-      else if (event is refreshAddressArea_Event) {
+      } else if (event is refreshAddressArea_Event) {
         emit(getListAddressArea_State(lst_AddressArea: lst_AddressArea));
-      }
-      else if (event is getListAddressAreaAsDataSource_Event) {
+      } else if (event is getListAddressAreaAsDataSource_Event) {
         await getLst_AddressAreaAsDataSource(event.cityID);
         emit(getListAddressAreaAsDataSource_State(lst_AddressAreaAsDataSource: lst_AddressAreaAsDataSource));
       }
-
-
     });
   }
 }

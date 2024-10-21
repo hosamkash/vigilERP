@@ -9,6 +9,7 @@ import 'blocManagment/blocConnectivity/connectivity_bloc.dart';
 import 'blocManagment/blocDealing/dealing_bloc.dart';
 import 'blocManagment/blocDefinition/definition_bloc.dart';
 import 'blocManagment/blocFixTables/fix_table_bloc.dart';
+import 'blocManagment/blocHR/hr_bloc.dart';
 import 'blocManagment/blocInventory/inv_bloc.dart';
 import 'blocManagment/blocInvoices/invoic_bloc.dart';
 import 'blocManagment/general/cubitGeneral.dart';
@@ -73,6 +74,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => sales_bloc()),
         BlocProvider(create: (context) => purchaseReturned_bloc()),
         BlocProvider(create: (context) => salesReturned_bloc()),
+        BlocProvider(create: (context) => bonusType_bloc()),
+        BlocProvider(create: (context) => bonus_bloc()),
+        BlocProvider(create: (context) => discount_bloc()),
       ],
       child: BlocConsumer<cubitGeneral, cubitStates>(
         listener: (context, state) => state_InitialApp(),
@@ -111,6 +115,9 @@ class MyApp extends StatelessWidget {
           sales_bloc.cretaeInctance(context);
           purchaseReturned_bloc.cretaeInctance(context);
           salesReturned_bloc.cretaeInctance(context);
+          bonusType_bloc.cretaeInctance(context);
+          bonus_bloc.cretaeInctance(context);
+          discount_bloc.cretaeInctance(context);
 
           //*************************************
           cubitGeneral.get(context);

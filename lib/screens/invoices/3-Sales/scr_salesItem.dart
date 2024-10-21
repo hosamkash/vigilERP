@@ -653,9 +653,6 @@ class _scr_salesItemState extends State<scr_salesItem> {
   @override
   void initState() {
     super.initState();
-    // List<BLLCondions>? condions=[
-    //   BLLCondions(enTable_Def_Categories.IsActive.name, en_CondionsWhere.isEqualTo, true),
-    // ];
 
     product_bloc.instance.add(getListProduct_Event([BLLCondions(enTable_Def_ProductStructure.IsActive.name, en_CondionsWhere.isEqualTo, true)]));
     priceType_bloc.instance.getLst_PriceTypeAsDataSource();

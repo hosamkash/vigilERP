@@ -10,6 +10,7 @@ import 'package:vigil_erp/bll/bllFirebase/bllDef_ProductionCompanies.dart';
 import 'package:vigil_erp/bll/bllFirebase/bllDef_Sections.dart';
 import 'package:vigil_erp/bll/bllFirebase/bllDef_Stocks.dart';
 import 'package:vigil_erp/bll/bllFirebase/bllDef_Treasures.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllFix_BounsType.dart';
 import 'package:vigil_erp/bll/classModel/Def_Categories.dart';
 import 'package:vigil_erp/bll/classModel/Def_Units.dart';
 import 'package:vigil_erp/componants/ctr_TextHeaderPage.dart';
@@ -41,6 +42,7 @@ import '../../bll/classModel/Def_Stocks.dart';
 import '../../bll/classModel/Def_Treasures.dart';
 import '../../bll/classModel/Fix_Address_Government.dart';
 import '../../bll/classModel/Fix_BalanceType.dart';
+import '../../bll/classModel/Fix_BounsType.dart';
 import '../../bll/classModel/Fix_DocumentsType.dart';
 import '../../bll/classModel/Fix_FinacialType.dart';
 import '../../bll/classModel/Fix_Gender.dart';
@@ -338,6 +340,22 @@ class _scr_SettingDefaulsValueState extends State<scr_SettingDefaulsValue> {
                 bllFix_Address_Government.fire_SetItem('25', Fix_Address_Government(ID: 25, Name: 'الإسماعيلية'));
                 bllFix_Address_Government.fire_SetItem('26', Fix_Address_Government(ID: 26, Name: 'بورسعيد'));
                 bllFix_Address_Government.fire_SetItem('27', Fix_Address_Government(ID: 27, Name: 'دمياط'));
+              },
+            ),
+
+            // نوع المكافئة - Bonus Type
+            ElevatedButton.icon(
+              label: const Text(
+                ' نوع المكافئة - Bonus Type',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              icon: const Icon(Icons.calendar_month),
+              iconAlignment: IconAlignment.start,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 3),
+              onPressed: () {
+                bllFix_BounsType.fire_SetItem('1', Fix_BounsType(ID: 1, Name: 'قيمة'));
+                bllFix_BounsType.fire_SetItem('2', Fix_BounsType(ID: 2, Name: 'يوم'));
+
               },
             ),
 

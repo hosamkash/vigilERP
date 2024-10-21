@@ -391,7 +391,12 @@ class job_bloc extends Bloc<definition_event, definition_state> {
       if (event is getListJobs_Event) {
         await getList_Job();
         emit(getListJobs_StateDataChanged(filterdLst_Jobs: filterdLst_Job));
-      } else if (event is filterAnyJobs_Event) {
+      }
+      else if (event is getListJobsAsDataSource_Event) {
+        await getLstJobsAsDataSource(condions: event.condions);
+        emit(getListJobsAsDataSource_StateDataChanged(lst_JobsAsDataSource: LstJobsAsDataSource));
+      }
+      else if (event is filterAnyJobs_Event) {
         await filterAny_Job(filterData: event.filterData);
         emit(getListJobs_StateDataChanged(filterdLst_Jobs: filterdLst_Job));
       } else if (event is resetFilterJobs_Event) {

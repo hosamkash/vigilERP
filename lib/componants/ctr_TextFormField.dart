@@ -21,6 +21,7 @@ class ctr_TextFormField extends StatefulWidget {
   late bool? useAsBarcodeControle;
   late int? maxLines;
   late int? minLines;
+  late FocusNode? focusNode;
 
   late String? Function(String?)? OnValidate;
   late String? Function(String?)? OnChanged;
@@ -48,6 +49,7 @@ class ctr_TextFormField extends StatefulWidget {
     this.useAsBarcodeControle,
     this.maxLines,
     this.minLines,
+    this.focusNode,
     this.OnValidate,
     this.OnChanged,
     this.OnSubmitted,
@@ -78,6 +80,7 @@ class _ctr_TextFormFieldState extends State<ctr_TextFormField> {
               readOnly: widget.readOnly ?? false,
               maxLines: widget.maxLines,
               minLines: widget.minLines,
+              focusNode: widget.focusNode,
               decoration: InputDecoration(
                 label: Text(widget.Lable),
                 labelStyle: widget.labelStyle ?? const TextStyle(fontSize: 17, color: Colors.grey),

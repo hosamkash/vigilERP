@@ -157,62 +157,62 @@ class scr_InvoicesTools extends StatelessWidget {
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-                },
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      Text(
-                        'مبيعات الأصناف',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-                },
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      Text(
-                        'أرباح الفواتير',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              // InkWell(
+              //   onTap: () async {
+              //     // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+              //   },
+              //   child: Container(
+              //     decoration: const BoxDecoration(
+              //       color: Colors.blue,
+              //       borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+              //     ),
+              //     child: const Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Icon(
+              //           Icons.home,
+              //           color: Colors.white,
+              //           size: 40,
+              //         ),
+              //         Text(
+              //           'مبيعات الأصناف',
+              //           textAlign: TextAlign.center,
+              //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              //           maxLines: 2,
+              //           overflow: TextOverflow.ellipsis,
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              // InkWell(
+              //   onTap: () async {
+              //     // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+              //   },
+              //   child: Container(
+              //     decoration: const BoxDecoration(
+              //       color: Colors.blue,
+              //       borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+              //     ),
+              //     child: const Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Icon(
+              //           Icons.home,
+              //           color: Colors.white,
+              //           size: 40,
+              //         ),
+              //         Text(
+              //           'أرباح الفواتير',
+              //           textAlign: TextAlign.center,
+              //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              //           maxLines: 2,
+              //           overflow: TextOverflow.ellipsis,
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
