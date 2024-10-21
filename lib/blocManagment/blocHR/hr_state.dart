@@ -22,4 +22,9 @@ final class getListWithdrwals_StateDataChanged extends hr_state {
   getListWithdrwals_StateDataChanged({required this.filterdLst_Withdrwals});
 }
 
+//*************************** Advances *******************************
+final class getListAdvances_StateDataChanged extends hr_state {
+  final List<HR_Advances> filterdLst_Advances;
+  getListAdvances_StateDataChanged({required this.filterdLst_Advances});
+}
 

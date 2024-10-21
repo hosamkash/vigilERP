@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vigil_erp/bll/classModel/HR_Advances.dart';
 import 'package:vigil_erp/bll/classModel/HR_Bonus.dart';
 import 'package:vigil_erp/bll/classModel/HR_Discount.dart';
 import 'package:vigil_erp/bll/classModel/HR_Withdrwals.dart';
@@ -161,6 +162,18 @@ class tablesCondions {
       return cond;
     }
 
+    List<BLLCondions> getCondions_HR_Advances() {
+      cond.clear();
+      if (branchID != null) {
+        cond.add(BLLCondions(enTable_HR_Advances.IDBranch.name, en_CondionsWhere.isEqualTo, branchID));
+      }
+      if (!isGetAllDates) {
+        cond.add(BLLCondions(enTable_HR_Advances.Date.name, en_CondionsWhere.isGreaterThanOrEqualTo, contDateFrom.text));
+        cond.add(BLLCondions(enTable_HR_Advances.Date.name, en_CondionsWhere.isLessThanOrEqualTo, contDateTo.text));
+      }
+      return cond;
+    }
+
 
 
     //****************************** inventory
@@ -202,7 +215,9 @@ class tablesCondions {
     else if (tableName == en_TablesName.HR_Withdrwals) {
       getCondions_HR_Withdrwals();
     }
-
+    else if (tableName == en_TablesName.HR_Advances) {
+      getCondions_HR_Advances();
+    }
 
 
 

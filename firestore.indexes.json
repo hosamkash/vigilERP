@@ -152,7 +152,19 @@
         {"fieldPath": "IDBranch","order": "ASCENDING" },
         {"fieldPath": "Date","order": "ASCENDING"}
       ]
+    },
+    {
+      "collectionGroup": "HR_Advances",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
     }
+
+
+
+
 
 
   ]

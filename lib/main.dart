@@ -40,13 +40,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => company_bloc()),
         BlocProvider(create: (context) => unit_bloc()),
         BlocProvider(create: (context) => productionCom_bloc()),
-        BlocProvider(create: (context) => withdrwals_bloc()),
-
-        //*************************************
-
         BlocProvider(create: (context) => cubitGeneral()),
         BlocProvider(create: (context) => religions_bloc()),
-
         BlocProvider(create: (context) => categories_bloc()),
         BlocProvider(create: (context) => job_bloc()),
         BlocProvider(create: (context) => financialCluses_bloc()),
@@ -79,6 +74,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => bonus_bloc()),
         BlocProvider(create: (context) => discount_bloc()),
         BlocProvider(create: (context) => withdrwals_bloc()),
+        BlocProvider(create: (context) => advances_bloc()),
       ],
       child: BlocConsumer<cubitGeneral, cubitStates>(
         listener: (context, state) => state_InitialApp(),
@@ -120,6 +116,8 @@ class MyApp extends StatelessWidget {
           bonusType_bloc.cretaeInctance(context);
           bonus_bloc.cretaeInctance(context);
           discount_bloc.cretaeInctance(context);
+          withdrwals_bloc.cretaeInctance(context);
+          advances_bloc.cretaeInctance(context);
 
           //*************************************
           cubitGeneral.get(context);

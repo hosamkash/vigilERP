@@ -463,7 +463,9 @@ class sharedControls {
                           else if (tableName == en_TablesName.HR_Withdrwals) {
                             withdrwals_bloc.instance.add(getListWithdrwals_Event(conditions: cond));
                           }
-
+                          else if (tableName == en_TablesName.HR_Advances) {
+                            advances_bloc.instance.add(getListAdvances_Event(conditions: cond));
+                          }
 
 
 

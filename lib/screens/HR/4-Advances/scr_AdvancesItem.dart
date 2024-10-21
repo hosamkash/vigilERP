@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:vigil_erp/bll/bllFirebase/bllDealing_Employees.dart';
-import 'package:vigil_erp/bll/bllFirebase/bllHR_Withdrwals.dart';
-import 'package:vigil_erp/bll/classModel/HR_Withdrwals.dart';
+import 'package:vigil_erp/bll/bllFirebase/bllHR_Advances.dart';
+import 'package:vigil_erp/bll/classModel/HR_Advances.dart';
 import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/componants/ctr_DropDowenList.dart';
 import 'package:vigil_erp/componants/ctr_TextFormField.dart';
 import 'package:vigil_erp/componants/ctr_TextHeaderPage.dart';
+import 'package:vigil_erp/screens/Inventory/1-PermissionAdd/scr_PermissionAddItem.dart';
 import 'package:vigil_erp/shared/enumerators.dart';
 import 'package:vigil_erp/shared/sharedFunctions.dart';
 import 'package:vigil_erp/shared/sharedHive.dart';
@@ -15,18 +16,18 @@ import '../../../componants/ctr_Date.dart';
 import '../../../componants/ctr_SelectEmployee.dart';
 import '../../../componants/ctr_Time.dart';
 
-class scr_withdrwalsItem extends StatefulWidget {
-  scr_withdrwalsItem(this.itemWithdrwals, this.scaffold, this.frmMode, {super.key});
+class scr_AdvancesItem extends StatefulWidget {
+  scr_AdvancesItem(this.itemAdvances, this.scaffold, this.frmMode, {super.key});
 
   GlobalKey<ScaffoldState> scaffold = GlobalKey<ScaffoldState>();
-  HR_Withdrwals? itemWithdrwals;
+  HR_Advances? itemAdvances;
   en_FormMode frmMode;
 
   @override
-  State<scr_withdrwalsItem> createState() => _scr_withdrwalsItemState();
+  State<scr_AdvancesItem> createState() => _scr_AdvancesItemState();
 }
 
-class _scr_withdrwalsItemState extends State<scr_withdrwalsItem> {
+class _scr_AdvancesItemState extends State<scr_AdvancesItem> {
   int selectedID = -1;
   int? branchID;
   bool chkIsClosed = false;
@@ -41,12 +42,12 @@ class _scr_withdrwalsItemState extends State<scr_withdrwalsItem> {
   TextEditingController contSalaryWeekValue = TextEditingController();
   TextEditingController contSalaryDayValue = TextEditingController();
   TextEditingController contSalaryHourValue = TextEditingController();
-  TextEditingController contWithdrwalsDay = TextEditingController();
-  TextEditingController contWithdrwalsValue = TextEditingController();
-  TextEditingController contBounsReson = TextEditingController();
+  TextEditingController contValue = TextEditingController();
+  TextEditingController contInstallmentValue = TextEditingController();
+  TextEditingController contInstallmentCount = TextEditingController();
+  TextEditingController contInstallmentDateStart = TextEditingController();
+  TextEditingController contReson = TextEditingController();
   var frmKey = GlobalKey<FormState>();
-  FocusNode focusNodeWithdrwalsDay = FocusNode();
-  FocusNode focusNodeWithdrwalsValue = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -300,30 +301,72 @@ class _scr_withdrwalsItemState extends State<scr_withdrwalsItem> {
             ),
             Row(
               children: [
-
-                SizedBox(
-                  width: 120,
+                Expanded(
                   child: ctr_TextFormField(
-                    Controller: contWithdrwalsValue,
-                    padding: EdgeInsets.only(right: 5, left: 5),
-                    Lable: 'القيمة',
+                    Controller: contValue,
+                    padding: EdgeInsets.only(right: 5, left: 0),
+                    Lable: 'قيمة السلفة',
                     TextType: const TextInputType.numberWithOptions(decimal: true),
-                    focusNode: focusNodeWithdrwalsValue,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Expanded(
+                  child: ctr_TextFormField(
+                    Controller: contInstallmentValue,
+                    padding: EdgeInsets.only(right: 5, left: 5),
+                    Lable: 'قيمة القسط',
+                    TextType: const TextInputType.numberWithOptions(decimal: true),
+                    OnChanged: (val) {
+                      contInstallmentCount.text = (double.parse(contValue.text) / double.parse(contInstallmentValue.text)).toStringAsFixed(2);
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Row(
+              children: [
+                Expanded(
+                  child: ctr_TextFormField(
+                    Controller: contInstallmentCount,
+                    padding: EdgeInsets.only(right: 5, left: 0),
+                    Lable: 'عدد الأقساط',
+                    TextType: const TextInputType.numberWithOptions(decimal: true),
+                    OnChanged: (val) {
+                      contInstallmentCount.text = contInstallmentCount.text.trim().isNotEmpty  ? contInstallmentCount.text.trim() : '0.0';
+                      contValue.text = contValue.text.trim().isNotEmpty  ? contValue.text.trim() : '0.0';
+
+                      contInstallmentValue.text = (double.parse(contValue.text) / double.parse(contInstallmentCount.text)).toStringAsFixed(2);
+                      return null;
+                    },
+                  ),
+                ),
+                SizedBox(height: 5),
+                Expanded(
+                  child: ctr_Date(
+                    text: 'تاريخ أول قسط',
+                    dtController: contInstallmentDateStart,
+                    padding: EdgeInsets.only(right: 5, left: 0),
+                    isReadOnly: true,
+                    isOpenSelectorOnTap: true,
+                    OnChanged: (val) {
+                      return val;
+                    },
                   ),
                 ),
               ],
             ),
             SizedBox(height: 5),
             ctr_TextFormField(
-              Controller: contBounsReson,
+              Controller: contReson,
               padding: EdgeInsets.only(right: 5, left: 5),
               TextType: TextInputType.multiline,
               TextAlignValue: TextAlign.center,
-              Lable: 'البيان - سبب السحب',
+              Lable: 'البيان - سبب السلفة',
               autoSelectData: true,
               minLines: 3,
             ),
-
             if (!checkIsSavedClosed())
               ElevatedButton.icon(
                 label: Text(
@@ -339,7 +382,6 @@ class _scr_withdrwalsItemState extends State<scr_withdrwalsItem> {
                   });
                 },
               ),
-
           ],
         ),
       ),
@@ -361,17 +403,17 @@ class _scr_withdrwalsItemState extends State<scr_withdrwalsItem> {
     return Row(
       children: [
         if (!checkIsSavedClosed())
-        IconButton(
-          onPressed: () {
-            saveData();
-          },
-          icon: Icon(
-            Icons.save,
-            color: Colors.blue[900],
-            size: 30,
+          IconButton(
+            onPressed: () {
+              saveData();
+            },
+            icon: Icon(
+              Icons.save,
+              color: Colors.blue[900],
+              size: 30,
+            ),
+            padding: EdgeInsets.only(right: 5, left: 0),
           ),
-          padding: EdgeInsets.only(right: 5, left: 0),
-        ),
         IconButton(
           onPressed: () {
             Navigator.of(context).pop();
@@ -406,7 +448,7 @@ class _scr_withdrwalsItemState extends State<scr_withdrwalsItem> {
   }
 
   void newMode() async {
-    bllHR_Withdrwals.getMax_firestore(enTable_HR_Withdrwals.Code).then((val) {
+    bllHR_Advances.getMax_firestore(enTable_HR_Advances.Code).then((val) {
       contCode.text = val.toString();
     }).toString();
 
@@ -416,67 +458,72 @@ class _scr_withdrwalsItemState extends State<scr_withdrwalsItem> {
   }
 
   void editMode() async {
-    if (widget.itemWithdrwals != null) {
-      chkIsClosed = widget.itemWithdrwals!.IsClosed!;
-      branchID = widget.itemWithdrwals!.IDBranch;
-      selectedID = widget.itemWithdrwals!.ID!;
-      contCode.text = widget.itemWithdrwals!.Code.toString();
-      contDate.text = widget.itemWithdrwals!.Date!;
-      contTime.text = widget.itemWithdrwals!.Time!;
-      contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemWithdrwals!.IDEmployee!.toString());
+    if (widget.itemAdvances != null) {
+      chkIsClosed = widget.itemAdvances!.IsClosed!;
+      branchID = widget.itemAdvances!.IDBranch;
+      selectedID = widget.itemAdvances!.ID!;
+      contCode.text = widget.itemAdvances!.Code.toString();
+      contDate.text = widget.itemAdvances!.Date!;
+      contTime.text = widget.itemAdvances!.Time!;
+      contEmployee.selectEmployee = await bllDealing_Employees.fire_getItem(widget.itemAdvances!.IDEmployee!.toString());
       contEmployee.text = contEmployee.selectEmployee!.Name!;
 
-      contJob.text = job_bloc.instance.getNameByID(widget.itemWithdrwals!.IDJob);
-      contDepartment.text = sections_bloc.instance.getNameByID(widget.itemWithdrwals!.IDDepartment);
-      contSalaryMonthValue.text = widget.itemWithdrwals!.EmployeeSalaryMonth.toString();
-      contSalaryWeekValue.text = widget.itemWithdrwals!.EmployeeSalaryWeek.toString();
-      contSalaryDayValue.text = widget.itemWithdrwals!.EmployeeSalaryDay.toString();
-      contSalaryHourValue.text = widget.itemWithdrwals!.EmployeeSalaryHour.toString();
-      contWithdrwalsValue.text = widget.itemWithdrwals!.Value.toString();
-      contBounsReson.text = widget.itemWithdrwals!.Reson!;
+      contJob.text = job_bloc.instance.getNameByID(widget.itemAdvances!.IDJob);
+      contDepartment.text = sections_bloc.instance.getNameByID(widget.itemAdvances!.IDDepartment);
+      contSalaryMonthValue.text = widget.itemAdvances!.EmployeeSalaryMonth.toString();
+      contSalaryWeekValue.text = widget.itemAdvances!.EmployeeSalaryWeek.toString();
+      contSalaryDayValue.text = widget.itemAdvances!.EmployeeSalaryDay.toString();
+      contSalaryHourValue.text = widget.itemAdvances!.EmployeeSalaryHour.toString();
+      contValue.text = widget.itemAdvances!.Value.toString();
+      contInstallmentValue .text = widget.itemAdvances!.InstallmentValue .toString();
+      contInstallmentCount .text = widget.itemAdvances!. InstallmentCount.toString();
+      contInstallmentDateStart.text = widget.itemAdvances!.InstallmentDateStart .toString();
+      contReson.text = widget.itemAdvances!.Reson!;
     }
   }
 
   void clearCachedData() {
     ctr_SelectEmployee.branchID = branchID = contEmployee.selectEmployee = null;
-    contWithdrwalsValue.text = contWithdrwalsDay.text = contBounsReson.text = contEmployee.text = '';
+    contValue.text = contReson.text = contEmployee.text = '';
     employee_bloc.instance.add(resetFilterEmployee_Event());
   }
 
   bool checkIsSavedClosed() {
-    if (widget.frmMode == en_FormMode.EditMode && (widget.itemWithdrwals!.IsClosed!))
+    if (widget.frmMode == en_FormMode.EditMode && (widget.itemAdvances!.IsClosed!))
       return true;
     else
       return false;
   }
 
-
   void saveData() async {
     if (frmKey.currentState != null && frmKey.currentState!.validate()) {
       if (widget.frmMode == en_FormMode.NewMode) {
-        selectedID = await bllHR_Withdrwals.getMaxID_firestore();
+        selectedID = await bllHR_Advances.getMaxID_firestore();
       } else if (widget.frmMode == en_FormMode.EditMode) {
-        selectedID = widget.itemWithdrwals!.ID!;
+        selectedID = widget.itemAdvances!.ID!;
       }
-      widget.itemWithdrwals = HR_Withdrwals();
-      widget.itemWithdrwals!.ID = selectedID;
-      widget.itemWithdrwals!.IDBranch = branchID;
-      widget.itemWithdrwals!.Code = int.parse(contCode.text);
-      widget.itemWithdrwals!.Date = contDate.text;
-      widget.itemWithdrwals!.Time = contTime.text;
-      widget.itemWithdrwals!.IDEmployee = contEmployee.selectEmployee!.ID;
-      widget.itemWithdrwals!.IDJob = contEmployee.selectEmployee!.IDJob;
-      widget.itemWithdrwals!.IDDepartment = contEmployee.selectEmployee!.IDDepartment;
-      widget.itemWithdrwals!.EmployeeSalaryMonth = double.tryParse(contSalaryMonthValue.text);
-      widget.itemWithdrwals!.EmployeeSalaryWeek = double.tryParse(contSalaryWeekValue.text);
-      widget.itemWithdrwals!.EmployeeSalaryDay = double.tryParse(contSalaryDayValue.text);
-      widget.itemWithdrwals!.EmployeeSalaryHour = double.tryParse(contSalaryHourValue.text);
-      widget.itemWithdrwals!.Value = double.tryParse(contWithdrwalsValue.text);
-      widget.itemWithdrwals!.Reson = contBounsReson.text;
-      widget.itemWithdrwals!.UID = sharedHive.UID;
-      widget.itemWithdrwals!.IsClosed = chkIsClosed;
+      widget.itemAdvances = HR_Advances();
+      widget.itemAdvances!.ID = selectedID;
+      widget.itemAdvances!.IDBranch = branchID;
+      widget.itemAdvances!.Code = int.parse(contCode.text);
+      widget.itemAdvances!.Date = contDate.text;
+      widget.itemAdvances!.Time = contTime.text;
+      widget.itemAdvances!.IDEmployee = contEmployee.selectEmployee!.ID;
+      widget.itemAdvances!.IDJob = contEmployee.selectEmployee!.IDJob;
+      widget.itemAdvances!.IDDepartment = contEmployee.selectEmployee!.IDDepartment;
+      widget.itemAdvances!.EmployeeSalaryMonth = double.tryParse(contSalaryMonthValue.text);
+      widget.itemAdvances!.EmployeeSalaryWeek = double.tryParse(contSalaryWeekValue.text);
+      widget.itemAdvances!.EmployeeSalaryDay = double.tryParse(contSalaryDayValue.text);
+      widget.itemAdvances!.EmployeeSalaryHour = double.tryParse(contSalaryHourValue.text);
+      widget.itemAdvances!.Value = double.tryParse(contValue.text);
+      widget.itemAdvances!.InstallmentValue = double.tryParse(contInstallmentValue.text);
+      widget.itemAdvances!.InstallmentCount = double.tryParse(contInstallmentCount.text);
+      widget.itemAdvances!.InstallmentDateStart = contInstallmentDateStart.text;
+      widget.itemAdvances!.Reson = contReson.text;
+      widget.itemAdvances!.UID = sharedHive.UID;
+      widget.itemAdvances!.IsClosed = chkIsClosed;
 
-      await bllHR_Withdrwals.fire_SetItem(selectedID.toString(), widget.itemWithdrwals!);
+      await bllHR_Advances.fire_SetItem(selectedID.toString(), widget.itemAdvances!);
       Navigator.pop(context, true);
     }
   }

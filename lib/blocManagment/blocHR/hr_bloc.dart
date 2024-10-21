@@ -4,10 +4,11 @@ import 'package:vigil_erp/bll/bllFirebase/ManageBLL.dart';
 import 'package:vigil_erp/bll/bllFirebase/bllHR_Withdrwals.dart';
 import 'package:vigil_erp/bll/classModel/HR_Bonus.dart';
 import 'package:vigil_erp/bll/classModel/HR_Withdrwals.dart';
+import '../../bll/bllFirebase/bllHR_Advances.dart';
 import '../../bll/bllFirebase/bllHR_Bonus.dart';
 import '../../bll/bllFirebase/bllHR_Discount.dart';
+import '../../bll/classModel/HR_Advances.dart';
 import '../../bll/classModel/HR_Discount.dart';
-import '../../bll/classModel/HR_Withdrwals.dart';
 import '../../componants/ctr_DropDowenList.dart';
 import '../blocDealing/dealing_bloc.dart';
 import '../blocDefinition/definition_bloc.dart';
@@ -213,3 +214,68 @@ class withdrwals_bloc extends Bloc<hr_event, hr_state> {
     });
   }
 }
+
+class advances_bloc extends Bloc<hr_event, hr_state> {
+  static late advances_bloc instance;
+
+  static advances_bloc cretaeInctance(BuildContext context) {
+    instance = BlocProvider.of<advances_bloc>(context);
+    return instance;
+  }
+
+  List<HR_Advances> filterdLst_advances = [];
+  List<DropDowenDataSource> LstadvancesAsDataSource = [];
+
+  Future getList_advances({List<BLLCondions>? conditions}) async {
+    try {
+      filterdLst_advances = await bllHR_Advances.fire_getListWithConditions(conditions: conditions);
+    } catch (error) {
+      print(error.toString());
+    }
+  }
+
+  filterAny_advances({String? filterData}) {
+    if (filterData == null || filterData.isEmpty) {
+      resetFilter_advances();
+    }
+    filterdLst_advances = bllHR_Advances.lstHR_Advances.where((item) {
+
+      String branchName = company_bloc.instance.getNameByID(item.IDBranch);
+      String employeeName = employee_bloc.instance.getNameByID(item.IDEmployee);
+      String jobName = job_bloc.instance.getNameByID(item.IDJob);
+      String departmentName = sections_bloc.instance.getNameByID(item.IDDepartment);
+
+      return (item.Code == null ? false : item.Code!.toString().toLowerCase().contains(filterData!.toLowerCase())) ||
+          (branchName.isEmpty ? false : branchName.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (employeeName.isEmpty ? false : employeeName.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (jobName.isEmpty ? false : jobName.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (departmentName.isEmpty ? false : departmentName.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (item.Time == null ? false : item.Time!.toLowerCase().contains(filterData!.toLowerCase())) ||
+          (item.Value == null ? false : item.Value.toString().contains(filterData!.toLowerCase())) ||
+          (item.Date == null ? false : item.Date!.toLowerCase().contains(filterData!.toLowerCase()))
+      ;
+    }).toList();
+  }
+
+  Future resetFilter_advances() async {
+    filterdLst_advances.clear();
+    filterdLst_advances = bllHR_Advances.lstHR_Advances;
+  }
+
+  advances_bloc() : super(hr_StateInitial()) {
+    on<hr_event>((event, emit) async {
+      if (event is getListAdvances_Event) {
+        await getList_advances(conditions: event.conditions);
+        emit(getListAdvances_StateDataChanged(filterdLst_Advances: filterdLst_advances));
+      }
+      else if (event is filterAnyAdvances_Event) {
+        await filterAny_advances(filterData: event.filterData);
+        emit(getListAdvances_StateDataChanged(filterdLst_Advances: filterdLst_advances));
+      } else if (event is resetFilterAdvances_Event) {
+        await resetFilter_advances();
+        emit(getListAdvances_StateDataChanged(filterdLst_Advances: filterdLst_advances));
+      }
+    });
+  }
+}
+

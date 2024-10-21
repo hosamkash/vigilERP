@@ -5,6 +5,7 @@ import 'package:vigil_erp/shared/shared_controls.dart';
 import '../HR/1-bonus/scr_bonusView.dart';
 import '../HR/2-discount/scr_discountView.dart';
 import '../HR/3-withdrwals/scr_withdrwalsView.dart';
+import '../HR/4-Advances/scr_AdvancesView.dart';
 
 
 class scr_HRTools extends StatelessWidget {
@@ -161,7 +162,7 @@ class scr_HRTools extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                    sharedControls.navigatTo(context, scr_AdvancesView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(

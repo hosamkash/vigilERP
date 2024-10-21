@@ -6,21 +6,21 @@ import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/componants/ctr_AlertDialog.dart';
 import 'package:vigil_erp/componants/ctr_TextFormField.dart';
 import 'package:vigil_erp/componants/ctr_TextHeaderPage.dart';
-import 'package:vigil_erp/screens/HR/3-withdrwals/scr_withdrwalsItem.dart';
+import 'package:vigil_erp/screens/HR/4-Advances/scr_AdvancesItem.dart';
 import 'package:vigil_erp/shared/enumerators.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
-import '../../../bll/bllFirebase/bllHR_Withdrwals.dart';
-import '../../../bll/classModel/HR_Withdrwals.dart';
+import '../../../bll/bllFirebase/bllHR_Advances.dart';
+import '../../../bll/classModel/HR_Advances.dart';
 import '../../../blocManagment/blocHR/hr_bloc.dart';
 
-class scr_withdrwalsView extends StatefulWidget {
-  scr_withdrwalsView({super.key});
+class scr_AdvancesView extends StatefulWidget {
+  scr_AdvancesView({super.key});
 
   @override
-  State<scr_withdrwalsView> createState() => _scr_withdrwalsViewState();
+  State<scr_AdvancesView> createState() => _scr_AdvancesViewState();
 }
 
-class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
+class _scr_AdvancesViewState extends State<scr_AdvancesView> {
   GlobalKey<ScaffoldState> scaffold = GlobalKey<ScaffoldState>();
   TextEditingController controllerfilter = TextEditingController();
   TextEditingController contTotalValue = TextEditingController();
@@ -80,11 +80,11 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
                   color: Colors.grey[300],
                   borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
                 ),
-                BlocBuilder<withdrwals_bloc, hr_state>(
+                BlocBuilder<advances_bloc, hr_state>(
                   builder: (context, state) {
-                    if (state is getListWithdrwals_StateDataChanged)
+                    if (state is getListAdvances_StateDataChanged)
                       return ctr_TextHeaderPage(
-                        text: state.filterdLst_Withdrwals.length.toString(),
+                        text: state.filterdLst_Advances.length.toString(),
                         color: Colors.grey[300],
                         borderRadius: const BorderRadiusDirectional.all(Radius.circular(10)),
                         style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
@@ -107,7 +107,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
                     padding: const EdgeInsets.only(right: 10, left: 10),
                     OnChanged: (value) {
                       if (value != null) {
-                        withdrwals_bloc.instance.add(filterAnyWithdrwals_Event(filterData: value.trim()));
+                        advances_bloc.instance.add(filterAnyAdvances_Event(filterData: value.trim()));
                       }
                       return null;
                     },
@@ -115,7 +115,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
                   IconButton(
                     onPressed: () {
                       controllerfilter.clear();
-                      withdrwals_bloc.instance.add(resetFilterWithdrwals_Event());
+                      advances_bloc.instance.add(resetFilterAdvances_Event());
                     },
                     icon: const Icon(Icons.clear),
                   ),
@@ -131,11 +131,11 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
   }
 
   Widget buildListView(BuildContext context) {
-    return BlocBuilder<withdrwals_bloc, hr_state>(
+    return BlocBuilder<advances_bloc, hr_state>(
       builder: (context, state) {
         if (state is hr_StateInitial) {
           return const Center(child: CircularProgressIndicator());
-        } else if (state is getListWithdrwals_StateDataChanged) {
+        } else if (state is getListAdvances_StateDataChanged) {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SizedBox(
@@ -147,7 +147,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
                   Container(
                     color: Colors.grey[300],
                     padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0),
-                    width: 1100,
+                    width: 1350,
                     height: 30,
                     child: Row(
                       children: [
@@ -174,7 +174,18 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
                             child: Text('الإدارة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
                         SizedBox(
                             width: 80,
-                            child: Text('القيمة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                            child: Text('السلفة', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                        SizedBox(
+                            width: 80,
+                            child: Text('القسط', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                        SizedBox(
+                            width: 80,
+                            child: Text('الأقساط', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+                        SizedBox(
+                            width: 80,
+                            child: Text('أول قسط', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+
+
                         SizedBox(
                             width: 200,
                             child: Text('البيان - السبب', textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
@@ -191,29 +202,29 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
                   // ListView - Rows
                   Expanded(
                     child: SizedBox(
-                      width: 1100,
+                      width: 1350,
                       height: 480,
                       child: ListView.separated(
                         // physics: const BouncingScrollPhysics(),
                         padding: const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0),
                         itemBuilder: (context, index) {
-                          return buildListViewItem(state.filterdLst_Withdrwals[index], context);
+                          return buildListViewItem(state.filterdLst_Advances[index], context);
                         },
                         separatorBuilder: (context, index) => const SizedBox(height: 1),
-                        itemCount: state.filterdLst_Withdrwals.length,
+                        itemCount: state.filterdLst_Advances.length,
                       ),
                     ),
                   ),
                   SizedBox(
-                    width: 1100,
+                    width: 1350,
                     height: 35,
                     child: Row(
                       children: [
                         SizedBox(width: 100),
-                        BlocBuilder<withdrwals_bloc, hr_state>(
+                        BlocBuilder<advances_bloc, hr_state>(
                           builder: (context, state) {
-                            if (state is getListWithdrwals_StateDataChanged) {
-                              contTotalValue.text = state.filterdLst_Withdrwals
+                            if (state is getListAdvances_StateDataChanged) {
+                              contTotalValue.text = state.filterdLst_Advances
                                   .fold(0.0, (previousValue, element) => previousValue + element.Value!)
                                   .toStringAsFixed(2);
                               return SizedBox(
@@ -243,7 +254,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
     );
   }
 
-  buildListViewItem(HR_Withdrwals item, context) {
+  buildListViewItem(HR_Advances item, context) {
     return Column(
       children: [
         Divider(
@@ -294,9 +305,23 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
                   child: Text(item.Value.toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 ),
                 SizedBox(
+                  width: 80,
+                  child: Text(item.InstallmentValue.toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(
+                  width: 80,
+                  child: Text(item.InstallmentCount.toString(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(
+                  width: 90,
+                  child: Text(item.InstallmentDateStart.toString() , textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(
                   width: 200,
                   child: Text(item.Reson! , textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 ),
+
+
                 SizedBox(
                   width: 40,
                   child: Checkbox(value: item.IsClosed, onChanged: (value) {}),
@@ -344,26 +369,26 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
     await sections_bloc.instance.getList_Section();
     await employee_bloc.instance.getLstEmployeeAsDataSource();
 
-    withdrwals_bloc.instance.add(getListWithdrwals_Event());
+    advances_bloc.instance.add(getListAdvances_Event());
     if (controllerfilter.text.trim().isNotEmpty) {
-      withdrwals_bloc.instance.add(filterAnyWithdrwals_Event(filterData: controllerfilter.text.trim()));
+      advances_bloc.instance.add(filterAnyAdvances_Event(filterData: controllerfilter.text.trim()));
     }
   }
 
   void newItem() async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => scr_withdrwalsItem(null, scaffold, en_FormMode.NewMode),
+        builder: (context) => scr_AdvancesItem(null, scaffold, en_FormMode.NewMode),
       ),
     );
 
     if (result == true) loadDataFromDB();
   }
 
-  void editItem(HR_Withdrwals item) async {
+  void editItem(HR_Advances item) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => scr_withdrwalsItem(item, scaffold, en_FormMode.EditMode),
+        builder: (context) => scr_AdvancesItem(item, scaffold, en_FormMode.EditMode),
       ),
     );
 
@@ -376,7 +401,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
         IconButton(
           onPressed: () {
             sharedControls
-                .showFormFilterByDates(context, en_TablesName.HR_Withdrwals, branchID, contDateFrom, contDateTo, isGetAllDates)
+                .showFormFilterByDates(context, en_TablesName.HR_Advances, branchID, contDateFrom, contDateTo, isGetAllDates)
                 .then((retValues) {
               if (retValues != null) {
                 isGetAllDates = retValues[0] as bool;
@@ -398,7 +423,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
             loadDataFromDB();
             // tablesCondions
             //     .createCondionsByDates(en_TablesName.Invoices_Sales, branchID, contDateFrom, contDateTo, isGetAllDates)
-            //     .then((cond) => withdrwals_bloc.instance.add(getListWithdrwals_Event(conditions: cond)));
+            //     .then((cond) => advances_bloc.instance.add(getListAdvances_Event(conditions: cond)));
           },
           icon: Icon(
             Icons.cloud_download_rounded,
@@ -429,7 +454,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
     );
   }
 
-  void deleteItem(HR_Withdrwals item) {
+  void deleteItem(HR_Advances item) {
     print('حذف ${item.Code}  -  ID ${item.ID}');
 
     ctr_AlertDialog.showListFilter(
@@ -452,7 +477,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
                 iconAlignment: IconAlignment.end,
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 3),
                 onPressed: () {
-                  bllHR_Withdrwals.fire_DeleteItem(item.ID.toString());
+                  bllHR_Advances.fire_DeleteItem(item.ID.toString());
                   loadDataFromDB();
                   Navigator.of(context).pop();
                 },
@@ -477,7 +502,7 @@ class _scr_withdrwalsViewState extends State<scr_withdrwalsView> {
     );
   }
 
-  void shareItem(HR_Withdrwals item) async {
+  void shareItem(HR_Advances item) async {
     print('مشاركة  ${item.Code}  -  ID ${item.ID}');
   }
 }

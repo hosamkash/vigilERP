@@ -36,3 +36,14 @@ class filterAnyWithdrwals_Event extends hr_event {
   filterAnyWithdrwals_Event({ this.filterData});
 }
 
+//*************************** Advances *******************************
+class getListAdvances_Event extends hr_event {
+  final List<BLLCondions>? conditions;
+  getListAdvances_Event({ this.conditions });
+}
+class resetFilterAdvances_Event extends hr_event {}
+class filterAnyAdvances_Event extends hr_event {
+  final String? filterData;
+  filterAnyAdvances_Event({ this.filterData});
+}
+
