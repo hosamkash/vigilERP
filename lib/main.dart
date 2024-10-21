@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => company_bloc()),
         BlocProvider(create: (context) => unit_bloc()),
         BlocProvider(create: (context) => productionCom_bloc()),
+        BlocProvider(create: (context) => withdrwals_bloc()),
 
         //*************************************
 
@@ -77,6 +78,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => bonusType_bloc()),
         BlocProvider(create: (context) => bonus_bloc()),
         BlocProvider(create: (context) => discount_bloc()),
+        BlocProvider(create: (context) => withdrwals_bloc()),
       ],
       child: BlocConsumer<cubitGeneral, cubitStates>(
         listener: (context, state) => state_InitialApp(),

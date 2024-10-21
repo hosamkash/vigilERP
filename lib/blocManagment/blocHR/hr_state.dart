@@ -16,5 +16,10 @@ final class getListDiscount_StateDataChanged extends hr_state {
   getListDiscount_StateDataChanged({required this.filterdLst_Discount});
 }
 
+//*************************** Withdrwals *******************************
+final class getListWithdrwals_StateDataChanged extends hr_state {
+  final List<HR_Withdrwals> filterdLst_Withdrwals;
+  getListWithdrwals_StateDataChanged({required this.filterdLst_Withdrwals});
+}
 
 

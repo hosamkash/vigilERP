@@ -144,8 +144,15 @@
         {"fieldPath": "IDBranch","order": "ASCENDING" },
         {"fieldPath": "Date","order": "ASCENDING"}
       ]
+    },
+    {
+      "collectionGroup": "HR_Withdrwals",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
     }
-
 
 
   ]

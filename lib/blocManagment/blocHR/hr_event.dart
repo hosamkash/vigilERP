@@ -24,3 +24,15 @@ class filterAnyDiscount_Event extends hr_event {
   final String? filterData;
   filterAnyDiscount_Event({ this.filterData});
 }
+
+//*************************** Withdrwals *******************************
+class getListWithdrwals_Event extends hr_event {
+  final List<BLLCondions>? conditions;
+  getListWithdrwals_Event({ this.conditions });
+}
+class resetFilterWithdrwals_Event extends hr_event {}
+class filterAnyWithdrwals_Event extends hr_event {
+  final String? filterData;
+  filterAnyWithdrwals_Event({ this.filterData});
+}
+
