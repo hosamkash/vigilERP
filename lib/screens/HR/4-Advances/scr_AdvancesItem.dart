@@ -6,7 +6,6 @@ import 'package:vigil_erp/blocManagment/blocDefinition/definition_bloc.dart';
 import 'package:vigil_erp/componants/ctr_DropDowenList.dart';
 import 'package:vigil_erp/componants/ctr_TextFormField.dart';
 import 'package:vigil_erp/componants/ctr_TextHeaderPage.dart';
-import 'package:vigil_erp/screens/Inventory/1-PermissionAdd/scr_PermissionAddItem.dart';
 import 'package:vigil_erp/shared/enumerators.dart';
 import 'package:vigil_erp/shared/sharedFunctions.dart';
 import 'package:vigil_erp/shared/sharedHive.dart';
