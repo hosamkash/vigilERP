@@ -43,8 +43,11 @@ enum en_DataTypeComon {
 }
 
 enum en_finacialType {
-  finacialTypeExchange,
-  finacialTypeSupplay,
+  finacialTypeExchange(1),
+  finacialTypeSupplay(2);
+  final int value;
+
+  const en_finacialType(this.value);
 }
 
 enum en_PriceType {
@@ -197,4 +200,13 @@ enum en_BounsType {
 
  final int? value;
   const en_BounsType(this.value);
+}
+
+enum en_DealingType {
+  Cliens(1),
+  Vendors(2),
+  Employees(3);
+
+  final int? value;
+  const en_DealingType(this.value);
 }

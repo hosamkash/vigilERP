@@ -1,4 +1,4 @@
-import '../classModel/Fix_FinacialType.dart';
+import '../classModel/Fina_Supplay.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -6,11 +6,11 @@ import '../../shared/enumerators.dart';
 import 'ManageBLL.dart';
 
 
-class bllFix_FinacialType
+class bllFina_Supplay
 	{
-		static List<String> ColumnsName = enTable_Fix_FinacialType.values.map((item) => item.name).toList();
-			static late List<Fix_FinacialType> lstFix_FinacialType = [];
-			static late Fix_FinacialType itemFix_FinacialType;
+		static List<String> ColumnsName = enTable_Fina_Supplay.values.map((item) => item.name).toList();
+			static late List<Fina_Supplay> lstFina_Supplay = [];
+			static late Fina_Supplay itemFina_Supplay;
 			static String query = '';
 
 //**************************** general function ****************************
@@ -18,12 +18,12 @@ class bllFix_FinacialType
 static Future<int> getMaxID_firestore() async {
 	int maxID = 0;
 	await FirebaseFirestore.instance
-	.collection(en_TablesName.Fix_FinancialType.name)
-	.orderBy(enTable_Fix_FinacialType.ID.name, descending: true)
+	.collection(en_TablesName.Fina_Supplay.name)
+	.orderBy(enTable_Fina_Supplay.ID.name, descending: true)
 	.limit(1).get().then((value) {
 	if (value.docs.isEmpty) {maxID = 1;}
 	else {
-	maxID = value.docs.first.get(enTable_Fix_FinacialType.ID.name);
+	maxID = value.docs.first.get(enTable_Fina_Supplay.ID.name);
 	maxID += 1;}
 	}).catchError((error) {
 	print(error.toString());  throw error;
@@ -31,17 +31,17 @@ static Future<int> getMaxID_firestore() async {
 	return maxID;
 }
 
-static Future<int> getMax_firestore(enTable_Fix_FinacialType colName, {BLLCondions? condion}) async {
+static Future<int> getMax_firestore(enTable_Fina_Supplay colName, {BLLCondions? condion}) async {
 	int maxID = 1;
 	QuerySnapshot? snapshot;
 	 try {if (condion != null) {
 	snapshot = await FirebaseFirestore.instance
-	.collection(en_TablesName.Fix_FinancialType.name)
+	.collection(en_TablesName.Fina_Supplay.name)
 	.where(condion.columnName, isEqualTo: condion.value)
 	.orderBy(colName.name, descending: true)
 	.limit(1).get();} else if (condion == null) {
 	snapshot = await FirebaseFirestore.instance
-	.collection(en_TablesName.Fix_FinancialType.name)
+	.collection(en_TablesName.Fina_Supplay.name)
 	.orderBy(colName.name, descending: true)
 	.limit(1).get();}
 	if (snapshot != null && snapshot.docs.isNotEmpty) {
@@ -54,9 +54,9 @@ static Future<int> getMax_firestore(enTable_Fix_FinacialType colName, {BLLCondio
 //**************************** add & set ****************************
 
 /// هو إسم الكلاس والإضافة بتكون بكون عشوائي ولا يمكن للمستخدم تحديده collection وبيكون ال  FirebaseFirestore تستخدم للإضافة فى
-static Future<String> fire_AddItem(Fix_FinacialType  itemFix_FinacialType) async {
+static Future<String> fire_AddItem(Fina_Supplay  itemFina_Supplay) async {
 	String docCreatedName = '';
-	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).add(itemFix_FinacialType.toMap()).then((val) {
+	await FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name).add(itemFina_Supplay.toMap()).then((val) {
 	docCreatedName = val.id;
 	}).catchError((error) {
 	print(error.toString());  throw error;
@@ -64,9 +64,9 @@ static Future<String> fire_AddItem(Fix_FinacialType  itemFix_FinacialType) async
 	return docCreatedName;
 }
 
-static Future<bool> fire_SetItemMap(String docName, Map<String, dynamic>  itemFix_FinacialType) async {
+static Future<bool> fire_SetItemMap(String docName, Map<String, dynamic>  itemFina_Supplay) async {
 	bool result = false;
-	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).set(itemFix_FinacialType).then((val) {
+	await FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name).doc(docName).set(itemFina_Supplay).then((val) {
 	result = true;
 	}).catchError((error) {
 	print(error.toString()); throw error;
@@ -74,9 +74,9 @@ static Future<bool> fire_SetItemMap(String docName, Map<String, dynamic>  itemFi
 	return result;
 }
 
-static Future<bool> fire_SetItem(String docName, Fix_FinacialType  itemFix_FinacialType) async {
+static Future<bool> fire_SetItem(String docName, Fina_Supplay  itemFina_Supplay) async {
 	bool result = false;
-	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).set(itemFix_FinacialType.toMap()).then((val) {
+	await FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name).doc(docName).set(itemFina_Supplay.toMap()).then((val) {
 	result = true;
 	}).catchError((error) {
 	print(error.toString()); throw error;
@@ -86,17 +86,17 @@ static Future<bool> fire_SetItem(String docName, Fix_FinacialType  itemFix_Finac
 
 static Future fire_setListMaster_And_Details(
 	{required String insertdDocID,
-	required Fix_FinacialType  itemFix_FinacialType,
+	required Fina_Supplay  itemFina_Supplay,
 	required String collectionDetailsName,
 	required String columnNameAsDocumentDetails,
 	required List<Map<String, dynamic>> detais,
 	required List<Map<String, dynamic>> deletedItemsDetais,
 	}) async {
-	CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name);
+	CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name);
 	DocumentReference tablemasterDocref = coll.doc(insertdDocID);
 	WriteBatch batch = FirebaseFirestore.instance.batch();
 	// save Master
-	batch.set(tablemasterDocref,  itemFix_FinacialType.toMap());
+	batch.set(tablemasterDocref,  itemFina_Supplay.toMap());
 	// delete old items it removed from list
 	for (var item in deletedItemsDetais) {
 	DocumentReference itemRefDelete = tablemasterDocref.collection(collectionDetailsName).doc(item[columnNameAsDocumentDetails].toString());
@@ -112,11 +112,11 @@ static Future fire_setListMaster_And_Details(
 }
 
 static Future fire_setListMaster({
-	required List<Fix_FinacialType> lstFix_FinacialType,
+	required List<Fina_Supplay> lstFina_Supplay,
 	}) async {
-	CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name);
+	CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name);
 	WriteBatch batch = FirebaseFirestore.instance.batch();
-	lstFix_FinacialType.forEach((elm){
+	lstFina_Supplay.forEach((elm){
 	DocumentReference docRef = coll.doc(elm.ID.toString());
 	batch.set(docRef, elm.toMap());
 	});
@@ -126,42 +126,42 @@ static Future fire_setListMaster({
 
 //**************************** get ****************************
 
-static Future<Fix_FinacialType> fire_getItem(String docName) async {
-	late Fix_FinacialType  itemFix_FinacialType;
-	try { var retValue = await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).get();
-	 itemFix_FinacialType = Fix_FinacialType();
- itemFix_FinacialType.ID = retValue.data()!['ID']; itemFix_FinacialType.Name = retValue.data()!['Name'];	return  itemFix_FinacialType;
+static Future<Fina_Supplay> fire_getItem(String docName) async {
+	late Fina_Supplay  itemFina_Supplay;
+	try { var retValue = await FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name).doc(docName).get();
+	 itemFina_Supplay = Fina_Supplay();
+ itemFina_Supplay.ID = retValue.data()!['ID']; itemFina_Supplay.Code = retValue.data()!['Code']; itemFina_Supplay.Serial = retValue.data()!['Serial']; itemFina_Supplay.Date = retValue.data()!['Date']; itemFina_Supplay.Time = retValue.data()!['Time']; itemFina_Supplay.IDTreasur = retValue.data()!['IDTreasur']; itemFina_Supplay.DealingTypeID = retValue.data()!['DealingTypeID']; itemFina_Supplay.DealingID = retValue.data()!['DealingID']; itemFina_Supplay.BalanceBefor = retValue.data()!['BalanceBefor']; itemFina_Supplay.Value = retValue.data()!['Value']; itemFina_Supplay.BalanceAfter = retValue.data()!['BalanceAfter']; itemFina_Supplay.IDFinancialCluses = retValue.data()!['IDFinancialCluses']; itemFina_Supplay.Note = retValue.data()!['Note']; itemFina_Supplay.IsBindeDocument = retValue.data()!['IsBindeDocument']; itemFina_Supplay.BindeDocumentTypeID = retValue.data()!['BindeDocumentTypeID']; itemFina_Supplay.BindeDocumentID = retValue.data()!['BindeDocumentID']; itemFina_Supplay.BindeDocumentText = retValue.data()!['BindeDocumentText']; itemFina_Supplay.BindeDocumentCode = retValue.data()!['BindeDocumentCode']; itemFina_Supplay.IsAccountedByRepresent = retValue.data()!['IsAccountedByRepresent']; itemFina_Supplay.IDUser = retValue.data()!['IDUser']; itemFina_Supplay.IDBranch = retValue.data()!['IDBranch']; itemFina_Supplay.IsClosedTreasure = retValue.data()!['IsClosedTreasure']; itemFina_Supplay.IDClosedTreasure = retValue.data()!['IDClosedTreasure']; itemFina_Supplay.IsClosedEdit = retValue.data()!['IsClosedEdit']; itemFina_Supplay.IDCalcSalary = retValue.data()!['IDCalcSalary'];	return  itemFina_Supplay;
 	} catch (error) {
 	print(error.toString()); throw error;
 	}
 }
 
-static Future<List<Fix_FinacialType>> fire_getList() async {
+static Future<List<Fina_Supplay>> fire_getList() async {
 	await FirebaseFirestore.instance
-	.collection(en_TablesName.Fix_FinancialType.name)
+	.collection(en_TablesName.Fina_Supplay.name)
 	.get()
 	.then((value) {
-	lstFix_FinacialType.clear();
+	lstFina_Supplay.clear();
 	value.docs.forEach((element) {
-	lstFix_FinacialType.add(Fix_FinacialType.fromJson(element.data()));
+	lstFina_Supplay.add(Fina_Supplay.fromJson(element.data()));
 	});
 	}).catchError((error) {
 print(error.toString()); throw error;
 });
-return lstFix_FinacialType;
+return lstFina_Supplay;
 }
 
-static Future<List<Fix_FinacialType>> fire_getListByBranch(int branchID , String BranchColumnName) async {
-	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name)
+static Future<List<Fina_Supplay>> fire_getListByBranch(int branchID , String BranchColumnName) async {
+	await FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name)
 	.where(BranchColumnName, isEqualTo: branchID).get()
-	.then((value) {lstFix_FinacialType.clear();value.docs.forEach((element) {
-	lstFix_FinacialType.add(Fix_FinacialType.fromJson(element.data()));});
+	.then((value) {lstFina_Supplay.clear();value.docs.forEach((element) {
+	lstFina_Supplay.add(Fina_Supplay.fromJson(element.data()));});
 	}).catchError((error) {print(error.toString());throw error;});
-	return lstFix_FinacialType;
+	return lstFina_Supplay;
 }
 
-static Future<List<Fix_FinacialType>> fire_getListWithConditions({List<BLLCondions>? conditions}) async {
-	CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name);
+static Future<List<Fina_Supplay>> fire_getListWithConditions({List<BLLCondions>? conditions}) async {
+	CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name);
 	Query query = colRef;
 	  if (conditions != null) {
 	for (var cond in conditions) {
@@ -190,10 +190,10 @@ static Future<List<Fix_FinacialType>> fire_getListWithConditions({List<BLLCondio
 	}
 }
 	QuerySnapshot snap = await query.get();
-	lstFix_FinacialType.clear();
+	lstFina_Supplay.clear();
 	snap.docs.forEach((element) {
-	lstFix_FinacialType.add(Fix_FinacialType.fromJson(element.data() as Map<String, dynamic> )); });
-	return lstFix_FinacialType;
+	lstFina_Supplay.add(Fina_Supplay.fromJson(element.data() as Map<String, dynamic> )); });
+	return lstFina_Supplay;
 }
 
 
@@ -201,7 +201,7 @@ static Future<List<Fix_FinacialType>> fire_getListWithConditions({List<BLLCondio
 
 static Future<bool> fire_DeleteItem(String docName) async {
 	bool result = false;
-	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).delete().then((val) {
+	await FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name).doc(docName).delete().then((val) {
 	result = true;
 	}).catchError((error) {
 	print(error.toString()); 
@@ -211,7 +211,7 @@ static Future<bool> fire_DeleteItem(String docName) async {
 	}
 
 static Future fire_DeleteListMaster(List<BLLCondions> conditions) async {
-	CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name);
+	CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name);
 	Query query = colRef;
 	for (var cond in conditions) {
 	if (cond.where == en_CondionsWhere.isNull)
@@ -247,7 +247,7 @@ static Future fire_DeleteListMaster(List<BLLCondions> conditions) async {
 
 static Future<bool> fire_DeleteListMaster_And_Details(String docName, String subCollectionName) async {
 	// specify Main Collection
-	CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name);
+	CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Fina_Supplay.name);
 	// Mention to Document
 	DocumentReference tablemasterDocref = coll.doc(docName);
 	// Mention to subCollection
@@ -269,7 +269,7 @@ static Future<bool> fire_DeleteListMaster_And_Details(String docName, String sub
 //**************************** Upload Files ****************************
 
 static Future<String> storage_UploadFile(String fileName, File file ,{String pathOnStorage = ''}) async {
-	pathOnStorage = pathOnStorage.isEmpty ? en_TablesName.Fix_FinancialType.name : pathOnStorage;
+	pathOnStorage = pathOnStorage.isEmpty ? en_TablesName.Fina_Supplay.name : pathOnStorage;
 	String fileDownloadURL = '';
 	await firebase_storage.FirebaseStorage.instance.ref().child('${pathOnStorage}/${fileName}').putFile(file).then((fileUpload) async {
 	await fileUpload.ref.getDownloadURL().then((URL) {
@@ -283,7 +283,7 @@ static Future<String> storage_UploadFile(String fileName, File file ,{String pat
 
 static Future<String> storage_GetFileDowenloadURL(String fileName) async {
 	String fileDownloadURL = '';
-	await firebase_storage.FirebaseStorage.instance.ref().child('${en_TablesName.Fix_FinancialType.name}/${fileName}').getDownloadURL().then((URL) {
+	await firebase_storage.FirebaseStorage.instance.ref().child('${en_TablesName.Fina_Supplay.name}/${fileName}').getDownloadURL().then((URL) {
 	fileDownloadURL = URL;
 	}).catchError((error) {
 	print(error.toString());  throw error;
@@ -293,7 +293,7 @@ static Future<String> storage_GetFileDowenloadURL(String fileName) async {
 
 static Future<bool> storage_DeleteFile(String fileName ,{String pathOnStorage = ''}) async {
 	bool result = false;
-	pathOnStorage = pathOnStorage.isEmpty ? en_TablesName.Fix_FinancialType.name : pathOnStorage;
+	pathOnStorage = pathOnStorage.isEmpty ? en_TablesName.Fina_Supplay.name : pathOnStorage;
 	await firebase_storage.FirebaseStorage.instance.ref().child('${pathOnStorage}/${fileName}').delete().then((val) {
 	result = true;
 	}).catchError((error) {

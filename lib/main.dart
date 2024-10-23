@@ -12,6 +12,7 @@ import 'blocManagment/blocFixTables/fix_table_bloc.dart';
 import 'blocManagment/blocHR/hr_bloc.dart';
 import 'blocManagment/blocInventory/inv_bloc.dart';
 import 'blocManagment/blocInvoices/invoic_bloc.dart';
+import 'blocManagment/bloc_Financial/financial_bloc.dart';
 import 'blocManagment/general/cubitGeneral.dart';
 import 'blocManagment/general/cubitStates.dart';
 import 'blocManagment/general/myBlocObserver.dart';
@@ -75,6 +76,10 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => discount_bloc()),
         BlocProvider(create: (context) => withdrwals_bloc()),
         BlocProvider(create: (context) => advances_bloc()),
+        BlocProvider(create: (context) => dealingType_bloc()),
+        BlocProvider(create: (context) => financialType_bloc()),
+        BlocProvider(create: (context) => exchange_bloc()),
+        BlocProvider(create: (context) => supplay_bloc()),
       ],
       child: BlocConsumer<cubitGeneral, cubitStates>(
         listener: (context, state) => state_InitialApp(),
@@ -118,6 +123,10 @@ class MyApp extends StatelessWidget {
           discount_bloc.cretaeInctance(context);
           withdrwals_bloc.cretaeInctance(context);
           advances_bloc.cretaeInctance(context);
+          dealingType_bloc.cretaeInctance(context);
+          financialType_bloc.cretaeInctance(context);
+          exchange_bloc.cretaeInctance(context);
+          supplay_bloc.cretaeInctance(context);
 
           //*************************************
           cubitGeneral.get(context);

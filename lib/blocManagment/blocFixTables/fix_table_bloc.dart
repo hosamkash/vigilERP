@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vigil_erp/bll/bllFirebase/bllFix_BounsType.dart';
+import 'package:vigil_erp/bll/classModel/Fix_DealingType.dart';
 import '../../bll/bllFirebase/ManageBLL.dart';
 import '../../bll/bllFirebase/bllFix_Address_City.dart';
 import '../../bll/bllFirebase/bllFix_Address_DistrictArea.dart';
 import '../../bll/bllFirebase/bllFix_Address_Government.dart';
 import '../../bll/bllFirebase/bllFix_BalanceType.dart';
+import '../../bll/bllFirebase/bllFix_DealingType.dart';
+import '../../bll/bllFirebase/bllFix_FinancialType.dart';
 import '../../bll/bllFirebase/bllFix_Gender.dart';
 import '../../bll/bllFirebase/bllFix_MaritalStatus.dart';
 import '../../bll/bllFirebase/bllFix_MilitaryStatus.dart';
@@ -17,6 +20,7 @@ import '../../bll/classModel/Fix_Address_DistrictArea.dart';
 import '../../bll/classModel/Fix_Address_Government.dart';
 import '../../bll/classModel/Fix_BalanceType.dart';
 import '../../bll/classModel/Fix_BounsType.dart';
+import '../../bll/classModel/Fix_FinancialType.dart';
 import '../../bll/classModel/Fix_Gender.dart';
 import '../../bll/classModel/Fix_MaritalStatus.dart';
 import '../../bll/classModel/Fix_MilitaryStatus.dart';
@@ -571,6 +575,112 @@ class address_bloc extends Bloc<fixTable_event, fixTable_state> {
         await getLst_AddressAreaAsDataSource(event.cityID);
         emit(getListAddressAreaAsDataSource_State(lst_AddressAreaAsDataSource: lst_AddressAreaAsDataSource));
       }
+    });
+  }
+}
+
+class dealingType_bloc extends Bloc<fixTable_event, fixTable_state> {
+  static late dealingType_bloc instance;
+
+  static dealingType_bloc cretaeInctance(BuildContext context) {
+    instance = BlocProvider.of<dealingType_bloc>(context);
+    return instance;
+  }
+
+  List<Fix_DealingType> lst_dealingType = [];
+  List<DropDowenDataSource> lstDealingTypeAsDataSource = [];
+
+  Future getLst_dealingType() async {
+    try {
+      lst_dealingType.clear();
+      lst_dealingType = await bllFix_DealingType.fire_getList();
+    } catch (error) {
+      print(error.toString());
+    }
+  }
+
+  Future getLst_dealingTypeAsDataSource() async {
+    lstDealingTypeAsDataSource.clear();
+    if (bllFix_DealingType.lstFix_DealingType.length == 0) await bllFix_DealingType.fire_getList();
+    for (var item in bllFix_DealingType.lstFix_DealingType) {
+      lstDealingTypeAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
+    }
+  }
+
+  String getNameByID(int? ID) {
+    String ret = '';
+    if (bllFix_DealingType.lstFix_DealingType.isNotEmpty && ID != null) {
+      ret = bllFix_DealingType.lstFix_DealingType.firstWhere((elm) {
+        return elm.ID == ID;
+      }).Name!;
+    }
+    return ret;
+  }
+
+  dealingType_bloc() : super(dealingType_StateInitial()) {
+    on<fixTable_event>((event, emit) async {
+      if (event is getListDealingType_Event) {
+        await getLst_dealingType();
+        emit(getListDealingType_State(lst_DealingType: lst_dealingType));
+      }
+      else if (event is getListDealingTypeAsDataSource_Event) {
+        await getLst_dealingTypeAsDataSource();
+        emit(getListDealingTypeAsDataSource_State(lst_DealingTypeAsDataSource: lstDealingTypeAsDataSource));
+      }
+
+    });
+  }
+}
+
+class financialType_bloc extends Bloc<fixTable_event, fixTable_state> {
+  static late financialType_bloc instance;
+
+  static financialType_bloc cretaeInctance(BuildContext context) {
+    instance = BlocProvider.of<financialType_bloc>(context);
+    return instance;
+  }
+
+  List<Fix_FinancialType> lst_financialType = [];
+  List<DropDowenDataSource> lstFinancialTypeAsDataSource = [];
+
+  Future getLst_financialType() async {
+    try {
+      lst_financialType.clear();
+      lst_financialType = await bllFix_FinancialType.fire_getList();
+    } catch (error) {
+      print(error.toString());
+    }
+  }
+
+  Future getLst_financialTypeAsDataSource() async {
+    lstFinancialTypeAsDataSource.clear();
+    if (bllFix_FinancialType.lstFix_FinancialType.length == 0) await bllFix_FinancialType.fire_getList();
+    for (var item in bllFix_FinancialType.lstFix_FinancialType) {
+      lstFinancialTypeAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
+    }
+  }
+
+  String getNameByID(int? ID) {
+    String ret = '';
+    if (bllFix_FinancialType.lstFix_FinancialType.isNotEmpty && ID != null) {
+      ret = bllFix_FinancialType.lstFix_FinancialType.firstWhere((elm) {
+        return elm.ID == ID;
+      }).Name!;
+    }
+    return ret;
+  }
+
+  financialType_bloc() : super(financialType_StateInitial()) {
+    on<fixTable_event>((event, emit) async {
+      if (event is getListFinancialType_Event) {
+        await getLst_financialType();
+        emit(getListFinancialType_State(lst_FinancialType: lst_financialType));
+      }
+      else if (event is getListFinancialTypeAsDataSource_Event) {
+        await getLst_financialTypeAsDataSource();
+        emit(getListFinancialTypeAsDataSource_State(lst_FinancialTypeAsDataSource: lstFinancialTypeAsDataSource));
+      }
+
     });
   }
 }

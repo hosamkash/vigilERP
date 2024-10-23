@@ -90,3 +90,25 @@ final class getListBonusTypeAsDataSource_State extends fixTable_state {
   final List<DropDowenDataSource> lst_BonusTypeAsDataSource;
   getListBonusTypeAsDataSource_State({required this.lst_BonusTypeAsDataSource});
 }
+
+//*************************** DealingType *******************************
+final class dealingType_StateInitial extends fixTable_state {}
+final class getListDealingType_State extends fixTable_state {
+  final List<Fix_DealingType> lst_DealingType;
+  getListDealingType_State({required this.lst_DealingType});
+}
+final class getListDealingTypeAsDataSource_State extends fixTable_state {
+  final List<DropDowenDataSource> lst_DealingTypeAsDataSource;
+  getListDealingTypeAsDataSource_State({required this.lst_DealingTypeAsDataSource});
+}
+
+//*************************** FinancialType *******************************
+final class financialType_StateInitial extends fixTable_state {}
+final class getListFinancialType_State extends fixTable_state {
+  final List<Fix_FinancialType> lst_FinancialType;
+  getListFinancialType_State({required this.lst_FinancialType});
+}
+final class getListFinancialTypeAsDataSource_State extends fixTable_state {
+  final List<DropDowenDataSource> lst_FinancialTypeAsDataSource;
+  getListFinancialTypeAsDataSource_State({required this.lst_FinancialTypeAsDataSource});
+}

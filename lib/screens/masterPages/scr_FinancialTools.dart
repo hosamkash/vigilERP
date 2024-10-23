@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:vigil_erp/screens/financial/1-Exchange/scr_ExchangeView.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
+
+import '../financial/2-Supplay/scr_SupplayView.dart';
 
 class scr_FinancialTools extends StatefulWidget {
   scr_FinancialTools({super.key});
@@ -47,7 +50,7 @@ class _scr_FinancialToolsState extends State<scr_FinancialTools> {
             children: [
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                  sharedControls.navigatTo(context, scr_ExchangeView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -75,7 +78,7 @@ class _scr_FinancialToolsState extends State<scr_FinancialTools> {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                   sharedControls.navigatTo(context, scr_SupplayView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(

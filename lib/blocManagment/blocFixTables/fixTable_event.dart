@@ -53,3 +53,10 @@ class refreshAddressArea_Event extends fixTable_event {}
 class getListBonusType_Event extends fixTable_event {}
 class getListBonusTypeAsDataSource_Event extends fixTable_event {}
 
+//*************************** DealingType *******************************
+class getListDealingType_Event extends fixTable_event {}
+class getListDealingTypeAsDataSource_Event extends fixTable_event {}
+
+//*************************** FinancialType *******************************
+class getListFinancialType_Event extends fixTable_event {}
+class getListFinancialTypeAsDataSource_Event extends fixTable_event {}

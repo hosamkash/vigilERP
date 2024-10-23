@@ -38,14 +38,30 @@ class employee_bloc extends Bloc<dealing_event, dealing_state> {
     }
   }
 
-  // Future getList_EmployeeFromDB_ByBranch(int branchID) async {
-  //   try {
-  //     filterdLst_Employee.clear();
-  //     filterdLst_Employee = await bllDealing_Employees.fire_getListByBranch(branchID , enTable_Dealing_Employees.IDBranch.name);
-  //   } catch (error) {
-  //     print(error.toString());
-  //   }
-  // }
+  Future getList_EmployeeFilteredByBranch(int? branchID, String? filterData) async {
+    try {
+      if (filterdLst_Employee.length == 0) {
+        getList_Employee();
+      }
+
+      if (filterData == null || filterData.isEmpty) {
+        return filterdLst_Employee.where((item) {
+          return item.IDBranch == branchID;
+        }).toList();
+      } else {
+        return filterdLst_Employee.where((item) {
+          return item.IDBranch == branchID &&
+              ((item.Code == null ? false : item.Code!.toString().toLowerCase().contains(filterData.toLowerCase())) ||
+                  (item.Name == null ? false : item.Name!.toLowerCase().contains(filterData.toLowerCase())) ||
+                  (item.Phone == null ? false : item.Phone!.toLowerCase().contains(filterData.toLowerCase())) ||
+                  (item.Mobile == null ? false : item.Mobile!.toLowerCase().contains(filterData.toLowerCase())) ||
+                  (item.Address == null ? false : item.Address!.toLowerCase().contains(filterData.toLowerCase())));
+        }).toList();
+      }
+    } catch (error) {
+      print(error.toString());
+    }
+  }
 
   filterAny_Employee({String? filterData}) {
     if (filterData == null || filterData.isEmpty) {
@@ -102,6 +118,19 @@ class employee_bloc extends Bloc<dealing_event, dealing_state> {
     return ret;
   }
 
+  Future<Dealing_Employees?> getEmployeeByID(int? ID)async {
+    if (filterdLst_Employee.length == 0) {
+      await getList_Employee();
+    }
+    if (filterdLst_Employee.isNotEmpty && ID != null) {
+      return await filterdLst_Employee.where((elm) {
+        return elm.ID == ID;
+      }).first;
+    }
+    else
+      return null;
+  }
+
   late imageTemplet EmployeeImageTemp = imageTemplet();
 
   Future takeImageEmployee(ImageSource imageSource) async {
@@ -120,7 +149,12 @@ class employee_bloc extends Bloc<dealing_event, dealing_state> {
       if (event is getListEmployee_Event) {
         await getList_Employee();
         emit(getListEmployee_StateDataChanged(filterdLst_Employee: filterdLst_Employee));
-      } else if (event is getLstEmployeeAsDataSource_Event) {
+      }
+      else if (event is getListEmployeesOffline_Event) {
+        List<Dealing_Employees> listEmployeesOffline = await getList_EmployeeFilteredByBranch(event.branchID, event.filterData);
+        emit(getListEmployeesOffline_State(listEmployeesOffline: listEmployeesOffline));
+      }
+        else if (event is getLstEmployeeAsDataSource_Event) {
         await getLstEmployeeAsDataSource();
         emit(getListEmployee_StateDataChanged(filterdLst_Employee: filterdLst_Employee));
       } else if (event is filterAnyEmployee_Event) {
@@ -148,6 +182,31 @@ class client_bloc extends Bloc<dealing_event, dealing_state> {
   Future getList_Client() async {
     try {
       filterdLst_Client = await bllDealing_Clients.fire_getList();
+    } catch (error) {
+      print(error.toString());
+    }
+  }
+
+  Future getList_ClientFilteredByBranch(int? branchID, String? filterData) async {
+    try {
+      if (filterdLst_Client.length == 0) {
+        getList_Client();
+      }
+
+      if (filterData == null || filterData.isEmpty) {
+        return filterdLst_Client.where((item) {
+          return item.IDBranch == branchID;
+        }).toList();
+      } else {
+        return filterdLst_Client.where((item) {
+          return item.IDBranch == branchID &&
+              ((item.Code == null ? false : item.Code!.toString().toLowerCase().contains(filterData.toLowerCase())) ||
+              (item.Name == null ? false : item.Name!.toLowerCase().contains(filterData.toLowerCase())) ||
+              (item.Phone == null ? false : item.Phone!.toLowerCase().contains(filterData.toLowerCase())) ||
+              (item.Mobile == null ? false : item.Mobile!.toLowerCase().contains(filterData.toLowerCase())) ||
+              (item.Address == null ? false : item.Address!.toLowerCase().contains(filterData.toLowerCase())));
+        }).toList();
+      }
     } catch (error) {
       print(error.toString());
     }
@@ -187,15 +246,28 @@ class client_bloc extends Bloc<dealing_event, dealing_state> {
 
   String getNameByID(int? ID) {
     String ret = '';
-    if(bllDealing_Clients.lstDealing_Clients.length == 0)
-      bllDealing_Clients.fire_getList();
-
-    if (bllDealing_Clients.lstDealing_Clients.isNotEmpty && ID != null) {
-      ret = bllDealing_Clients.lstDealing_Clients.firstWhere((elm) {
+    if (filterdLst_Client.length == 0) {
+      getList_Client();
+    }
+    if (filterdLst_Client.isNotEmpty && ID != null) {
+      ret = filterdLst_Client.firstWhere((elm) {
         return elm.ID == ID;
       }).Name!;
     }
     return ret;
+  }
+
+  Future<Dealing_Clients?> getClientByID(int? ID)async {
+    if (filterdLst_Client.length == 0) {
+     await getList_Client();
+    }
+    if (filterdLst_Client.isNotEmpty && ID != null) {
+      return await filterdLst_Client.where((elm) {
+        return elm.ID == ID;
+      }).first;
+    }
+    else
+      return null;
   }
 
   client_bloc() : super(client_StateInitial()) {
@@ -203,12 +275,13 @@ class client_bloc extends Bloc<dealing_event, dealing_state> {
       if (event is getListClient_Event) {
         await getList_Client();
         emit(getListClient_StateDataChanged(filterdLst_Client: filterdLst_Client));
-      }
-      else if (event is getListClientAsDataSource_Event) {
+      } else if (event is getListClientsOffline_Event) {
+        List<Dealing_Clients> listClientsOffline = await getList_ClientFilteredByBranch(event.branchID, event.filterData);
+        emit(getListClientsOffline_State(listClientsOffline: listClientsOffline));
+      } else if (event is getListClientAsDataSource_Event) {
         await getLstClientAsDataSource();
         emit(getListClientAsDataSource_StateDataChanged(filterdLst_ClientAsDataSource: LstClientAsDataSource));
-      }
-      else if (event is filterAnyClient_Event) {
+      } else if (event is filterAnyClient_Event) {
         await filterAny_Client(filterData: event.filterData);
         emit(getListClient_StateDataChanged(filterdLst_Client: filterdLst_Client));
       } else if (event is resetFilterClient_Event) {
@@ -238,6 +311,31 @@ class vendor_bloc extends Bloc<dealing_event, dealing_state> {
     }
   }
 
+  Future getList_VendorFilteredByBranch(int? branchID, String? filterData) async {
+    try {
+      if (filterdLst_Vendor.length == 0) {
+        getList_Vendor();
+      }
+
+      if (filterData == null || filterData.isEmpty) {
+        return filterdLst_Vendor.where((item) {
+          return item.IDBranch == branchID;
+        }).toList();
+      } else {
+        return filterdLst_Vendor.where((item) {
+          return item.IDBranch == branchID &&
+              ((item.Code == null ? false : item.Code!.toString().toLowerCase().contains(filterData.toLowerCase())) ||
+                  (item.Name == null ? false : item.Name!.toLowerCase().contains(filterData.toLowerCase())) ||
+                  (item.Phone == null ? false : item.Phone!.toLowerCase().contains(filterData.toLowerCase())) ||
+                  (item.Mobile == null ? false : item.Mobile!.toLowerCase().contains(filterData.toLowerCase())) ||
+                  (item.Address == null ? false : item.Address!.toLowerCase().contains(filterData.toLowerCase())));
+        }).toList();
+      }
+    } catch (error) {
+      print(error.toString());
+    }
+  }
+
   filterAny_Vendor({String? filterData}) {
     if (filterData == null || filterData.isEmpty) {
       resetFilter_Vendor();
@@ -261,7 +359,7 @@ class vendor_bloc extends Bloc<dealing_event, dealing_state> {
   }
 
   Future getList_VendorAsDataSource() async {
-     LstVendorAsDataSource.clear();
+    LstVendorAsDataSource.clear();
     if (bllDealing_Vendors.lstDealing_Vendors.length == 0) {
       await bllDealing_Vendors.fire_getList();
     }
@@ -280,17 +378,34 @@ class vendor_bloc extends Bloc<dealing_event, dealing_state> {
     return ret;
   }
 
+  Future<Dealing_Vendors?> getVendorByID(int? ID)async {
+    if (filterdLst_Vendor.length == 0) {
+      await getList_Vendor();
+    }
+    if (filterdLst_Vendor.isNotEmpty && ID != null) {
+      return await filterdLst_Vendor.where((elm) {
+        return elm.ID == ID;
+      }).first;
+    }
+    else
+      return null;
+  }
+
   vendor_bloc() : super(vendor_StateInitial()) {
     on<dealing_event>((event, emit) async {
       if (event is getListVendor_Event) {
         await getList_Vendor();
         emit(getListVendor_StateDataChanged(filterdLst_Vendor: filterdLst_Vendor));
       }
+      else if (event is getListVendorsOffline_Event) {
+        List<Dealing_Vendors> listVendorsOffline = await getList_VendorFilteredByBranch(event.branchID, event.filterData);
+        emit(getListVendorsOffline_State(listVendorsOffline: listVendorsOffline));
+      }
+
       else if (event is getListVendorAsDataSource_Event) {
         await getList_VendorAsDataSource();
         emit(getListVendorAsDataSource_StateDataChanged(filterdLst_VendorAsDataSource: LstVendorAsDataSource));
-      }
-      else if (event is filterAnyVendor_Event) {
+      } else if (event is filterAnyVendor_Event) {
         await filterAny_Vendor(filterData: event.filterData);
         emit(getListVendor_StateDataChanged(filterdLst_Vendor: filterdLst_Vendor));
       } else if (event is resetFilterVendor_Event) {

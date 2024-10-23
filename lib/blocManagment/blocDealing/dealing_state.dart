@@ -13,7 +13,10 @@ final class getListEmployeeAsDataSource_StateDataChanged extends dealing_state {
   final List<DropDowenDataSource> filterdLst_EmployeeAsDataSource;
   getListEmployeeAsDataSource_StateDataChanged({required this.filterdLst_EmployeeAsDataSource});
 }
-
+final class getListEmployeesOffline_State extends dealing_state {
+  final List<Dealing_Employees>? listEmployeesOffline;
+  getListEmployeesOffline_State({ this.listEmployeesOffline});
+}
 //*************************** Client *******************************
 final class client_StateInitial extends dealing_state {}
 final class getListClient_StateDataChanged extends dealing_state {
@@ -24,7 +27,10 @@ final class getListClientAsDataSource_StateDataChanged extends dealing_state {
   final List<DropDowenDataSource> filterdLst_ClientAsDataSource;
   getListClientAsDataSource_StateDataChanged({required this.filterdLst_ClientAsDataSource});
 }
-
+final class getListClientsOffline_State extends dealing_state {
+  final List<Dealing_Clients>? listClientsOffline;
+  getListClientsOffline_State({ this.listClientsOffline});
+}
 //*************************** Vendor *******************************
 final class vendor_StateInitial extends dealing_state {}
 final class getListVendor_StateDataChanged extends dealing_state {
@@ -35,7 +41,10 @@ final class getListVendorAsDataSource_StateDataChanged extends dealing_state {
   final List<DropDowenDataSource> filterdLst_VendorAsDataSource;
   getListVendorAsDataSource_StateDataChanged({required this.filterdLst_VendorAsDataSource});
 }
-
+final class getListVendorsOffline_State extends dealing_state {
+  final List<Dealing_Vendors>? listVendorsOffline;
+  getListVendorsOffline_State({ this.listVendorsOffline});
+}
 //*************************** User *******************************
 final class user_StateInitial extends dealing_state {}
 final class getListUser_StateDataChanged extends dealing_state {

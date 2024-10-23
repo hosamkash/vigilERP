@@ -1,4 +1,4 @@
-import '../classModel/Fix_FinacialType.dart';
+import '../classModel/Fix_FinancialType.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -6,11 +6,11 @@ import '../../shared/enumerators.dart';
 import 'ManageBLL.dart';
 
 
-class bllFix_FinacialType
+class bllFix_FinancialType
 	{
-		static List<String> ColumnsName = enTable_Fix_FinacialType.values.map((item) => item.name).toList();
-			static late List<Fix_FinacialType> lstFix_FinacialType = [];
-			static late Fix_FinacialType itemFix_FinacialType;
+		static List<String> ColumnsName = enTable_Fix_FinancialType.values.map((item) => item.name).toList();
+			static late List<Fix_FinancialType> lstFix_FinancialType = [];
+			static late Fix_FinancialType itemFix_FinancialType;
 			static String query = '';
 
 //**************************** general function ****************************
@@ -19,11 +19,11 @@ static Future<int> getMaxID_firestore() async {
 	int maxID = 0;
 	await FirebaseFirestore.instance
 	.collection(en_TablesName.Fix_FinancialType.name)
-	.orderBy(enTable_Fix_FinacialType.ID.name, descending: true)
+	.orderBy(enTable_Fix_FinancialType.ID.name, descending: true)
 	.limit(1).get().then((value) {
 	if (value.docs.isEmpty) {maxID = 1;}
 	else {
-	maxID = value.docs.first.get(enTable_Fix_FinacialType.ID.name);
+	maxID = value.docs.first.get(enTable_Fix_FinancialType.ID.name);
 	maxID += 1;}
 	}).catchError((error) {
 	print(error.toString());  throw error;
@@ -31,7 +31,7 @@ static Future<int> getMaxID_firestore() async {
 	return maxID;
 }
 
-static Future<int> getMax_firestore(enTable_Fix_FinacialType colName, {BLLCondions? condion}) async {
+static Future<int> getMax_firestore(enTable_Fix_FinancialType colName, {BLLCondions? condion}) async {
 	int maxID = 1;
 	QuerySnapshot? snapshot;
 	 try {if (condion != null) {
@@ -54,9 +54,9 @@ static Future<int> getMax_firestore(enTable_Fix_FinacialType colName, {BLLCondio
 //**************************** add & set ****************************
 
 /// هو إسم الكلاس والإضافة بتكون بكون عشوائي ولا يمكن للمستخدم تحديده collection وبيكون ال  FirebaseFirestore تستخدم للإضافة فى
-static Future<String> fire_AddItem(Fix_FinacialType  itemFix_FinacialType) async {
+static Future<String> fire_AddItem(Fix_FinancialType  itemFix_FinancialType) async {
 	String docCreatedName = '';
-	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).add(itemFix_FinacialType.toMap()).then((val) {
+	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).add(itemFix_FinancialType.toMap()).then((val) {
 	docCreatedName = val.id;
 	}).catchError((error) {
 	print(error.toString());  throw error;
@@ -64,9 +64,9 @@ static Future<String> fire_AddItem(Fix_FinacialType  itemFix_FinacialType) async
 	return docCreatedName;
 }
 
-static Future<bool> fire_SetItemMap(String docName, Map<String, dynamic>  itemFix_FinacialType) async {
+static Future<bool> fire_SetItemMap(String docName, Map<String, dynamic>  itemFix_FinancialType) async {
 	bool result = false;
-	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).set(itemFix_FinacialType).then((val) {
+	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).set(itemFix_FinancialType).then((val) {
 	result = true;
 	}).catchError((error) {
 	print(error.toString()); throw error;
@@ -74,9 +74,9 @@ static Future<bool> fire_SetItemMap(String docName, Map<String, dynamic>  itemFi
 	return result;
 }
 
-static Future<bool> fire_SetItem(String docName, Fix_FinacialType  itemFix_FinacialType) async {
+static Future<bool> fire_SetItem(String docName, Fix_FinancialType  itemFix_FinancialType) async {
 	bool result = false;
-	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).set(itemFix_FinacialType.toMap()).then((val) {
+	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).set(itemFix_FinancialType.toMap()).then((val) {
 	result = true;
 	}).catchError((error) {
 	print(error.toString()); throw error;
@@ -86,7 +86,7 @@ static Future<bool> fire_SetItem(String docName, Fix_FinacialType  itemFix_Finac
 
 static Future fire_setListMaster_And_Details(
 	{required String insertdDocID,
-	required Fix_FinacialType  itemFix_FinacialType,
+	required Fix_FinancialType  itemFix_FinancialType,
 	required String collectionDetailsName,
 	required String columnNameAsDocumentDetails,
 	required List<Map<String, dynamic>> detais,
@@ -96,7 +96,7 @@ static Future fire_setListMaster_And_Details(
 	DocumentReference tablemasterDocref = coll.doc(insertdDocID);
 	WriteBatch batch = FirebaseFirestore.instance.batch();
 	// save Master
-	batch.set(tablemasterDocref,  itemFix_FinacialType.toMap());
+	batch.set(tablemasterDocref,  itemFix_FinancialType.toMap());
 	// delete old items it removed from list
 	for (var item in deletedItemsDetais) {
 	DocumentReference itemRefDelete = tablemasterDocref.collection(collectionDetailsName).doc(item[columnNameAsDocumentDetails].toString());
@@ -112,11 +112,11 @@ static Future fire_setListMaster_And_Details(
 }
 
 static Future fire_setListMaster({
-	required List<Fix_FinacialType> lstFix_FinacialType,
+	required List<Fix_FinancialType> lstFix_FinancialType,
 	}) async {
 	CollectionReference coll = FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name);
 	WriteBatch batch = FirebaseFirestore.instance.batch();
-	lstFix_FinacialType.forEach((elm){
+	lstFix_FinancialType.forEach((elm){
 	DocumentReference docRef = coll.doc(elm.ID.toString());
 	batch.set(docRef, elm.toMap());
 	});
@@ -126,41 +126,41 @@ static Future fire_setListMaster({
 
 //**************************** get ****************************
 
-static Future<Fix_FinacialType> fire_getItem(String docName) async {
-	late Fix_FinacialType  itemFix_FinacialType;
+static Future<Fix_FinancialType> fire_getItem(String docName) async {
+	late Fix_FinancialType  itemFix_FinancialType;
 	try { var retValue = await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name).doc(docName).get();
-	 itemFix_FinacialType = Fix_FinacialType();
- itemFix_FinacialType.ID = retValue.data()!['ID']; itemFix_FinacialType.Name = retValue.data()!['Name'];	return  itemFix_FinacialType;
+	 itemFix_FinancialType = Fix_FinancialType();
+ itemFix_FinancialType.ID = retValue.data()!['ID']; itemFix_FinancialType.Name = retValue.data()!['Name'];	return  itemFix_FinancialType;
 	} catch (error) {
 	print(error.toString()); throw error;
 	}
 }
 
-static Future<List<Fix_FinacialType>> fire_getList() async {
+static Future<List<Fix_FinancialType>> fire_getList() async {
 	await FirebaseFirestore.instance
 	.collection(en_TablesName.Fix_FinancialType.name)
 	.get()
 	.then((value) {
-	lstFix_FinacialType.clear();
+	lstFix_FinancialType.clear();
 	value.docs.forEach((element) {
-	lstFix_FinacialType.add(Fix_FinacialType.fromJson(element.data()));
+	lstFix_FinancialType.add(Fix_FinancialType.fromJson(element.data()));
 	});
 	}).catchError((error) {
 print(error.toString()); throw error;
 });
-return lstFix_FinacialType;
+return lstFix_FinancialType;
 }
 
-static Future<List<Fix_FinacialType>> fire_getListByBranch(int branchID , String BranchColumnName) async {
+static Future<List<Fix_FinancialType>> fire_getListByBranch(int branchID , String BranchColumnName) async {
 	await FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name)
 	.where(BranchColumnName, isEqualTo: branchID).get()
-	.then((value) {lstFix_FinacialType.clear();value.docs.forEach((element) {
-	lstFix_FinacialType.add(Fix_FinacialType.fromJson(element.data()));});
+	.then((value) {lstFix_FinancialType.clear();value.docs.forEach((element) {
+	lstFix_FinancialType.add(Fix_FinancialType.fromJson(element.data()));});
 	}).catchError((error) {print(error.toString());throw error;});
-	return lstFix_FinacialType;
+	return lstFix_FinancialType;
 }
 
-static Future<List<Fix_FinacialType>> fire_getListWithConditions({List<BLLCondions>? conditions}) async {
+static Future<List<Fix_FinancialType>> fire_getListWithConditions({List<BLLCondions>? conditions}) async {
 	CollectionReference colRef = FirebaseFirestore.instance.collection(en_TablesName.Fix_FinancialType.name);
 	Query query = colRef;
 	  if (conditions != null) {
@@ -190,10 +190,10 @@ static Future<List<Fix_FinacialType>> fire_getListWithConditions({List<BLLCondio
 	}
 }
 	QuerySnapshot snap = await query.get();
-	lstFix_FinacialType.clear();
+	lstFix_FinancialType.clear();
 	snap.docs.forEach((element) {
-	lstFix_FinacialType.add(Fix_FinacialType.fromJson(element.data() as Map<String, dynamic> )); });
-	return lstFix_FinacialType;
+	lstFix_FinancialType.add(Fix_FinancialType.fromJson(element.data() as Map<String, dynamic> )); });
+	return lstFix_FinancialType;
 }
 
 

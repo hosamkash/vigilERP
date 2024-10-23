@@ -82,6 +82,10 @@ final class getListTreasure_StateDataChanged extends definition_state {
   final List<Def_Treasures> filterdLst_Treasure;
   getListTreasure_StateDataChanged({required this.filterdLst_Treasure});
 }
+final class getListTreasureAsDataSource_State  extends definition_state {
+  List<DropDowenDataSource> lstTreasureAsDataSource = [];
+  getListTreasureAsDataSource_State({required this.lstTreasureAsDataSource});
+}
 
 //*************************** Product *******************************
 final class product_StateInitial  extends definition_state {}

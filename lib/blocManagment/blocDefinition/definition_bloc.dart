@@ -391,12 +391,10 @@ class job_bloc extends Bloc<definition_event, definition_state> {
       if (event is getListJobs_Event) {
         await getList_Job();
         emit(getListJobs_StateDataChanged(filterdLst_Jobs: filterdLst_Job));
-      }
-      else if (event is getListJobsAsDataSource_Event) {
+      } else if (event is getListJobsAsDataSource_Event) {
         await getLstJobsAsDataSource(condions: event.condions);
         emit(getListJobsAsDataSource_StateDataChanged(lst_JobsAsDataSource: LstJobsAsDataSource));
-      }
-      else if (event is filterAnyJobs_Event) {
+      } else if (event is filterAnyJobs_Event) {
         await filterAny_Job(filterData: event.filterData);
         emit(getListJobs_StateDataChanged(filterdLst_Jobs: filterdLst_Job));
       } else if (event is resetFilterJobs_Event) {
@@ -446,9 +444,9 @@ class financialCluses_bloc extends Bloc<definition_event, definition_state> {
 
   Future getLstFinancialAsDataSource({List<BLLCondions>? condions}) async {
     LstFinancialClusesAsDataSource.clear();
-    if (bllDef_FinancialCluses.lstDef_FinancialCluses.length == 0) {
+    // if (bllDef_FinancialCluses.lstDef_FinancialCluses.length == 0) {
       await getList_FinancialCluses(condions: condions);
-    }
+    // }
     for (var item in bllDef_FinancialCluses.lstDef_FinancialCluses) {
       LstFinancialClusesAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
     }
@@ -723,13 +721,18 @@ class treasure_bloc extends Bloc<definition_event, definition_state> {
     filterdLst_Treasure = await bllDef_Treasures.lstDef_Treasures;
   }
 
-  Future getLstTreasureAsDataSource({List<BLLCondions>? condions}) async {
+  Future getList_TreasureAsDataSource({int? branchID, List<BLLCondions>? condions}) async {
     LstTreasuresAsDataSource.clear();
     if (bllDef_Treasures.lstDef_Treasures.length == 0) {
       await getList_Treasure(condions: condions);
     }
+    // for (var item in bllDef_Treasures.lstDef_Treasures.where((elm) {
+    //   return elm.IDBranch == branchID;
+    // }).toList()) {
+    //   LstTreasuresAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!, branchID: item.IDBranch));
+    // }
     for (var item in bllDef_Treasures.lstDef_Treasures) {
-      LstTreasuresAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!));
+      LstTreasuresAsDataSource.add(DropDowenDataSource(valueMember: item.ID!, displayMember: item.Name!, branchID: item.IDBranch));
     }
   }
 
@@ -748,6 +751,9 @@ class treasure_bloc extends Bloc<definition_event, definition_state> {
       if (event is getListTreasure_Event) {
         await getList_Treasure();
         emit(getListTreasure_StateDataChanged(filterdLst_Treasure: filterdLst_Treasure));
+      } else if (event is getListTreasureAsDataSource_Event) {
+        await getList_TreasureAsDataSource(branchID: event.branchID );
+        emit(getListTreasureAsDataSource_State(lstTreasureAsDataSource: LstTreasuresAsDataSource));
       } else if (event is filterAnyTreasure_Event) {
         await filterAnyTreasure_Event(filterData: event.filterData);
         emit(getListTreasure_StateDataChanged(filterdLst_Treasure: filterdLst_Treasure));

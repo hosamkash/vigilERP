@@ -98,11 +98,7 @@ class getLstStocksAsDataSource_Event extends definition_event {
   int? branchID2 ;
   getLstStocksAsDataSource_Event({this.branchID  ,this.branchID2  ,this.condions});
 }
-// class getLstStocksOtherAsDataSource_Event extends definition_event {
-//   List<BLLCondions>? condions  ;
-//   int? branchID ;
-//   getLstStocksOtherAsDataSource_Event({this.branchID  ,this.condions});
-// }
+
 
 // class getStocksByBranchID_Event extends definition_event {
 //   final int? branchID;
@@ -118,6 +114,11 @@ class resetFilterTreasure_Event extends definition_event {}
 class filterAnyTreasure_Event extends definition_event {
   final String? filterData;
   filterAnyTreasure_Event({ this.filterData});
+}
+class getListTreasureAsDataSource_Event extends definition_event {
+  List<BLLCondions>? condions  ;
+  int? branchID ;
+  getListTreasureAsDataSource_Event({this.branchID  ,this.condions});
 }
 
 //*************************** Product *******************************
