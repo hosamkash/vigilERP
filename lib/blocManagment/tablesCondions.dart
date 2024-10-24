@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:vigil_erp/bll/classModel/Fina_ClosedTreasure.dart';
+import 'package:vigil_erp/bll/classModel/Fina_Exchange.dart';
+import 'package:vigil_erp/bll/classModel/Fina_Supplay.dart';
+import 'package:vigil_erp/bll/classModel/Fina_Transfere.dart';
+import 'package:vigil_erp/bll/classModel/Fina_TreasuryMovementFull.dart';
 import 'package:vigil_erp/bll/classModel/HR_Advances.dart';
 import 'package:vigil_erp/bll/classModel/HR_Bonus.dart';
 import 'package:vigil_erp/bll/classModel/HR_Discount.dart';
@@ -175,6 +180,69 @@ class tablesCondions {
     }
 
 
+    //****************************** Financial
+    List<BLLCondions> getCondions_Fina_Exchange() {
+      cond.clear();
+      if (branchID != null) {
+        cond.add(BLLCondions(enTable_Fina_Exchange.IDBranch.name, en_CondionsWhere.isEqualTo, branchID));
+      }
+      if (!isGetAllDates) {
+        cond.add(BLLCondions(enTable_Fina_Exchange.Date.name, en_CondionsWhere.isGreaterThanOrEqualTo, contDateFrom.text));
+        cond.add(BLLCondions(enTable_Fina_Exchange.Date.name, en_CondionsWhere.isLessThanOrEqualTo, contDateTo.text));
+      }
+      return cond;
+    }
+
+    List<BLLCondions> getCondions_Fina_Supplay() {
+      cond.clear();
+      if (branchID != null) {
+        cond.add(BLLCondions(enTable_Fina_Supplay.IDBranch.name, en_CondionsWhere.isEqualTo, branchID));
+      }
+      if (!isGetAllDates) {
+        cond.add(BLLCondions(enTable_Fina_Supplay.Date.name, en_CondionsWhere.isGreaterThanOrEqualTo, contDateFrom.text));
+        cond.add(BLLCondions(enTable_Fina_Supplay.Date.name, en_CondionsWhere.isLessThanOrEqualTo, contDateTo.text));
+      }
+      return cond;
+    }
+
+    List<BLLCondions> getCondions_Fina_Transfere() {
+      cond.clear();
+      if (branchID != null) {
+        cond.add(BLLCondions(enTable_Fina_Transfere.IDBranchFrom.name, en_CondionsWhere.isEqualTo, branchID));
+      }
+      if (!isGetAllDates) {
+        cond.add(BLLCondions(enTable_Fina_Transfere.Date.name, en_CondionsWhere.isGreaterThanOrEqualTo, contDateFrom.text));
+        cond.add(BLLCondions(enTable_Fina_Transfere.Date.name, en_CondionsWhere.isLessThanOrEqualTo, contDateTo.text));
+      }
+      return cond;
+    }
+
+    List<BLLCondions> getCondions_Fina_ClosedTreasure() {
+      cond.clear();
+      if (branchID != null) {
+        cond.add(BLLCondions(enTable_Fina_ClosedTreasure.IDBranchFrom.name, en_CondionsWhere.isEqualTo, branchID));
+      }
+      if (!isGetAllDates) {
+        cond.add(BLLCondions(enTable_Fina_ClosedTreasure.Date.name, en_CondionsWhere.isGreaterThanOrEqualTo, contDateFrom.text));
+        cond.add(BLLCondions(enTable_Fina_ClosedTreasure.Date.name, en_CondionsWhere.isLessThanOrEqualTo, contDateTo.text));
+      }
+      return cond;
+    }
+
+    List<BLLCondions> getCondions_Fina_TreasurMovement() {
+      cond.clear();
+      if (branchID != null) {
+         cond.add(BLLCondions(enTable_Fina_TreasuryMovementFull.IDBranch.name, en_CondionsWhere.isEqualTo, branchID));
+      }
+      if (!isGetAllDates) {
+        cond.add(BLLCondions(enTable_Fina_TreasuryMovementFull.Date.name, en_CondionsWhere.isGreaterThanOrEqualTo, contDateFrom.text));
+        cond.add(BLLCondions(enTable_Fina_TreasuryMovementFull.Date.name, en_CondionsWhere.isLessThanOrEqualTo, contDateTo.text));
+      }
+      return cond;
+    }
+
+
+
 
     //****************************** inventory
     if (tableName == en_TablesName.Inv_PermissionAdd) {
@@ -219,6 +287,23 @@ class tablesCondions {
       getCondions_HR_Advances();
     }
 
+
+    //****************************** Financial
+    else if (tableName == en_TablesName.Fina_Exchange) {
+      getCondions_Fina_Exchange();
+    }
+    else if (tableName == en_TablesName.Fina_Supplay) {
+      getCondions_Fina_Supplay();
+    }
+    else if (tableName == en_TablesName.Fina_Transfere) {
+      getCondions_Fina_Transfere();
+    }
+    else if (tableName == en_TablesName.Fina_ClosedTreasure) {
+      getCondions_Fina_ClosedTreasure();
+    }
+    else if (tableName == en_TablesName.Fina_TreasurMovement) {
+      getCondions_Fina_TreasurMovement();
+    }
 
 
 

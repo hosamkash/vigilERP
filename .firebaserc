@@ -2,7 +2,8 @@
   "projects": {
     "firebase deploy --only firestore:indexes": "vigilerp",
     "vigilerp": "vigilerp",
-    "vigil": "vigilerp"
+    "vigil": "vigilerp",
+    "default": "vigilerp"
   },
   "targets": {},
   "etags": {},

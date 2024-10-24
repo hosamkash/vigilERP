@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vigil_erp/blocManagment/blocHR/hr_bloc.dart';
 import 'package:vigil_erp/blocManagment/blocInvoices/invoic_bloc.dart';
+import 'package:vigil_erp/blocManagment/bloc_Financial/financial_bloc.dart';
 import 'package:vigil_erp/shared/sharedDesigne.dart';
 import 'package:vigil_erp/shared/sharedFunctions.dart';
 
@@ -174,6 +175,57 @@ class sharedControls {
               ],
             ),
           ],
+        );
+      },
+    );
+  }
+
+  static Future<void> showScreenAsDialog(
+    context,
+    Widget page,
+  ) {
+    return showDialog(
+      context: context,
+      useSafeArea: true,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content:  page,
+
+          // actions: [
+          //   Column(
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: [
+          //       page,
+          //       SizedBox(height: 10),
+          //       // Row(
+          //       //   children: [
+          //       //     ElevatedButton.icon(
+          //       //       label: Text(textButtonOk ?? 'تأكيد', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          //       //       icon: const Icon(Icons.delete_forever),
+          //       //       iconAlignment: IconAlignment.end,
+          //       //       style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 3),
+          //       //       onPressed: () {
+          //       //         OnDeleted();
+          //       //         Navigator.of(context).pop();
+          //       //       },
+          //       //     ),
+          //       //     const SizedBox(width: 10),
+          //       //     ElevatedButton.icon(
+          //       //       label: Text(textButtonCancle ?? 'الغاء', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          //       //       icon: const Icon(Icons.cancel),
+          //       //       iconAlignment: IconAlignment.end,
+          //       //       style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 3),
+          //       //       onPressed: () {
+          //       //         Navigator.of(context).pop();
+          //       //       },
+          //       //     ),
+          //       //   ],
+          //       // ),
+          //     ],
+          //   ),
+          // ],
         );
       },
     );
@@ -362,50 +414,38 @@ class sharedControls {
                 ),
                 Row(
                   children: [
-
                     TextButton(
                         onPressed: () {
                           contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
                           contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
                         },
                         child: Text('يوم', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold))),
-
                     TextButton(
                         onPressed: () {
-                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
-                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 7)));
+                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 7)));
+                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
                         },
                         child: Text('أسبوع', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold))),
                     TextButton(
                         onPressed: () {
-                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
-                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 30)));
+                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 30)));
+                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
                         },
                         child: Text('شهر', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold))),
                     TextButton(
                         onPressed: () {
-                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
-                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 365)));
+                          contDateFrom.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now().subtract(Duration(days: 365)));
+                          contDateTo.text = sharedFunctions_Dates.convertToShortDateString(DateTime.now());
                         },
                         child: Text('سنة', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold))),
                   ],
                 ),
-                ctr_Date( 
+                ctr_Date(
                   text: 'من تاريخ',
                   dtController: contDateFrom,
                   padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 10),
                   isReadOnly: true,
                   isOpenSelectorOnTap: isEnableDates,
-                  // defaultValue: contDateFrom.text,
-                  // OnChanged: (val) {
-                  //   return val;
-                  // },
-                  // OnValidate: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'لابد من إختيار قيمة';
-                  //   }
-                  //   return null;
-                  // },
                 ),
                 ctr_Date(
                   text: 'إلى تاريخ',
@@ -413,22 +453,12 @@ class sharedControls {
                   padding: EdgeInsets.only(right: 5, left: 5, top: 0, bottom: 10),
                   isReadOnly: true,
                   isOpenSelectorOnTap: isEnableDates,
-                  // OnChanged: (val) {
-                  //   return val;
-                  // },
-                  // OnValidate: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'لابد من إختيار قيمة';
-                  //   }
-                  //   return null;
-                  // },
                 ),
                 Center(
                   child: Row(
                     children: [
                       TextButton(
                         onPressed: () async {
-
                           var cond = await tablesCondions.createCondionsByDates(tableName, branchID, contDateFrom, contDateTo, isGetAllDates);
 
                           //****************************** inventory
@@ -456,22 +486,35 @@ class sharedControls {
                           //****************************** HR
                           else if (tableName == en_TablesName.HR_Bonus) {
                             bonus_bloc.instance.add(getListBonus_Event(conditions: cond));
-                          }
-                          else if (tableName == en_TablesName.HR_Discount) {
+                          } else if (tableName == en_TablesName.HR_Discount) {
                             discount_bloc.instance.add(getListDiscount_Event(conditions: cond));
-                          }
-                          else if (tableName == en_TablesName.HR_Withdrwals) {
+                          } else if (tableName == en_TablesName.HR_Withdrwals) {
                             withdrwals_bloc.instance.add(getListWithdrwals_Event(conditions: cond));
-                          }
-                          else if (tableName == en_TablesName.HR_Advances) {
+                          } else if (tableName == en_TablesName.HR_Advances) {
                             advances_bloc.instance.add(getListAdvances_Event(conditions: cond));
                           }
 
+                          //****************************** Financial
+                          else if (tableName == en_TablesName.Fina_Exchange) {
+                            exchange_bloc.instance.add(getListExchange_Event(conditions: cond));
+                          } else if (tableName == en_TablesName.Fina_Supplay) {
+                            supplay_bloc.instance.add(getListSupplay_Event(conditions: cond));
+                          } else if (tableName == en_TablesName.Fina_Transfere) {
+                            transfereMony_bloc.instance.add(getListTransfereMony_Event(conditions: cond));
+                          } else if (tableName == en_TablesName.Fina_ClosedTreasure) {
+                            closedTreasure_bloc.instance.add(getListClosedTreasure_Event(conditions: cond));
+                          }
+                          // else if (tableName == en_TablesName.Fina_TreasurMovement) {
+                          //   exchange_bloc.instance.add(getListExchange_Event(conditions: cond));
+                          //   supplay_bloc.instance.add(getListSupplay_Event(conditions: cond));
+                          // }
 
 
 
                           //**************************************************************************************
                           List<dynamic> dates = [isGetAllDates, contDateFrom.text, contDateTo.text, branchID];
+                          if (tableName == en_TablesName.Fina_TreasurMovement)
+                            dates = cond;
                           Navigator.pop(context, dates);
                         },
                         child: Text('تأكيد', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),

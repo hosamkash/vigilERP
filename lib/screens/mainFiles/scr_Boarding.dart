@@ -48,93 +48,95 @@ class scr_Boarding extends StatelessWidget {
   Widget buildPageItem(context, pageItem item) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: Column(children: [
-        Stack(
-          alignment: AlignmentDirectional.center,
-          children: [
-            SizedBox(height: 600),
-            Image(
-              image: AssetImage(item.image),
-              width: double.infinity,
-            ),
-            Positioned(
-                top: 10,
-                left: -10,
-                child: MaterialButton(
-                  onPressed: () {
-                    sharedHive.saveData(en_AppKey.isSkipBoarding.name, true);
-                    sharedControls.navigatToAndFinish(context, scr_HomepageSlider());
-                  },
-                  child: Text(
-                    'تخطي',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: sharedDesigne.primaryColor, fontSize: 20),
-                  ),
-                )),
-            const Positioned(
-              top: 60,
-              child: Text(
-                'مكة ستار',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25),
+      child: SingleChildScrollView(
+        child: Column(children: [
+          Stack(
+            alignment: AlignmentDirectional.center,
+            children: [
+              SizedBox(height: 600),
+              Image(
+                image: AssetImage(item.image),
+                width: double.infinity,
               ),
-            ),
-            Positioned(
-              top: 100,
-              child: Text(
-                item.title,
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 35),
-              ),
-            ),
-            Positioned(
-              bottom: 120,
-              child: Container(
-                width: 300,
-                child: Text(
-                  textDirection: TextDirection.rtl,
-                  item.body,
-                  // textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 20),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 30,
-              left: 10,
-              child: Row(
-                children: [
-                  MaterialButton(
+              Positioned(
+                  top: 10,
+                  left: -10,
+                  child: MaterialButton(
                     onPressed: () {
-                      if (pageController.page == 2) {
-                        sharedHive.saveData(en_AppKey.isSkipBoarding.name, true);
-                        sharedControls.navigatToAndFinish(context, scr_Homepage());
-                      } else
-                        pageController.nextPage(duration: Duration(seconds: 1), curve: Curves.linear);
+                      sharedHive.saveData(en_AppKey.isSkipBoarding.name, true);
+                      sharedControls.navigatToAndFinish(context, scr_HomepageSlider());
                     },
-                    child: const Text(
-                      'التالي',
+                    child: Text(
+                      'تخطي',
                       style: TextStyle(fontWeight: FontWeight.bold, color: sharedDesigne.primaryColor, fontSize: 20),
                     ),
-                  ),
-                  const Icon(Icons.arrow_forward ,color: sharedDesigne.primaryColor,size: 30,),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 45,
-              right: 10,
-              child: SmoothPageIndicator(
-                effect: ExpandingDotsEffect(
-                  activeDotColor: sharedDesigne.primaryColor,
+                  )),
+              const Positioned(
+                top: 60,
+                child: Text(
+                  'مكة ستار',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 25),
                 ),
-                controller: pageController,
-                count: 3,
-                onDotClicked: (index) => ActionChip.elevated,
               ),
-            ),
-          ],
-        ),
-      ]),
+              Positioned(
+                top: 100,
+                child: Text(
+                  item.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 35),
+                ),
+              ),
+              Positioned(
+                bottom: 120,
+                child: Container(
+                  width: 300,
+                  child: Text(
+                    textDirection: TextDirection.rtl,
+                    item.body,
+                    // textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 20),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 30,
+                left: 10,
+                child: Row(
+                  children: [
+                    MaterialButton(
+                      onPressed: () {
+                        if (pageController.page == 2) {
+                          sharedHive.saveData(en_AppKey.isSkipBoarding.name, true);
+                          sharedControls.navigatToAndFinish(context, scr_Homepage());
+                        } else
+                          pageController.nextPage(duration: Duration(seconds: 1), curve: Curves.linear);
+                      },
+                      child: const Text(
+                        'التالي',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: sharedDesigne.primaryColor, fontSize: 20),
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward ,color: sharedDesigne.primaryColor,size: 30,),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 45,
+                right: 10,
+                child: SmoothPageIndicator(
+                  effect: ExpandingDotsEffect(
+                    activeDotColor: sharedDesigne.primaryColor,
+                  ),
+                  controller: pageController,
+                  count: 3,
+                  onDotClicked: (index) => ActionChip.elevated,
+                ),
+              ),
+            ],
+          ),
+        ]),
+      ),
     );
   }
 }

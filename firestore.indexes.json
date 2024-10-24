@@ -160,8 +160,34 @@
         {"fieldPath": "IDBranch","order": "ASCENDING" },
         {"fieldPath": "Date","order": "ASCENDING"}
       ]
-    }
+    },
 
+
+
+    {
+      "collectionGroup": "Fina_Exchange",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "Fina_Supplay",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranch","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "Fina_Transfere",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "IDBranchFrom","order": "ASCENDING" },
+        {"fieldPath": "Date","order": "ASCENDING"}
+      ]
+    }
 
 
 

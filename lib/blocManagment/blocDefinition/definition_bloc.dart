@@ -464,9 +464,10 @@ class financialCluses_bloc extends Bloc<definition_event, definition_state> {
   String getNameByID(int? ID) {
     String ret = '';
     if (bllDef_FinancialCluses.lstDef_FinancialCluses.isNotEmpty && ID != null) {
-      ret = bllDef_FinancialCluses.lstDef_FinancialCluses.firstWhere((elm) {
+      var xx = bllDef_FinancialCluses.lstDef_FinancialCluses.where((elm) {
         return elm.ID == ID;
-      }).Name!;
+      }).toList();
+      ret = xx.length >0 ? xx[0].Name! : '';
     }
     return ret;
   }

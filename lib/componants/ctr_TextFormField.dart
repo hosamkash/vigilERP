@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class ctr_TextFormField extends StatefulWidget {
@@ -15,9 +16,11 @@ class ctr_TextFormField extends StatefulWidget {
   late TextStyle? labelStyle;
   late Widget? PrefixIcon;
   late EdgeInsets? padding;
+
   // double? height;
   late bool? autoSelectData;
   late bool? readOnly;
+  late bool? isdigitsOnly;
   late bool? useAsBarcodeControle;
   late int? maxLines;
   late int? minLines;
@@ -46,6 +49,7 @@ class ctr_TextFormField extends StatefulWidget {
     // this.height = 50,
     this.autoSelectData,
     this.readOnly,
+    this.isdigitsOnly = false,
     this.useAsBarcodeControle,
     this.maxLines,
     this.minLines,
@@ -81,6 +85,7 @@ class _ctr_TextFormFieldState extends State<ctr_TextFormField> {
               maxLines: widget.maxLines,
               minLines: widget.minLines,
               focusNode: widget.focusNode,
+              inputFormatters: widget.isdigitsOnly != null && widget.isdigitsOnly! ? [FilteringTextInputFormatter.digitsOnly] : [],
               decoration: InputDecoration(
                 label: Text(widget.Lable),
                 labelStyle: widget.labelStyle ?? const TextStyle(fontSize: 17, color: Colors.grey),
@@ -93,7 +98,7 @@ class _ctr_TextFormFieldState extends State<ctr_TextFormField> {
                 contentPadding: EdgeInsets.symmetric(vertical: 0.3, horizontal: 2), // حشوة داخلية ثابتة
               ),
 
-               validator: widget.OnValidate,
+              validator: widget.OnValidate,
               // validator: (val) {
               //   setState(() {
               //     if (val == null || val.isEmpty) {

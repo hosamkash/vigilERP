@@ -282,7 +282,7 @@ class _scr_SupplayItemState extends State<scr_SupplayItem> {
                   child: ctr_TextFormField(
                     Controller: contDealingBalanceBefor,
                     padding: EdgeInsets.only(right: 0, left: 5),
-                    Lable: 'رصيد ${dealingType_bloc.instance.getNameByID(1)}',
+                    Lable: 'رصيد ${dealingType_bloc.instance.getNameByID(dealingTypeID)}',
                     TextType: const TextInputType.numberWithOptions(decimal: true),
                     readOnly: true,
                     textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.blue[800]),

@@ -80,6 +80,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => financialType_bloc()),
         BlocProvider(create: (context) => exchange_bloc()),
         BlocProvider(create: (context) => supplay_bloc()),
+        BlocProvider(create: (context) => transfereMony_bloc()),
+        BlocProvider(create: (context) => treasurMovement_bloc()),
+        BlocProvider(create: (context) => closedTreasure_bloc()),
       ],
       child: BlocConsumer<cubitGeneral, cubitStates>(
         listener: (context, state) => state_InitialApp(),
@@ -127,6 +130,9 @@ class MyApp extends StatelessWidget {
           financialType_bloc.cretaeInctance(context);
           exchange_bloc.cretaeInctance(context);
           supplay_bloc.cretaeInctance(context);
+          transfereMony_bloc.cretaeInctance(context);
+          treasurMovement_bloc.cretaeInctance(context);
+          closedTreasure_bloc.cretaeInctance(context);
 
           //*************************************
           cubitGeneral.get(context);

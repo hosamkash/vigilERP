@@ -3,6 +3,10 @@ import 'package:vigil_erp/screens/financial/1-Exchange/scr_ExchangeView.dart';
 import 'package:vigil_erp/shared/shared_controls.dart';
 
 import '../financial/2-Supplay/scr_SupplayView.dart';
+import '../financial/3-MonyCount/scr_MonyCount.dart';
+import '../financial/4-Transfere/scr_TransfereView.dart';
+import '../financial/5-TreasuryMovement/scr_TreasuryMovementView.dart';
+import '../financial/6-ClosedTreasure/scr_ClosedTreasureView.dart';
 
 class scr_FinancialTools extends StatefulWidget {
   scr_FinancialTools({super.key});
@@ -78,7 +82,7 @@ class _scr_FinancialToolsState extends State<scr_FinancialTools> {
               ),
               InkWell(
                 onTap: () async {
-                   sharedControls.navigatTo(context, scr_SupplayView());
+                  sharedControls.navigatTo(context, scr_SupplayView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -106,7 +110,36 @@ class _scr_FinancialToolsState extends State<scr_FinancialTools> {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                  sharedControls.navigatTo(context, scr_MonyCount());
+                },
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+                  ),
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.home,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                      Text(
+                        'عد النقدية',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              InkWell(
+                onTap: () async {
+                  sharedControls.navigatTo(context, scr_TreasuryMovementView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -134,7 +167,7 @@ class _scr_FinancialToolsState extends State<scr_FinancialTools> {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                  sharedControls.navigatTo(context, scr_TransfereView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -162,7 +195,7 @@ class _scr_FinancialToolsState extends State<scr_FinancialTools> {
               ),
               InkWell(
                 onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+                  sharedControls.navigatTo(context, scr_ClosedTreasureView());
                 },
                 child: Container(
                   decoration: const BoxDecoration(
@@ -216,90 +249,91 @@ class _scr_FinancialToolsState extends State<scr_FinancialTools> {
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-                },
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.amberAccent,
-                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      Text(
-                        'شيكات الدفع - الصادرة',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-                },
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.amberAccent,
-                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      Text(
-                        'شيكات القبض - الواردة',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () async {
-                  // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
-                },
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.amberAccent,
-                    borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      Text(
-                        'حركة الشيكات',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              // InkWell(
+              //   onTap: () async {
+              //     // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+              //   },
+              //   child: Container(
+              //     decoration: const BoxDecoration(
+              //       color: Colors.amberAccent,
+              //       borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+              //     ),
+              //     child: const Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Icon(
+              //           Icons.home,
+              //           color: Colors.white,
+              //           size: 40,
+              //         ),
+              //         Text(
+              //           'شيكات الدفع - الصادرة',
+              //           textAlign: TextAlign.center,
+              //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              //           maxLines: 2,
+              //           overflow: TextOverflow.ellipsis,
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              // InkWell(
+              //   onTap: () async {
+              //     // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+              //   },
+              //   child: Container(
+              //     decoration: const BoxDecoration(
+              //       color: Colors.amberAccent,
+              //       borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+              //
+              //     ),
+              //     child: const Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Icon(
+              //           Icons.home,
+              //           color: Colors.white,
+              //           size: 40,
+              //         ),
+              //         Text(
+              //           'شيكات القبض - الواردة',
+              //           textAlign: TextAlign.center,
+              //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              //           maxLines: 2,
+              //           overflow: TextOverflow.ellipsis,
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              // InkWell(
+              //   onTap: () async {
+              //     // sharedControls.navigatTo(context, scr_InvoicesRepresentView());
+              //   },
+              //   child: Container(
+              //     decoration: const BoxDecoration(
+              //       color: Colors.amberAccent,
+              //       borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+              //     ),
+              //     child: const Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Icon(
+              //           Icons.home,
+              //           color: Colors.white,
+              //           size: 40,
+              //         ),
+              //         Text(
+              //           'حركة الشيكات',
+              //           textAlign: TextAlign.center,
+              //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              //           maxLines: 2,
+              //           overflow: TextOverflow.ellipsis,
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
